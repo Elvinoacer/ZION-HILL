@@ -1,0 +1,394 @@
+"use client";
+import { useSession } from "next-auth/react";
+import React, { useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useDashboardStore } from "@/store/dashboardStore";
+import { Icons } from "@/components/icons";
+
+const DashboardPage = () => {
+  const { data: session } = useSession();
+  const {
+    profile,
+    upcomingEvents,
+    recentSermons,
+    givingHistory,
+    bibleStudyProgress,
+    prayerRequests,
+    loading,
+    error,
+    fetchDashboardData,
+  } = useDashboardStore();
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchDashboardData(session.user.id);
+    }
+  }, [session, fetchDashboardData]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col items-center justify-center space-y-6 h-[60vh]">
+            <Icons.spinner className="h-12 w-12 animate-spin text-blue-600" />
+            <div className="text-center space-y-2">
+              <h1 className="text-3xl font-bold text-slate-800">
+                Loading your spiritual journey
+              </h1>
+              <p className="text-lg text-slate-600">
+                Gathering your personalized dashboard...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white p-8 rounded-xl shadow-sm max-w-2xl mx-auto">
+            <div className="text-center space-y-6">
+              <div className="inline-flex items-center justify-center bg-red-100 p-4 rounded-full">
+                <Icons.warning className="h-8 w-8 text-red-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-slate-800">
+                Something went wrong
+              </h1>
+              <p className="text-slate-600">{error}</p>
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                Try Again
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold text-slate-800 tracking-tight">
+            Spiritual Dashboard
+          </h1>
+          <p className="text-xl text-slate-600">
+            Welcome back,{" "}
+            <span className="text-blue-600 font-semibold">
+              {profile?.name || "Beloved"}
+            </span>
+            . May your day be blessed.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Profile Card */}
+          <Card className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition-all">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-slate-50 border-b border-slate-100">
+              <div className="flex items-center space-x-4">
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <Icons.user className="h-5 w-5 text-blue-600" />
+                </div>
+                <CardTitle className="text-lg font-semibold text-slate-800">
+                  Your Profile
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {profile ? (
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <Icons.userCircle className="h-5 w-5 text-slate-400" />
+                    <span className="text-slate-700">{profile.name}</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Icons.mail className="h-5 w-5 text-slate-400" />
+                    <span className="text-slate-700">{profile.email}</span>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-slate-400 italic">
+                  No profile data available
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Upcoming Events */}
+          <Card className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition-all">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-slate-50 border-b border-slate-100">
+              <div className="flex items-center space-x-4">
+                <div className="bg-purple-100 p-3 rounded-full">
+                  <Icons.calendar className="h-5 w-5 text-purple-600" />
+                </div>
+                <CardTitle className="text-lg font-semibold text-slate-800">
+                  Upcoming Events
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {upcomingEvents.length > 0 ? (
+                <ul className="space-y-4">
+                  {upcomingEvents.map((event) => (
+                    <li key={event.id} className="flex items-start space-x-3">
+                      <div className="bg-purple-50 p-2 rounded-lg">
+                        <div className="text-center">
+                          <div className="text-sm font-medium text-purple-800">
+                            {new Date(event.date).toLocaleDateString("en-US", {
+                              month: "short",
+                            })}
+                          </div>
+                          <div className="text-xl font-bold text-purple-600">
+                            {new Date(event.date).getDate()}
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-slate-800">
+                          {event.title}
+                        </h3>
+                        <p className="text-sm text-slate-500">
+                          {event.location || "Church Venue"}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 space-y-2">
+                  <Icons.calendarOff className="h-8 w-8 text-slate-300" />
+                  <p className="text-slate-400">No upcoming events</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recent Sermons */}
+          <Card className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition-all">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-slate-50 border-b border-slate-100">
+              <div className="flex items-center space-x-4">
+                <div className="bg-amber-100 p-3 rounded-full">
+                  <Icons.audioLines className="h-5 w-5 text-amber-600" />
+                </div>
+                <CardTitle className="text-lg font-semibold text-slate-800">
+                  Recent Sermons
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {recentSermons.length > 0 ? (
+                <ul className="space-y-4">
+                  {recentSermons.map((sermon) => (
+                    <li key={sermon.id} className="group">
+                      <div className="flex items-start space-x-3 p-2 rounded-lg group-hover:bg-slate-50 transition-colors">
+                        <div className="bg-amber-50 p-2 rounded-lg">
+                          <Icons.playCircle className="h-5 w-5 text-amber-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-slate-800 truncate">
+                            {sermon.title}
+                          </h3>
+                          <p className="text-sm text-slate-500">
+                            {sermon.speaker?.name || "Pastor"} •{" "}
+                            {new Date(sermon.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-blue-600"
+                        >
+                          Listen
+                        </Button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 space-y-2">
+                  <Icons.audioLinesOff className="h-8 w-8 text-slate-300" />
+                  <p className="text-slate-400">No recent sermons</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Giving History */}
+          <Card className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition-all">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-slate-50 border-b border-slate-100">
+              <div className="flex items-center space-x-4">
+                <div className="bg-emerald-100 p-3 rounded-full">
+                  <Icons.handCoins className="h-5 w-5 text-emerald-600" />
+                </div>
+                <CardTitle className="text-lg font-semibold text-slate-800">
+                  Giving History
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {givingHistory.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-medium text-slate-800">
+                      Recent Contributions
+                    </h3>
+                    <span className="text-sm font-medium text-emerald-600">
+                      Total: $
+                      {givingHistory
+                        .reduce((sum, item) => sum + item.amount, 0)
+                        .toFixed(2)}
+                    </span>
+                  </div>
+                  <ul className="space-y-3">
+                    {givingHistory.slice(0, 3).map((transaction) => (
+                      <li
+                        key={transaction.id}
+                        className="flex justify-between items-center"
+                      >
+                        <div>
+                          <p className="font-medium text-slate-800">
+                            {transaction.description || "General Donation"}
+                          </p>
+                          <p className="text-sm text-slate-500">
+                            {new Date(transaction.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span className="font-semibold text-emerald-600">
+                          ${transaction.amount.toFixed(2)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  {givingHistory.length > 3 && (
+                    <Button variant="ghost" className="w-full text-blue-600">
+                      View All
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 space-y-2">
+                  <Icons.piggyBank className="h-8 w-8 text-slate-300" />
+                  <p className="text-slate-400">No giving history yet</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Bible Study Progress */}
+          <Card className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition-all">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-slate-50 border-b border-slate-100">
+              <div className="flex items-center space-x-4">
+                <div className="bg-indigo-100 p-3 rounded-full">
+                  <Icons.bookOpen className="h-5 w-5 text-indigo-600" />
+                </div>
+                <CardTitle className="text-lg font-semibold text-slate-800">
+                  Bible Study
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {bibleStudyProgress ? (
+                <div className="space-y-4">
+                  <h3 className="font-medium text-slate-800">
+                    {bibleStudyProgress.title}
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm text-slate-600">
+                      <span>Progress</span>
+                      <span>{bibleStudyProgress.progress || 0}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-indigo-500 to-blue-500 h-2 rounded-full transition-all duration-500"
+                        style={{
+                          width: `${bibleStudyProgress.progress || 0}%`,
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
+                    Continue Study
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <Icons.bookOpenCheck className="h-8 w-8 text-slate-300" />
+                  <p className="text-slate-400">No active study</p>
+                  <Button className="bg-indigo-600 hover:bg-indigo-700">
+                    Start a Study
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Prayer Requests */}
+          <Card className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition-all">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-slate-50 border-b border-slate-100">
+              <div className="flex items-center space-x-4">
+                <div className="bg-pink-100 p-3 rounded-full">
+                  <Icons.pray className="h-5 w-5 text-pink-600" />
+                </div>
+                <CardTitle className="text-lg font-semibold text-slate-800">
+                  Prayer Requests
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {prayerRequests.length > 0 ? (
+                <div className="space-y-4">
+                  <ul className="space-y-3">
+                    {prayerRequests.slice(0, 2).map((request) => (
+                      <li
+                        key={request.id}
+                        className="p-3 rounded-lg bg-slate-50"
+                      >
+                        <div className="flex items-start space-x-3">
+                          {request.isUrgent ? (
+                            <Icons.alertTriangle className="h-5 w-5 text-pink-500 flex-shrink-0" />
+                          ) : (
+                            <Icons.pray className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                          )}
+                          <p className="text-slate-700">{request.request}</p>
+                        </div>
+                        {request.isUrgent && (
+                          <div className="mt-2 text-xs font-medium text-pink-600">
+                            Urgent Prayer
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                  {prayerRequests.length > 2 && (
+                    <Button variant="ghost" className="w-full text-blue-600">
+                      View All ({prayerRequests.length})
+                    </Button>
+                  )}
+                  <Button className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white">
+                    <Icons.plus className="h-4 w-4 mr-2" />
+                    New Prayer Request
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <Icons.pray className="h-8 w-8 text-slate-300" />
+                  <p className="text-slate-400">No prayer requests</p>
+                  <Button className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white">
+                    <Icons.plus className="h-4 w-4 mr-2" />
+                    Submit Request
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DashboardPage;

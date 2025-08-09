@@ -1,0 +1,678 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  name                String?
+  email               String?              @unique
+  emailVerified       DateTime?
+  image               String?
+  phone               String?
+  address             String?
+  membersince         String?
+  birthdate           String?
+  photo               String?
+  password            String?
+  isActive            Boolean              @default(true)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  familyId            String?
+  createFamily        Family?              @relation("createdBy")
+  family              Family?              @relation("members", fields: [familyId], references: [id])
+  roles               RoleName[]
+  createdTickets      Ticket[]             @relation("CreatedTickets")
+  assignedTickets     Ticket[]             @relation("AssignedTickets")
+  ledMinistries       Ministry[]
+  ledGroups           Group[]
+  counselingSessions  CounselingSession[]  @relation("Counselor")
+  attendedSessions    CounselingSession[]  @relation("Client")
+  auditLogs           AuditLog[]
+  uploadedAssets      Asset[]
+  sermons             Sermon[]
+  waiverSignatures    WaiverSignature[]
+  transactions        Transaction[]
+  feedback            Feedback[]
+  shifts              VolunteerShift[]
+  bibleStudyProgress  BibleStudyProgress[]
+  ministryMemberships MinistryMember[]
+  parentalControl     ParentalControl?
+  sentMessages        Message[]            @relation("SentMessages")
+  pushSubscriptions   PushSubscription[]
+  accounts            Account[]
+  sessions            Session[]
+  ForumTopic          ForumTopic[]
+  ForumPost           ForumPost[]
+  postFeedbacks       PostFeedback[]
+  topicFeedbacks      TopicFeedback[]
+  polls               Poll[]
+  votes               Vote[]
+  Role                Role?                @relation(fields: [roleId], references: [id])
+  roleId              Int?
+  christian           Boolean? // Added for therapist filtering
+  prayerRequest       PrayerRequest[]
+  receivedMessages    Message[]            @relation("ReceivedMessages")
+  participants        Participant[] // Add this line
+}
+
+enum MessageType {
+  GENERAL
+  EVENT_QUERY
+  SUPPORT
+  FEEDBACK
+}
+
+model Family {
+  id          String   @id @default(cuid())
+  name        String
+  createdById String   @unique
+  createdBy   User     @relation("createdBy", fields: [createdById], references: [id])
+  members     User[]   @relation("members")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  users User[]
+}
+
+enum RoleName {
+  ADMIN
+  MEMBER
+  GUEST
+  PRAYER_MANAGER
+  COUNSELOR
+  VOLUNTEER
+}
+
+model Ministry {
+  id          String           @id @default(cuid())
+  name        String
+  description String?
+  leaderId    String
+  leader      User             @relation(fields: [leaderId], references: [id])
+  groups      Group[]
+  events      Event[]
+  members     MinistryMember[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model MinistryMember {
+  ministryId String
+  userId     String
+  ministry   Ministry @relation(fields: [ministryId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@id([ministryId, userId])
+}
+
+model Group {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  ministryId  String
+  ministry    Ministry @relation(fields: [ministryId], references: [id])
+  leaderId    String
+  leader      User     @relation(fields: [leaderId], references: [id])
+  meetings    Event[]
+  createdAt   DateTime @default(now())
+}
+
+model Event {
+  id                  String               @id @default(cuid())
+  title               String
+  description         String? // Added for event description
+  imageUrl            String? // Added for event image
+  type                EventType
+  date                DateTime
+  location            String?
+  tags                String[]
+  latitude            Float?
+  longitude           Float?
+  time                String? // Added for event time
+  ministryId          String?
+  ministry            Ministry?            @relation(fields: [ministryId], references: [id])
+  groupId             String?
+  group               Group?               @relation(fields: [groupId], references: [id])
+  resourceAllocations ResourceAllocation[]
+  participants        Participant[]
+  financials          Financials[]
+  sponsors            Sponsor[]
+  feedback            Feedback[]
+  media               Asset[]
+  createdAt           DateTime             @default(now())
+  worshipResources    WorshipResource[]
+  Message             Message[]
+}
+
+model WorshipResource {
+  id        String    @id @default(cuid())
+  title     String
+  url       String
+  type      AssetType
+  serviceId String
+  service   Event     @relation(fields: [serviceId], references: [id])
+  createdAt DateTime  @default(now())
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model SongProposal {
+  id        String   @id @default(cuid())
+  title     String
+  artist    String
+  userId    String
+  createdAt DateTime @default(now())
+}
+
+model Resource {
+  id                  String               @id @default(cuid())
+  title               String
+  description         String?
+  url                 String
+  category            Category
+  type                ResourceType
+  resourceAllocations ResourceAllocation[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+enum Category {
+  KIDS
+  TEENS
+  PARENTS
+}
+
+model ResourceAllocation {
+  id         String   @id @default(cuid())
+  eventId    String
+  resourceId String
+  event      Event    @relation(fields: [eventId], references: [id])
+  resource   Resource @relation(fields: [resourceId], references: [id])
+  quantity   Int
+}
+
+model Participant {
+  id      String @id @default(cuid())
+  eventId String
+  userId  String
+  status  String // Registered, Waitlisted, Invited
+  event   Event  @relation(fields: [eventId], references: [id])
+  user    User   @relation(fields: [userId], references: [id]) // Add this line
+}
+
+model Financials {
+  id             String @id @default(cuid())
+  eventId        String @unique
+  event          Event  @relation(fields: [eventId], references: [id])
+  budget         Float
+  expenses       Float
+  revenue        Float
+  vendorPayments Json // { vendor: string; status: "Paid" | "Pending" }[]
+}
+
+model Sponsor {
+  id      String @id @default(cuid())
+  name    String
+  amount  Float
+  logoUrl String
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id])
+}
+
+model NewsletterSubscriber {
+  id    String @id @default(cuid())
+  email String @unique
+}
+
+model Feedback {
+  id        String    @id @default(cuid())
+  eventId   String?
+  userId    String
+  sentiment Sentiment
+  comment   String
+  tags      String[]
+  createdAt DateTime  @default(now())
+  event     Event?    @relation(fields: [eventId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model Asset {
+  id         String    @id @default(cuid())
+  title      String
+  type       AssetType
+  url        String
+  uploaderId String
+  uploader   User      @relation(fields: [uploaderId], references: [id])
+  eventId    String?
+  event      Event?    @relation(fields: [eventId], references: [id])
+  sermonId   String?   @unique
+  sermon     Sermon?
+  tags       String[]
+  createdAt  DateTime  @default(now())
+}
+
+model Sermon {
+  id         String   @id @default(cuid())
+  title      String
+  date       DateTime
+  speakerId  String
+  speaker    User     @relation(fields: [speakerId], references: [id])
+  videoAsset Asset    @relation(fields: [id], references: [sermonId])
+}
+
+model Transaction {
+  id          String            @id @default(cuid())
+  type        TransactionType
+  amount      Float
+  method      TransactionMethod
+  description String?
+  userId      String?
+  user        User?             @relation(fields: [userId], references: [id])
+  fundId      String?
+  fund        Fund?             @relation(fields: [fundId], references: [id])
+  date        DateTime          @default(now())
+  anomaly     Boolean           @default(false)
+}
+
+model Fund {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  goalAmount   String?
+  raisedAmount String?
+  transactions Transaction[]
+}
+
+model Ticket {
+  id         String   @id @default(cuid())
+  issue      String
+  priority   Urgency
+  status     String // Open, In-Progress, Closed
+  creatorId  String
+  assigneeId String?
+  creator    User     @relation("CreatedTickets", fields: [creatorId], references: [id])
+  assignee   User?    @relation("AssignedTickets", fields: [assigneeId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model Partner {
+  id      String      @id @default(cuid())
+  name    String
+  type    PartnerType
+  mouUrl  String?
+  contact String
+}
+
+model CounselingSession {
+  id          String   @id @default(cuid())
+  counselorId String
+  clientId    String
+  date        DateTime
+  status      String // Scheduled, Completed, Cancelled
+  notes       String? // Should be encrypted
+  progress    Int
+  counselor   User     @relation("Counselor", fields: [counselorId], references: [id])
+  client      User     @relation("Client", fields: [clientId], references: [id])
+}
+
+model Waiver {
+  id         String            @id @default(cuid())
+  title      String
+  content    String
+  signatures WaiverSignature[]
+}
+
+model WaiverSignature {
+  id       String   @id @default(cuid())
+  waiverId String
+  userId   String
+  signedAt DateTime @default(now())
+  waiver   Waiver   @relation(fields: [waiverId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  details   String?
+  timestamp DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model VolunteerShift {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  eventId         String
+  time            String
+  conflictCheck   Boolean  @default(false)
+  replacementPool String[]
+  checkedIn       Boolean  @default(false)
+}
+
+model BibleStudy {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id           String               @id @default(cuid())
+  title        String
+  content      String
+  bibleStudyId String
+  bibleStudy   BibleStudy           @relation(fields: [bibleStudyId], references: [id])
+  progress     BibleStudyProgress[]
+}
+
+model BibleStudyProgress {
+  id             String  @id @default(cuid())
+  userId         String
+  lessonId       String
+  completed      Boolean @default(false)
+  targetSessions Int     @default(3)
+  user           User    @relation(fields: [userId], references: [id])
+  lesson         Lesson  @relation(fields: [lessonId], references: [id])
+}
+
+model PrayerRequest {
+  id            String       @id @default(cuid())
+  request       String
+  isUrgent      Boolean      @default(false)
+  isPublic      Boolean      @default(true)
+  userId        String?
+  createdAt     DateTime     @default(now())
+  status        PrayerStatus @default(PENDING)
+  dailyRoomUrl  String? // New field for Daily.co room URL
+  dailyRoomName String? // New field for Daily.co room name
+  user          User?        @relation(fields: [userId], references: [id])
+}
+
+enum PrayerStatus {
+  ONGOING
+  PENDING
+  PRAYED
+}
+
+model ThemeOfTheWeek {
+  id        String   @id @default(cuid())
+  title     String
+  verse     String
+  reference String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ParentalControl {
+  id                    String  @id @default(cuid())
+  userId                String  @unique
+  user                  User    @relation(fields: [userId], references: [id])
+  contentFilter         Boolean @default(false)
+  activityMonitoring    Boolean @default(false)
+  screenTimeLimit       Boolean @default(false)
+  screenTimeHours       Int     @default(0)
+  messagingRestrictions Boolean @default(false)
+}
+
+model Message {
+  id          String      @id @default(cuid())
+  senderId    String
+  sender      User        @relation("SentMessages", fields: [senderId], references: [id])
+  recipientId String // ID of the user who receives the message
+  recipient   User        @relation("ReceivedMessages", fields: [recipientId], references: [id])
+  eventId     String? // Optional: ID of the event the message is related to
+  event       Event?      @relation(fields: [eventId], references: [id])
+  subject     String
+  content     String
+  read        Boolean     @default(false)
+  type        MessageType @default(GENERAL) // e.g., GENERAL, EVENT_QUERY, SUPPORT
+  createdAt   DateTime    @default(now())
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+}
+
+model ForumTopic {
+  id             String          @id @default(cuid())
+  title          String
+  content        String
+  userId         String
+  user           User            @relation(fields: [userId], references: [id])
+  imageUrl       String? // New field for image URL
+  videoUrl       String? // New field for video URL
+  likes          Int             @default(0) // New field for likes count
+  dislikes       Int             @default(0) // New field for dislikes count
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  posts          ForumPost[]
+  topicFeedbacks TopicFeedback[] // Opposite relation field for TopicFeedback
+}
+
+model ForumPost {
+  id        String         @id @default(cuid())
+  content   String
+  userId    String
+  user      User           @relation(fields: [userId], references: [id])
+  topicId   String
+  topic     ForumTopic     @relation(fields: [topicId], references: [id])
+  imageUrl  String?
+  videoUrl  String?
+  likes     Int            @default(0)
+  dislikes  Int            @default(0)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  feedback  PostFeedback[]
+}
+
+model TopicFeedback {
+  id        String       @id @default(cuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  topicId   String
+  topic     ForumTopic   @relation(fields: [topicId], references: [id])
+  type      FeedbackType // LIKE or DISLIKE
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, topicId])
+}
+
+model PostFeedback {
+  id        String       @id @default(cuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  postId    String
+  post      ForumPost    @relation(fields: [postId], references: [id])
+  type      FeedbackType // LIKE or DISLIKE
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, postId])
+}
+
+model Poll {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  createdAt   DateTime     @default(now())
+  createdBy   User         @relation(fields: [createdById], references: [id])
+  createdById String
+  options     PollOption[]
+  votes       Vote[]
+}
+
+model PollOption {
+  id     String @id @default(cuid())
+  text   String
+  pollId String
+  poll   Poll   @relation(fields: [pollId], references: [id])
+  votes  Vote[]
+}
+
+model Vote {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  pollId    String
+  poll      Poll       @relation(fields: [pollId], references: [id])
+  optionId  String
+  option    PollOption @relation(fields: [optionId], references: [id])
+  createdAt DateTime   @default(now())
+
+  @@unique([userId, pollId]) // A user can only vote once per poll
+}
+
+// ENUMS
+
+enum FeedbackType {
+  LIKE
+  DISLIKE
+}
+
+enum EventType {
+  SERVICE
+  MEETING
+  TRIP
+  APPOINTMENT
+  CLASS
+  EVENT
+  BOOKING
+}
+
+enum AssetType {
+  VIDEO
+  AUDIO
+  IMAGE
+  DOCUMENT
+  LOGO
+  FONT
+  TEMPLATE
+  SERMON
+  RESOURCE
+  ACTIVITY
+}
+
+enum TransactionType {
+  DONATION
+  EXPENSE
+  REVENUE
+}
+
+enum TransactionMethod {
+  MPESA
+  STRIPE
+  PAYPAL
+  CASH
+  CHECK
+  IN_KIND
+}
+
+enum Urgency {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Sentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+}
+
+enum PartnerType {
+  CHURCH
+  NGO
+  GOVERNMENT
+  BUSINESS
+}
+
+enum ResourceType {
+  EQUIPMENT
+  VENUE
+  TEAM
+  VEHICLE
+  VIDEO
+  AUDIO
+  IMAGE
+  DOCUMENT
+  ACTIVITY
+  TEMPLATE
+}
+
+model Institution {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  description String?
+  address     String?
+  contactInfo String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PastorQuestion {
+  id          String  @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  topic       String
+  description String
+}

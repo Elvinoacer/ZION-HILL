@@ -1,0 +1,11 @@
+WEB_PUSH_PUBLIC_KEY=BA5G7-42oUYg0AGcJ48b-S4TYEzCHqftMCwmwXinF-CUQHY11uGFZTwnNVy3EpMm4u6nsnyegwlmeGt8dIDrtkc
+WEB_PUSH_PRIVATE_KEY=TQcyssZAEtDcyevJ7-WPFQ7rGyuFHNHHXP7PLbCdjmA
+DATABASE_URL=postgres://elvin:Freedom2023@localhost:5432/churchV2
+INTASEND_PUBLISHABLE_KEY=ISPubKey_live_5ad888ac-01e9-40bf-ba17-2dbbb9be1fef
+INTASEND_SECRET_KEY=ISSecretKey_live_2ca411dc-2f04-452f-b777-d2fa4cd25839
+EMAIL_SERVER_HOST="smtp.gmail.com"
+EMAIL_SERVER_PORT="465"
+EMAIL_SERVER_USER="omondielvin@gmail.com"
+EMAIL_SERVER_PASSWORD="wzcrxzykemdfikeo"
+EMAIL_FROM="Your Church <jumaelvinomondi@gmail.com>"
+NEXTAUTH_SECRET="6c8b3f1d-2e4a-4b5c-9f0d-7e8f9a0b1c2d"
