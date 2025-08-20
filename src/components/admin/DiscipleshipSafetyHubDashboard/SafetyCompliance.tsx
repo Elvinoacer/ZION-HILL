@@ -1,24 +1,30 @@
-import { useState, useEffect } from "react";
+import { useAdminStore, useResourceStore } from "@/store";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
-import { useAdminStore, useResourceStore } from "@/store";
-import { Ticket, Resource } from "@prisma/client";
-
-interface SafetyComplianceProps {
-  // No props needed as data is fetched from stores
-}
+import { useEffect } from "react";
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
 
 export default function SafetyCompliance() {
-  const { tickets, loading: adminLoading, error: adminError, fetchTasks, createTicket } = useAdminStore();
-  const { equipment: rooms, loading: resourceLoading, error: resourceError, fetchEquipment } = useResourceStore();
+  const {
+    tickets,
+    loading: adminLoading,
+    error: adminError,
+    fetchTasks,
+    createTicket,
+  } = useAdminStore();
+  const {
+    equipment: rooms,
+    loading: resourceLoading,
+    error: resourceError,
+    fetchEquipment,
+  } = useResourceStore();
 
   useEffect(() => {
     fetchTasks(); // Assuming tickets are fetched via fetchTasks
     fetchEquipment(); // Assuming rooms are fetched via fetchEquipment (resources of type 'VENUE')
   }, [fetchTasks, fetchEquipment]);
 
-  const incidents = tickets.filter(ticket => ticket.type === "INCIDENT"); // Filter tickets for incidents
+  const incidents = (tickets || []).filter((ticket) => ticket.type === "INCIDENT"); // Filter tickets for incidents
 
   const chartData = rooms.map((room) => ({
     name: room.name,
@@ -30,11 +36,24 @@ export default function SafetyCompliance() {
   const handleReportIncident = async () => {
     console.log("Submitting incident report");
     // Placeholder for incident details. In a real app, you'd have a form.
-    await createTicket({ issue: "New Incident", priority: "HIGH", status: "Open", type: "INCIDENT" });
+    await createTicket({
+      issue: "New Incident",
+      priority: "HIGH",
+      status: "Open",
+      type: "INCIDENT",
+    });
   };
 
-  if (adminLoading || resourceLoading) return <div className="text-center py-8">Loading safety compliance data...</div>;
-  if (adminError || resourceError) return <div className="text-center py-8 text-red-500">Error: {adminError || resourceError}</div>;
+  if (adminLoading || resourceLoading)
+    return (
+      <div className="text-center py-8">Loading safety compliance data...</div>
+    );
+  if (adminError || resourceError)
+    return (
+      <div className="text-center py-8 text-red-500">
+        Error: {adminError || resourceError}
+      </div>
+    );
 
   return (
     <div>
@@ -73,16 +92,21 @@ export default function SafetyCompliance() {
                 >
                   <AlertTriangle className="h-5 w-5 text-blue-600 mr-2" />
                   <div>
-                    <div className="font-semibold text-gray-900">{room.name}</div>
+                    <div className="font-semibold text-gray-900">
+                      {room.name}
+                    </div>
                     <div className="text-sm text-gray-600">
-                      Current: {room.currentOccupancy || 0}/{room.capacity || 0} | Required Adults:{" "}
-                      {room.requiredAdults || 0}
+                      Current: {room.currentOccupancy || 0}/{room.capacity || 0}{" "}
+                      | Required Adults: {room.requiredAdults || 0}
                       {/* Assuming a ratio check based on currentOccupancy and requiredAdults */}
-                      {(room.currentOccupancy && room.requiredAdults && room.currentOccupancy / room.requiredAdults > 2) && (
-                        <span className="text-red-600 ml-2">
-                          Ratio Alert <AlertTriangle className="h-4 w-4 inline" />
-                        </span>
-                      )}
+                      {room.currentOccupancy &&
+                        room.requiredAdults &&
+                        room.currentOccupancy / room.requiredAdults > 2 && (
+                          <span className="text-red-600 ml-2">
+                            Ratio Alert{" "}
+                            <AlertTriangle className="h-4 w-4 inline" />
+                          </span>
+                        )}
                     </div>
                   </div>
                 </motion.div>
@@ -122,7 +146,9 @@ export default function SafetyCompliance() {
                       {incident.issue}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {incident.status === "Anonymous" ? "Anonymous" : "Reported"}
+                      {incident.status === "Anonymous"
+                        ? "Anonymous"
+                        : "Reported"}
                     </div>
                   </div>
                 </motion.div>

@@ -359,25 +359,25 @@ model Announcement {
 }
 
 model SongProposal {
-  id         String   @id @default(cuid())
-  title      String
-  artist     String
-  youtubeUrl String? // Optional YouTube link
-  spotifyUrl String? // Optional Spotify link
-  userId     String // ID of the user who submitted the proposal
-  user       User     @relation(fields: [userId], references: [id])
-  likes      Int      @default(0) // Added for like functionality
-  createdAt  DateTime @default(now())
+  id           String     @id @default(cuid())
+  title        String
+  artist       String
+  youtubeUrl   String? // Optional YouTube link
+  spotifyUrl   String? // Optional Spotify link
+  userId       String // ID of the user who submitted the proposal
+  user         User       @relation(fields: [userId], references: [id])
+  likes        Int        @default(0) // Added for like functionality
+  createdAt    DateTime   @default(now())
   likesByUsers SongLike[]
 }
 
 model SongLike {
-  id            String      @id @default(cuid())
-  userId        String
-  user          User        @relation(fields: [userId], references: [id])
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
   songProposalId String
-  songProposal  SongProposal @relation(fields: [songProposalId], references: [id])
-  createdAt     DateTime    @default(now())
+  songProposal   SongProposal @relation(fields: [songProposalId], references: [id])
+  createdAt      DateTime     @default(now())
 
   @@unique([userId, songProposalId]) // Ensures a user can like a song only once
 }
@@ -388,6 +388,8 @@ enum ResourceType {
   ARTICLE
   IMAGE
   LINK
+  EQUIPMENT
+  VENUE
 }
 
 model Resource {
@@ -421,13 +423,13 @@ model Participant {
 }
 
 model Financials {
-  id             String @id @default(cuid())
-  eventId        String @unique
+  id             String  @id @default(cuid())
+  eventId        String? @unique
   budget         Float
   expenses       Float
   revenue        Float
   vendorPayments Json
-  event          Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event          Event?  @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model Sponsor {
@@ -1033,12 +1035,12 @@ enum FinancialSupportStatus {
 }
 
 model LiveStream {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   streamUrl   String?
-  isLive      Boolean   @default(false)
+  isLive      Boolean  @default(false)
   platform    String?
   mediaType   String?
-  viewerCount Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  viewerCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

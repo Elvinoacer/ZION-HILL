@@ -12,9 +12,6 @@ export default function FamilyMembers() {
 
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
 
-  // Placeholder for userId - in a real app, this would come from auth context
-  const userId = "cmdyug60e0000rqhot5b47ii0"; // Replace with actual user ID
-
   useEffect(() => {
     if (currentUser?.familyId) {
       fetchFamilyMembers(currentUser.familyId);
@@ -60,7 +57,8 @@ export default function FamilyMembers() {
         {familyMembers.length === 0 && !loading && !error ? (
           <p className="text-gray-600">
             {currentUser?.familyId
-              ? "No members in this family yet." : "You are not part of a family. Create one in the Family tab."}
+              ? "No members in this family yet."
+              : "You are not part of a family. Create one in the Family tab."}
           </p>
         ) : (
           familyMembers.map((member) => (

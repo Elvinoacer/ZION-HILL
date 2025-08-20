@@ -23,7 +23,10 @@ interface EventsOverviewProps {
   currentUserId: string | undefined;
 }
 
-export default function EventsOverview({ events }: EventsOverviewProps) {
+export default function EventsOverview({
+  events,
+  currentUserId,
+}: EventsOverviewProps) {
   const { rsvpToEvent, fetchEvents } = useEventStore();
   const [activeTab, setActiveTab] = useState<"upcoming" | "past" | "my">(
     "upcoming"

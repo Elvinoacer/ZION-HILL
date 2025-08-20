@@ -4,51 +4,51 @@ This document lists all identified page and API endpoints within the project.
 
 ### Public Pages (Accessible to All)
 
-1.  `/services` - GUEST, MEMBER, ADMIN
-2.  `/counseling-request` - GUEST, MEMBER
-3.  `/partnerships` - GUEST, MEMBER
-4.  `/newsletter-subscriptions` - GUEST, MEMBER
-5.  `/institutions` - GUEST, MEMBER
-6.  `/event-rsvp` - GUEST, MEMBER
-7.  `/devotionals` - GUEST, MEMBER
-8.  `/contact` - GUEST, MEMBER
-9.  `/about` - GUEST, MEMBER
-10. `/livestream-integration` - GUEST, MEMBER
-11. `/announcements` - GUEST, MEMBER
-12. `/ask-the-pastor` - GUEST, MEMBER
-13. `/baptism-application` - GUEST, MEMBER
-14. `/bible-study` - GUEST, MEMBER
-15. `/bible-study/[courseId]` - GUEST, MEMBER
-16. `/bible-study/lesson/[lessonId]` - GUEST, MEMBER
-17. `/blog` - GUEST, MEMBER
-18. `/blog/[id]` - GUEST, MEMBER
-19. `/denied` - GUEST, MEMBER
-20. `/donations` - GUEST, MEMBER
-21. `/donors` - GUEST, MEMBER
-22. `/financial-support` - GUEST, MEMBER
-23. `/login` - GUEST
-24. `/media` - GUEST, MEMBER
-25. `/ministries` - GUEST, MEMBER
-26. `/ministries/[id]` - GUEST, MEMBER
-27. `/my-certificates` - MEMBER
-28. `/` - GUEST, MEMBER, ADMIN
-29. `/polls` - MEMBER
-30. `/projects` - GUEST, MEMBER
-31. `/public/financial-support` - GUEST, MEMBER
-32. `/signup` - GUEST
-33. `/testimonies-wall` - GUEST, MEMBER
+1.  `/services` - GUEST,
+2.  `/counseling-request` - MEMBER
+3.  `/partnerships` - GUEST
+4.  `/newsletter-subscriptions` - GUEST
+5.  `/institutions` - GUEST
+6.  `/event-rsvp` - GUEST
+7.  `/devotionals` - GUEST
+8.  `/contact` - GUEST
+9.  `/about` - GUEST
+10. `/livestream-integration` - GUEST
+11. `/announcements` -MEMBER
+
+12. `/baptism-application` -MEMBER
+13. `/bible-study` -MEMBER
+14. `/bible-study/[courseId]` -MEMBER
+15. `/bible-study/lesson/[lessonId]` -MEMBER
+16. `/blog` - GUEST
+17. `/blog/[id]` - GUEST
+18. `/denied` - anyone
+19. `/donations` - GUEST
+20. `/donors` - GUEST
+21. `/member-financial-support` - MEMBER
+22. `/login` - GUEST
+23. `/media` - GUEST
+24. `/ministries` - GUEST,
+25. `/ministries/[id]` - GUEST,
+26. `/my-certificates` - MEMBER
+27. `/` - GUEST,
+28. `/polls` - MEMBER
+29. `/projects` - GUEST
+30. `/financial-support` - GUEST
+31. `/signup` - GUEST
+32. `/testimonies-wall` -MEMBER
 
 ### Authenticated Member Pages
 
 34. `/dashboard` - MEMBER
 35. `/bible-reading-plans` - MEMBER
-36. `/certificate-generator` - MEMBER
+36. `/certificate-generator` - SENIOR_PASTOR
 37. `/certificates` - MEMBER
 38. `/chat` - MEMBER
 39. `/discussion-forums` - MEMBER
 40. `/discussion-forums/[topicId]` - MEMBER
-41. `/events` - MEMBER
-42. `/events/[id]` - MEMBER
+41. `/events` - GUEST
+42. `/events/[id]` - GUEST
 43. `/family-life` - MEMBER
 44. `/family` - MEMBER
 45. `/kids-teens-resources` - MEMBER
@@ -57,13 +57,12 @@ This document lists all identified page and API endpoints within the project.
 48. `/ministry` - MEMBER
 49. `/ministry/[id]` - MEMBER
 50. `/music-proposals` - MEMBER
-51. `/prayer-requests` - MEMBER
-52. `/prayer-wall` - MEMBER
-53. `/profile` - MEMBER
-54. `/resources` - MEMBER
-55. `/testimonials` - MEMBER
-56. `/volunteering` - MEMBER
-57. `/volunteering/[id]` - MEMBER
+51. `/prayer-wall` - MEMBER
+52. `/profile` - MEMBER
+53. `/resources` - MEMBER
+54. `/testimonials` - MEMBER
+55. `/volunteering` - MEMBER
+56. `/volunteering/[id]` - MEMBER
 
 ### Admin & Role-Specific Pages
 
@@ -73,65 +72,66 @@ This document lists all identified page and API endpoints within the project.
 61. `/events-manager` - EVENTS_MANAGER
 62. `/admin/devotionals` - ADMIN
 63. `/worship-leader` - WORSHIP_LEADER
-64. `/worship-team` - WORSHIP_LEADER, MEMBER
-65. `/admin/baptism-candidates` - ADMIN, SECRETARY
-66. `/admin/bible-reading-plans` - ADMIN, DISCIPLESHIP_LEADER
-67. `/admin/bible-reading-plans/[id]` - ADMIN, DISCIPLESHIP_LEADER
-68. `/admin/budgets` - ADMIN, FINANCE_ADMINISTRATOR
-69. `/admin/certificates` - ADMIN, SECRETARY
-70. `/admin/dashboard` - ADMIN
-71. `/admin/events` - ADMIN, EVENTS_MANAGER
-72. `/admin/financials` - ADMIN, FINANCE_ADMINISTRATOR
-73. `/admin/institutions` - ADMIN
-74. `/admin/kids-teens-resources` - ADMIN, CHILDREN_YOUTH_DIRECTOR
-75. `/admin/media` - ADMIN, TECH_MEDIA_MANAGER
-76. `/admin/ministries` - ADMIN, OVERALL_MINISTRIES_COORDINATOR
-77. `/admin/ministries/[id]` - ADMIN, OVERALL_MINISTRIES_COORDINATOR
-78. `/admin/newsletter` - ADMIN, COMMUNICATIONS_OFFICER
-79. `/admin/outreach` - ADMIN, OUTREACH_DIRECTOR
-80. `/admin/pastoral-care` - ADMIN, SENIOR_PASTOR
-81. `/admin/prayer-requests` - ADMIN, PRAYER_MANAGER
-82. `/admin/preaching-calendar` - ADMIN, SENIOR_PASTOR
-83. `/admin/role-management` - ADMIN
-84. `/admin/users` - ADMIN
-85. `/children-youth-director` - CHILDREN_YOUTH_DIRECTOR
-86. `/communications-officer/create-blog-post` - COMMUNICATIONS_OFFICER
-87. `/communications-officer/edit-blog-post/[id]` - COMMUNICATIONS_OFFICER
-88. `/communications-officer` - COMMUNICATIONS_OFFICER
-89. `/discipleship-leader` - DISCIPLESHIP_LEADER
-90. `/discipleship/theme-of-the-week/manage` - DISCIPLESHIP_LEADER
-91. `/events-manager/eventdashboard` - EVENTS_MANAGER
-92. `/events-manager/inbox` - EVENTS_MANAGER
-93. `/ministry-coordinator` - OVERALL_MINISTRIES_COORDINATOR
-94. `/outreach-director` - OUTREACH_DIRECTOR
-95. `/secretary` - SECRETARY
-96. `/secretary/bookings` - SECRETARY
-97. `/secretary/inbox` - SECRETARY
-98. `/senior-pastor` - SENIOR_PASTOR
-99. `/small-group-leader` - SMALL_GROUPS_LEADER
-100. `/tech-media-manager` - TECH_MEDIA_MANAGER
-101. `/volunteer-coordinator` - VOLUNTEER_COORDINATOR
-102. `/worship-leader/dashboard` - WORSHIP_LEADER
-103. `/admin/bible-study` - ADMIN, DISCIPLESHIP_LEADER
-104. `/admin/bible-study/new` - ADMIN, DISCIPLESHIP_LEADER
-105. `/admin/bible-study/[courseId]` - ADMIN, DISCIPLESHIP_LEADER
-106. `/admin/bible-study/[courseId]/edit` - ADMIN, DISCIPLESHIP_LEADER
-107. `/admin/projects` - ADMIN
-108. `/admin/volunteering/[id]` - ADMIN, VOLUNTEER_COORDINATOR
-109. `/AdminCommandCenterDashboard` - ADMIN
-110. `/BrandEngagementHubDashboard` - COMMUNICATIONS_OFFICER
-111. `/canvas-designs/[id]` - MEMBER, ADMIN
-112. `/DigitalHubDashboard` - TECH_MEDIA_MANAGER
-113. `/DiscipleshipHubDashboard` - DISCIPLESHIP_LEADER
-114. `/docs-gpt5` - ADMIN
-115. `/docs-grok` - ADMIN
-116. `/events-manager/dashboard` - EVENTS_MANAGER
-117. `/events-manager/dashboard/[id]` - EVENTS_MANAGER
-118. `/finance-administrator` - FINANCE_ADMINISTRATOR
-119. `/finance-administrator/donation-plans/[id]` - FINANCE_ADMINISTRATOR
-120. `/grok-editor` - ADMIN
-121. `/VolunteerHubDashboard` - VOLUNTEER_COORDINATOR
-122. `/members/[id]` - MEMBER, ADMIN
+64. `/worship-team` - MEMBER (but in worship team)
+65. `/admin/baptism-candidates` - SENIOR_PASTOR
+66. `/admin/budgets` - FINANCE_ADMINISTRATOR
+67. `/admin/certificates` - SENIOR_PASTOR
+68. `/admin/dashboard` - SENIOR_PASTOR
+69. `/admin/events` - SENIOR_PASTOR, EVENTS_MANAGER
+70. `/admin/financials` - SENIOR_PASTOR, FINANCE_ADMINISTRATOR
+71. `/admin/institutions` - ADMIN, SENIOR_PASTOR
+72. `/admin/kids-teens-resources` -CHILDREN_YOUTH_DIRECTOR
+73. `/admin/media` - ADMIN
+74. `/admin/ministries` -OVERALL_MINISTRIES_COORDINATOR
+75. `/admin/ministries/[id]` - OVERALL_MINISTRIES_COORDINATOR
+76. `/admin/newsletter` - COMMUNICATIONS_OFFICER
+77. `/admin/outreach` - MISSIONS_PASTOR, OUTREACH_DIRECTOR
+78. `/admin/pastoral-care` - ADMIN, SENIOR_PASTOR
+79. `/admin/prayer-requests` - SENIOR_PASTOR, PRAYER_MANAGER
+80. `/admin/preaching-calendar` - ADMIN, SENIOR_PASTOR
+81. `/admin/role-management` - SENIOR_PASTOR
+82. `/admin/users` - ADMIN,SENIOR_PASTOR
+83. `/children-youth-director` - CHILDREN_YOUTH_DIRECTOR
+84. `/communications-officer/create-blog-post` - COMMUNICATIONS_OFFICER
+85. `/communications-officer/edit-blog-post/[id]` - COMMUNICATIONS_OFFICER
+86. `/communications-officer` - COMMUNICATIONS_OFFICER
+87. `/discipleship-leader` - DISCIPLESHIP_LEADER
+88. `/discipleship/theme-of-the-week/manage` - DISCIPLESHIP_LEADER
+89. `/events-manager/eventdashboard` - EVENTS_MANAGER
+90. `/events-manager/inbox` - EVENTS_MANAGER
+91. `/ministry-coordinator` - OVERALL_MINISTRIES_COORDINATOR
+92. `/outreach-director` - OUTREACH_DIRECTOR
+93. `/secretary` - SECRETARY
+94. `/secretary/bookings` - SECRETARY
+95. `/secretary/inbox` - SECRETARY
+96. `/senior-pastor` - SENIOR_PASTOR// use real data
+97. `/small-group-leader` - SMALL_GROUPS_LEADER
+98. `/tech-media-manager` - TECH_MEDIA_MANAGER
+99. `/volunteer-coordinator` - VOLUNTEER_COORDINATOR
+100.  `/worship-leader/dashboard` - WORSHIP_LEADER
+101.  `/admin/bible-study` - DISCIPLESHIP_LEADER
+102.  `/admin/bible-study/new` - DISCIPLESHIP_LEADER
+103.  `/admin/bible-study/[courseId]` - DISCIPLESHIP_LEADER
+104.  `/admin/bible-study/[courseId]/edit` - DISCIPLESHIP_LEADER
+105.  `/admin/projects` - ADMIN
+106.  `/admin/volunteering/[id]` - VOLUNTEER_COORDINATOR
+107.  `/AdminCommandCenterDashboard` - ADMIN
+108.  `/BrandEngagementHubDashboard` - COMMUNICATIONS_OFFICER
+109.  `/canvas-designs/[id]` - MEMBER, ADMIN
+110.  `/DigitalHubDashboard` - TECH_MEDIA_MANAGER
+111.  `/DiscipleshipHubDashboard` - DISCIPLESHIP_LEADER
+112.  `/events-manager/dashboard` - EVENTS_MANAGER
+113.  `/events-manager/dashboard/[id]` - EVENTS_MANAGER
+114.  `/finance-administrator` - FINANCE_ADMINISTRATOR
+115.  `/finance-administrator/donation-plans/[id]` - FINANCE_ADMINISTRATOR
+116.  `/VolunteerHubDashboard` - VOLUNTEER_COORDINATOR
+117.  `/members/[id]` - MEMBER, ADMIN
+
+## Reserved pages:
+
+1. `/docs-gpt5` - ADMIN
+2. `/docs-grok` - ADMIN
+3. `/grok-editor`-ADMIN
 
 ## API Endpoints (`src/app/api/**/*.ts`)
 

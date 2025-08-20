@@ -21,7 +21,7 @@ export default function AuthenticatedLayout({
         <header className="flex justify-between items-center p-4 bg-white border-b">
           <div className="flex items-center">
             <button
-              onClick={() => setSidebarOpen(true)}
+              onClick={() => setSidebarOpen(!sidebarOpen)}
               className="text-gray-500 focus:outline-none lg:hidden"
             >
               <FiMenu size={24} />

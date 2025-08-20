@@ -1,4 +1,3 @@
-
 // components/UserProfile.tsx
 import { motion } from "framer-motion";
 import { Edit, Mail, Phone, MapPin, Calendar, Users } from "lucide-react";
@@ -10,7 +9,7 @@ import { useSession } from "next-auth/react";
 export default function UserProfile() {
   const { currentUser, loading, error, fetchCurrentUser, updateUserProfile } =
     useUserStore();
-    const {data:session}= useSession()
+  const { data: session } = useSession();
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
     name: "",
@@ -21,14 +20,15 @@ export default function UserProfile() {
     membersince: "",
     photo: "",
   });
-  const userId= session?.user.id||""
-  
+  const userId = session?.user.id || "";
+
   // Placeholder for userId - in a real app, this would come from auth context
 
-
   useEffect(() => {
-    fetchCurrentUser(userId);
-  }, [fetchCurrentUser, userId]);
+    if (session?.user.id) {
+      fetchCurrentUser(session?.user.id);
+    }
+  }, [fetchCurrentUser, session]);
 
   useEffect(() => {
     if (currentUser) {
@@ -60,7 +60,7 @@ export default function UserProfile() {
     return <div className="text-center py-8">Loading profile...</div>;
   if (error)
     return <div className="text-center py-8 text-red-500">Error: {error}</div>;
-  if (!currentUser)
+  if (!currentUser && !loading)
     return <div className="text-center py-8">No user data found.</div>;
 
   return (
@@ -230,7 +230,7 @@ export default function UserProfile() {
               type="date"
               className="p-2.5 rounded-lg bg-gray-50 text-gray-800"
             />
-            {currentUser.membersince
+            {currentUser?.membersince
               ? new Date(currentUser.membersince).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",

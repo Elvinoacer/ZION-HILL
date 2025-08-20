@@ -5,7 +5,36 @@ import { LayoutDashboardIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaBible, FaChurch, FaLandmark, FaUsers } from "react-icons/fa";
+import {
+  FaBible,
+  FaChurch,
+  FaLandmark,
+  FaUsers,
+  FaUser,
+  FaCalendarAlt,
+  FaPray,
+  FaStar,
+  FaPrayingHands,
+  FaComment,
+  FaVideo,
+  FaBookOpen,
+  FaChild,
+  FaSitemap,
+  FaHandshake,
+  FaCheckCircle,
+  FaUserShield,
+  FaUsersCog,
+  FaDollarSign,
+  FaHandHoldingHeart,
+  FaNewspaper,
+  FaBuilding,
+  FaMusic,
+  FaPhotoVideo,
+  FaFileInvoiceDollar,
+  FaBullhorn,
+  FaTimes,
+  FaHandHoldingUsd,
+} from "react-icons/fa";
 
 const SidebarContent = ({ setSidebarOpen }) => {
   const pathname = usePathname();
@@ -35,23 +64,6 @@ const SidebarContent = ({ setSidebarOpen }) => {
     "SENIOR_PASTOR",
   ];
 
-  const publicNavItems = [
-    { name: "Home", icon: <Icons.home />, path: "/" },
-    { name: "About Us", icon: <Icons.users />, path: "/about" },
-    { name: "Projects", icon: <Icons.building />, path: "/projects" },
-    { name: "Services", icon: <Icons.cross />, path: "/services" },
-    { name: "Blog", icon: <Icons.pen />, path: "/blog" },
-    { name: "Donations", icon: <Icons.dollar />, path: "/donations" },
-    { name: "Contact", icon: <Icons.mail />, path: "/contact" },
-    {
-      name: "Newsletter",
-      icon: <Icons.newspaper />,
-      path: "/newsletter-subscriptions",
-    },
-    { name: "Volunteering", icon: <Icons.handshake />, path: "/volunteering" },
-    { name: "Certificates", icon: <Icons.checkCircle />, path: "/certificates" }, // Added
-  ];
-
   const memberNavItems = [
     {
       name: "Dashboard",
@@ -61,7 +73,7 @@ const SidebarContent = ({ setSidebarOpen }) => {
     },
     {
       name: "Profile",
-      icon: <Icons.user />,
+      icon: <FaUser />,
       path: "/member-profile",
       requiredRoles: ["MEMBER", ...allLeadershipRoles],
     },
@@ -79,7 +91,7 @@ const SidebarContent = ({ setSidebarOpen }) => {
     },
     {
       name: "Events",
-      icon: <Icons.calendar />,
+      icon: <FaCalendarAlt />,
       path: "/events",
       requiredRoles: ["MEMBER", "ADMIN", "EVENTS_MANAGER"],
     },
@@ -97,61 +109,67 @@ const SidebarContent = ({ setSidebarOpen }) => {
     },
     {
       name: "Prayer Requests",
-      icon: <Icons.pray />,
+      icon: <FaPray />,
       path: "/prayer-requests",
       requiredRoles: ["MEMBER", "ADMIN", "COUNSELING_COORDINATOR"],
     },
     {
       name: "Testimonials",
-      icon: <Icons.star />,
+      icon: <FaStar />,
       path: "/testimonials",
       requiredRoles: ["MEMBER", "ADMIN"],
     },
     {
+      name: "Financial Support",
+      icon: <FaHandHoldingUsd />,
+      path: "/member-financial-support",
+      requiredRoles: ["MEMBER", ...allLeadershipRoles],
+    },
+    {
       name: "Prayer Wall",
-      icon: <Icons.prayHands />,
+      icon: <FaPrayingHands />,
       path: "/prayer-wall",
       requiredRoles: ["MEMBER", "ADMIN"],
     },
     {
       name: "Discussion Forums",
-      icon: <Icons.message />,
+      icon: <FaComment />,
       path: "/discussion-forums",
       requiredRoles: ["MEMBER", "ADMIN"],
     },
     {
       name: "Livestream",
-      icon: <Icons.video />,
+      icon: <FaVideo />,
       path: "/livestream-integration",
       requiredRoles: ["MEMBER", "ADMIN", "TECH_MEDIA_MANAGER"],
     },
     {
       name: "Bible Reading Plans",
-      icon: <Icons.bibleOpen />,
+      icon: <FaBookOpen />,
       path: "/bible-reading-plans",
       requiredRoles: ["MEMBER", "ADMIN", "DISCIPLESHIP_LEADER"],
     },
     {
       name: "Kids & Teens",
-      icon: <Icons.child />,
+      icon: <FaChild />,
       path: "/kids-teens-resources",
       requiredRoles: ["MEMBER", "ADMIN", "CHILDREN_YOUTH_DIRECTOR"],
     },
     {
       name: "Family Life",
-      icon: <Icons.familyTree />,
+      icon: <FaSitemap />,
       path: "/family-life",
       requiredRoles: ["MEMBER", "ADMIN"],
     },
     {
       name: "Volunteering",
-      icon: <Icons.handshake />,
+      icon: <FaHandshake />,
       path: "/volunteering",
       requiredRoles: ["MEMBER", "ADMIN"],
     },
     {
       name: "Certificates",
-      icon: <Icons.checkCircle />,
+      icon: <FaCheckCircle />,
       path: "/certificates",
       requiredRoles: ["MEMBER", "ADMIN"],
     },
@@ -160,61 +178,61 @@ const SidebarContent = ({ setSidebarOpen }) => {
   const adminNavItems = [
     {
       name: "Admin Dashboard",
-      icon: <Icons.admin />,
+      icon: <FaUserShield />,
       path: "/admin/dashboard",
       requiredRoles: ["ADMIN"],
     },
     {
       name: "User Management",
-      icon: <Icons.users />,
+      icon: <FaUsersCog />,
       path: "/admin/users",
       requiredRoles: ["ADMIN"],
     },
     {
       name: "Ministry Management",
-      icon: <Icons.church />,
+      icon: <FaChurch />,
       path: "/admin/ministries",
       requiredRoles: ["ADMIN"],
     },
     {
       name: "Event Management",
-      icon: <Icons.calendar />,
+      icon: <FaCalendarAlt />,
       path: "/admin/events",
       requiredRoles: ["ADMIN"],
     },
     {
       name: "Financial Management",
-      icon: <Icons.dollar />,
+      icon: <FaDollarSign />,
       path: "/admin/financials",
       requiredRoles: ["ADMIN"],
     },
     {
       name: "Outreach Management",
-      icon: <Icons.handshake />,
+      icon: <FaHandshake />,
       path: "/admin/outreach",
       requiredRoles: ["ADMIN"],
     },
     {
       name: "Pastoral Care",
-      icon: <Icons.counseling />,
+      icon: <FaHandHoldingHeart />,
       path: "/admin/pastoral-care",
       requiredRoles: ["ADMIN"],
     },
     {
       name: "Newsletter Sender",
-      icon: <Icons.newspaper />,
+      icon: <FaNewspaper />,
       path: "/admin/newsletter",
       requiredRoles: ["ADMIN", "COMMUNICATIONS_OFFICER"],
     },
     {
       name: "Prayer Request Management",
-      icon: <Icons.pray />,
+      icon: <FaPray />,
       path: "/admin/prayer-requests",
       requiredRoles: ["ADMIN", "PRAYER_MANAGER"],
     },
     {
       name: "Project Management",
-      icon: <Icons.building />,
+      icon: <FaBuilding />,
       path: "/admin/projects",
       requiredRoles: ["ADMIN"],
     },
@@ -223,58 +241,59 @@ const SidebarContent = ({ setSidebarOpen }) => {
   const leadershipNavItems = [
     {
       name: "Worship Leader",
-      icon: <Icons.music />,
+      icon: <FaMusic />,
       path: "/worship-leader",
       requiredRoles: ["WORSHIP_LEADER", "ADMIN"],
     },
     {
       name: "Ministry Coordinator",
-      icon: <Icons.organization />,
+      icon: <FaUsersCog />,
       path: "/ministry-coordinator",
       requiredRoles: ["MINISTRY_COORDINATOR", "ADMIN"],
     },
     {
       name: "Discipleship Leader",
-      icon: <Icons.bibleOpen />,
+      icon: <FaBookOpen />,
       path: "/discipleship-leader",
       requiredRoles: ["DISCIPLESHIP_LEADER", "ADMIN"],
     },
     {
       name: "Tech & Media",
-      icon: <Icons.media />,
+      icon: <FaPhotoVideo />,
       path: "/tech-media-manager",
       requiredRoles: ["TECH_MEDIA_MANAGER", "ADMIN"],
     },
     {
       name: "Finance Admin",
-      icon: <Icons.finance />,
+      icon: <FaFileInvoiceDollar />,
       path: "/finance-administrator",
       requiredRoles: ["FINANCE_ADMINISTRATOR", "ADMIN"],
     },
     {
       name: "Children/Youth",
-      icon: <Icons.child />,
+      icon: <FaChild />,
       path: "/children-youth-director",
       requiredRoles: ["CHILDREN_YOUTH_DIRECTOR", "ADMIN"],
     },
     {
       name: "Communications",
-      icon: <Icons.megaphone />,
+      icon: <FaBullhorn />,
       path: "/communications-officer",
       requiredRoles: ["COMMUNICATIONS_OFFICER", "ADMIN"],
     },
     {
       name: "Senior Pastor",
-      icon: <Icons.church />,
-      path: "/senior-pastor",
+      icon: <FaChurch />,
+      path: "/senior- pastor",
       requiredRoles: ["SENIOR_PASTOR", "ADMIN"],
     },
   ];
 
-  const NavItem = ({ item }) => (
+  const NavItem = ({ item, setSidebarOpen }) => (
     <motion.li whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
       <Link
         href={item.path}
+        onClick={() => setSidebarOpen(false)}
         className={`flex items-center p-3 rounded-lg transition-all ${
           pathname === item.path
             ? "bg-blue-600/10 text-blue-600 border-l-4 border-blue-600"
@@ -287,7 +306,7 @@ const SidebarContent = ({ setSidebarOpen }) => {
     </motion.li>
   );
 
-  const NavSection = ({ title, items }) => (
+  const NavSection = ({ title, items, setSidebarOpen }) => (
     <>
       <h3 className="text-xs uppercase font-semibold text-gray-400 mb-2 px-3">
         {title}
@@ -296,7 +315,7 @@ const SidebarContent = ({ setSidebarOpen }) => {
         {items
           .filter((item) => hasRole(item.requiredRoles))
           .map((item) => (
-            <NavItem key={item.name} item={item} />
+            <NavItem key={item.name} item={item} setSidebarOpen={setSidebarOpen} />
           ))}
       </ul>
     </>
@@ -313,28 +332,22 @@ const SidebarContent = ({ setSidebarOpen }) => {
           onClick={() => setSidebarOpen(false)}
           className="text-gray-400 hover:text-white lg:hidden"
         >
-          <Icons.close />
+          <FaTimes />
         </button>
       </div>
 
       <nav className="p-4 overflow-y-auto flex-grow">
-        {session?.user ? (
+        {session?.user && (
           <>
-            <NavSection title="Member Area" items={memberNavItems} />
+            <NavSection title="Member Area" items={memberNavItems} setSidebarOpen={setSidebarOpen} />
 
             {hasRole(allLeadershipRoles) && (
               <>
-                <NavSection title="Admin & Leadership" items={adminNavItems} />
-                <NavSection title="Ministry Tools" items={leadershipNavItems} />
+                <NavSection title="Admin & Leadership" items={adminNavItems} setSidebarOpen={setSidebarOpen} />
+                <NavSection title="Ministry Tools" items={leadershipNavItems} setSidebarOpen={setSidebarOpen} />
               </>
             )}
           </>
-        ) : (
-          <ul className="space-y-1">
-            {publicNavItems.map((item) => (
-              <NavItem key={item.name} item={item} />
-            ))}
-          </ul>
         )}
       </nav>
 
@@ -348,7 +361,7 @@ const SidebarContent = ({ setSidebarOpen }) => {
                 className="rounded-full"
               />
             ) : (
-              <Icons.user className="text-gray-400" />
+              <FaUser className="text-gray-400" />
             )}
           </div>
           <div className="ml-3">

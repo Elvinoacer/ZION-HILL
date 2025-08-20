@@ -3,6 +3,7 @@ import { BadgeCheck, Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useUserStore } from "@/store";
 import MembershipDetailsModal from "./MembershipDetailsModal";
+import { useSession } from "next-auth/react";
 
 export default function MembershipStatus() {
   const {
@@ -14,13 +15,13 @@ export default function MembershipStatus() {
   } = useUserStore();
 
   const [showModal, setShowModal] = useState(false);
-
-  // Placeholder for userId - in a real app, this would come from auth context
-  const userId = "cmdyug60e0000rqhot5b47ii0"; // Replace with actual user ID
+  const { data: session } = useSession();
 
   useEffect(() => {
-    fetchMembershipStatus(userId);
-  }, [fetchMembershipStatus, userId]);
+    if (session?.user.id) {
+      fetchMembershipStatus(session.user.id);
+    }
+  }, [fetchMembershipStatus, session]);
 
   const handleViewDetailsClick = () => {
     setShowModal(true);
@@ -54,7 +55,11 @@ export default function MembershipStatus() {
         <div>
           <div className="text-sm text-gray-500">Current Status</div>
           <div className="text-lg font-medium text-blue-700">
-            {memberRole ? memberRole.name : (currentUser ? "Community Member" : "Not a Member")}
+            {memberRole
+              ? memberRole.name
+              : currentUser
+              ? "Community Member"
+              : "Not a Member"}
           </div>
         </div>
       </div>
@@ -101,7 +106,10 @@ export default function MembershipStatus() {
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <MembershipDetailsModal userId={userId} onClose={handleCloseModal} />
+          <MembershipDetailsModal
+            userId={session?.user.id || ""}
+            onClose={handleCloseModal}
+          />
         </div>
       )}
     </motion.div>
