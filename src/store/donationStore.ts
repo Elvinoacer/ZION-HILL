@@ -26,15 +26,14 @@ interface DonationState {
 
 export const useDonationStore = create<DonationState>((set) => ({
   donations: [],
-  transactions: [],
   gateways: [],
   recurringGifts: [],
   loading: false,
   error: null,
   fetchedDonations: false,
-  fetchedTransactions: false,
   fetchedGateways: false,
   fetchedRecurringGifts: false,
+  fetchedTransactions: false,
 
   fetchDonations: async () => {
     set((state) => {
@@ -50,7 +49,7 @@ export const useDonationStore = create<DonationState>((set) => ({
       }
       const donations = await response.json();
       set({ donations, loading: false, fetchedDonations: true });
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -63,13 +62,13 @@ export const useDonationStore = create<DonationState>((set) => ({
       return { loading: true, error: null };
     });
     try {
-      const response = await fetch("/api/church-admin?type=transactions");
+      const response = await fetch("/api/transactions");
       if (!response.ok) {
         throw new Error(`Error fetching transactions: ${response.statusText}`);
       }
       const transactions = await response.json();
       set({ transactions, loading: false, fetchedTransactions: true });
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -88,7 +87,7 @@ export const useDonationStore = create<DonationState>((set) => ({
       }
       const gateways = await response.json();
       set({ gateways, loading: false, fetchedGateways: true });
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -107,7 +106,7 @@ export const useDonationStore = create<DonationState>((set) => ({
       }
       const recurringGifts = await response.json();
       set({ recurringGifts, loading: false, fetchedRecurringGifts: true });
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -130,7 +129,7 @@ export const useDonationStore = create<DonationState>((set) => ({
         donations: [...state.donations, newDonation],
         loading: false,
       }));
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -149,7 +148,7 @@ export const useDonationStore = create<DonationState>((set) => ({
         throw new Error(`Error sending receipt: ${response.statusText}`);
       }
       set({ loading: false });
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -168,7 +167,7 @@ export const useDonationStore = create<DonationState>((set) => ({
         throw new Error(`Error scanning receipt: ${response.statusText}`);
       }
       set({ loading: false });
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -187,7 +186,7 @@ export const useDonationStore = create<DonationState>((set) => ({
         throw new Error(`Error generating report: ${response.statusText}`);
       }
       set({ loading: false });
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -206,7 +205,7 @@ export const useDonationStore = create<DonationState>((set) => ({
         throw new Error(`Error switching gateway: ${response.statusText}`);
       }
       set({ loading: false });
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -225,83 +224,7 @@ export const useDonationStore = create<DonationState>((set) => ({
         throw new Error(`Error notifying donor: ${response.statusText}`);
       }
       set({ loading: false });
-    } catch (error: unknown) {
-      set({ error: error.message, loading: false });
-    }
-  },
-
-  generateReport: async (reportId) => {
-    set({ loading: true, error: null });
-    try {
-      const response = await fetch('/api/church-admin?type=generate-report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ reportId }),
-      });
-      if (!response.ok) {
-        throw new Error(`Error generating report: ${response.statusText}`);
-      }
-      set({ loading: false });
-    } catch (error: unknown) {
-      set({ error: error.message, loading: false });
-    }
-  },
-
-  sendReceipt: async (donationId, template) => {
-    set({ loading: true, error: null });
-    try {
-      const response = await fetch('/api/church-admin?type=send-receipt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ donationId, template }),
-      });
-      if (!response.ok) {
-        throw new Error(`Error sending receipt: ${response.statusText}`);
-      }
-      set({ loading: false });
-    } catch (error: unknown) {
-      set({ error: error.message, loading: false });
-    }
-  },
-
-  scanReceipt: async (transactionId) => {
-    set({ loading: true, error: null });
-    try {
-      const response = await fetch('/api/church-admin?type=scan-receipt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ transactionId }),
-      });
-      if (!response.ok) {
-        throw new Error(`Error scanning receipt: ${response.statusText}`);
-      }
-      set({ loading: false });
-    } catch (error: unknown) {
-      set({ error: error.message, loading: false });
-    }
-  },
-
-  sendReceipt: async (donationId, template) => {
-    set({ loading: true, error: null });
-    try {
-      const response = await fetch('/api/church-admin?type=send-receipt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ donationId, template }),
-      });
-      if (!response.ok) {
-        throw new Error(`Error sending receipt: ${response.statusText}`);
-      }
-      set({ loading: false });
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },

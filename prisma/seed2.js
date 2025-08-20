@@ -1,18 +1,25 @@
 const { PrismaClient } = require("../src/generated/prisma");
 const prisma = new PrismaClient();
+const { faker } = require("@faker-js/faker");
 
 async function main() {
-  // const mininstry = await prisma.ministry.create({
-  //   data: {
-  //     name: "worship",
-  //     description: "Turning to christ in worship",
-  //     leaderId: "cmdyug60e0000rqhot5b47ii0",
-  //   },
-  // });
-  // console.log(mininstry);
-
-  const availableEvents = await prisma.event.deleteMany();
-  console.log(availableEvents);
+  const users = await prisma.user.findMany();
+  const ministries = [];
+  for (let i = 0; i < 5; i++) {
+    const ministry = await prisma.ministry.create({
+      data: {
+        name: faker.lorem.words(2) + " Ministry",
+        description: faker.lorem.paragraph(),
+        leader: {
+          connect: {
+            id: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
+          },
+        },
+      },
+    });
+    ministries.push(ministry);
+    console.log(`Created ministry: ${ministry.name}`);
+  }
 }
 main()
   .catch((e) => {

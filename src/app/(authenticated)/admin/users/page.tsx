@@ -3,22 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner"; // Added toast import
 
 interface User {
   id: string;
@@ -49,6 +37,7 @@ const AdminUsersPage = () => {
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
+    password: "", // Added password field
     phone: "",
     address: "",
     membersince: "",
@@ -66,7 +55,7 @@ const AdminUsersPage = () => {
       const data = await res.json();
       setUsers(data);
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
   console.log(roles);
@@ -77,7 +66,7 @@ const AdminUsersPage = () => {
       const data = await res.json();
       setRoles(data);
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -87,9 +76,7 @@ const AdminUsersPage = () => {
     setLoading(false);
   }, []);
 
-  const handleNewUserChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleNewUserChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setNewUser((prev) => ({
       ...prev,
@@ -97,9 +84,7 @@ const AdminUsersPage = () => {
     }));
   };
 
-  const handleEditingUserChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleEditingUserChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setEditingUser((prev) => {
       if (!prev) return null;
@@ -122,10 +107,13 @@ const AdminUsersPage = () => {
   const handleEditingUserRoleChange = (value: string) => {
     setEditingUser((prev) => {
       if (!prev) return null;
-      const roleId = parseInt(value);
-      const updatedRoles = prev.roles.some((role) => role.id === roleId)
-        ? prev.roles.filter((role) => role.id !== roleId)
-        : [...prev.roles, roles.find((role) => role.id === roleId)!];
+      const roleName = roles.find((role) => String(role.id) === value)?.name; // Get the role name from the ID
+      if (!roleName) return prev; // Should not happen if value is valid role ID
+
+      const updatedRoles = prev.roles.some((role) => role.name === roleName)
+        ? prev.roles.filter((role) => role.name !== roleName)
+        : [...prev.roles, { id: parseInt(value), name: roleName }]; // Store Role object with name
+
       return {
         ...prev,
         roles: updatedRoles,
@@ -142,12 +130,22 @@ const AdminUsersPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newUser),
+        body: JSON.stringify({
+          name: newUser.name,
+          email: newUser.email,
+          password: newUser.password, // Include password
+          phone: newUser.phone,
+          address: newUser.address,
+          membersince: newUser.membersince,
+          birthdate: newUser.birthdate,
+          photo: newUser.photo,
+          roles: newUser.roleIds.map((id) => roles.find((r) => r.id === id)?.name).filter(Boolean), // Convert roleIds to role names
+        }),
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to add user");
+        throw new Error(errorData.message || "Failed to add user");
       }
 
       setNewUser({
@@ -162,7 +160,7 @@ const AdminUsersPage = () => {
       });
       fetchUsers(); // Refresh user list
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -178,8 +176,14 @@ const AdminUsersPage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...editingUser,
-          roleIds: editingUser.roles.map((role) => role.id),
+          name: editingUser.name,
+          email: editingUser.email,
+          phone: editingUser.phone,
+          address: editingUser.address,
+          membersince: editingUser.membersince,
+          birthdate: editingUser.birthdate,
+          photo: editingUser.photo,
+          roles: editingUser.roles.map((role) => role.name || "").filter(name => name !== ""), // Filter out empty strings
         }),
       });
 
@@ -191,7 +195,7 @@ const AdminUsersPage = () => {
       setEditingUser(null);
       fetchUsers(); // Refresh user list
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -209,16 +213,14 @@ const AdminUsersPage = () => {
 
       fetchUsers(); // Refresh user list
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
   if (loading) {
     return (
       <div className="container mx-auto py-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">
-          User Management
-        </h1>
+        <h1 className="text-4xl font-bold text-gray-800 mb-6">User Management</h1>
         <p className="text-lg text-gray-600">Loading users...</p>
       </div>
     );
@@ -227,9 +229,7 @@ const AdminUsersPage = () => {
   if (error) {
     return (
       <div className="container mx-auto py-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">
-          User Management
-        </h1>
+        <h1 className="text-4xl font-bold text-gray-800 mb-6">User Management</h1>
         <p className="text-lg text-red-500">Error: {error}</p>
       </div>
     );
@@ -238,9 +238,7 @@ const AdminUsersPage = () => {
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-4xl font-bold text-gray-800 mb-6">User Management</h1>
-      <p className="text-lg text-gray-600 mb-4">
-        Manage church users, their profiles, and roles.
-      </p>
+      <p className="text-lg text-gray-600 mb-4">Manage church users, their profiles, and roles.</p>
 
       <Card className="mb-8">
         <CardHeader>
@@ -252,10 +250,7 @@ const AdminUsersPage = () => {
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
           >
             <div>
-              <label
-                htmlFor="name"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
+              <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
                 Name:
               </label>
               <Input
@@ -263,17 +258,12 @@ const AdminUsersPage = () => {
                 id="name"
                 name="name"
                 value={editingUser ? editingUser.name : newUser.name}
-                onChange={
-                  editingUser ? handleEditingUserChange : handleNewUserChange
-                }
+                onChange={editingUser ? handleEditingUserChange : handleNewUserChange}
                 required
               />
             </div>
             <div>
-              <label
-                htmlFor="email"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
+              <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
                 Email:
               </label>
               <Input
@@ -281,17 +271,25 @@ const AdminUsersPage = () => {
                 id="email"
                 name="email"
                 value={editingUser ? editingUser.email : newUser.email}
-                onChange={
-                  editingUser ? handleEditingUserChange : handleNewUserChange
-                }
+                onChange={editingUser ? handleEditingUserChange : handleNewUserChange}
                 required
               />
             </div>
             <div>
-              <label
-                htmlFor="phone"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
+              <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
+                Password:
+              </label>
+              <Input
+                type="password"
+                id="password"
+                name="password"
+                value={newUser.password} // Only for new user, not editing
+                onChange={handleNewUserChange}
+                required={!editingUser} // Required only for new user
+              />
+            </div>
+            <div>
+              <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">
                 Phone:
               </label>
               <Input
@@ -299,75 +297,47 @@ const AdminUsersPage = () => {
                 id="phone"
                 name="phone"
                 value={editingUser ? editingUser.phone || "" : newUser.phone}
-                onChange={
-                  editingUser ? handleEditingUserChange : handleNewUserChange
-                }
+                onChange={editingUser ? handleEditingUserChange : handleNewUserChange}
               />
             </div>
             <div>
-              <label
-                htmlFor="address"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
+              <label htmlFor="address" className="block text-gray-700 text-sm font-bold mb-2">
                 Address:
               </label>
               <Input
                 type="text"
                 id="address"
                 name="address"
-                value={
-                  editingUser ? editingUser.address || "" : newUser.address
-                }
-                onChange={
-                  editingUser ? handleEditingUserChange : handleNewUserChange
-                }
+                value={editingUser ? editingUser.address || "" : newUser.address}
+                onChange={editingUser ? handleEditingUserChange : handleNewUserChange}
               />
             </div>
             <div>
-              <label
-                htmlFor="membersince"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
+              <label htmlFor="membersince" className="block text-gray-700 text-sm font-bold mb-2">
                 Member Since:
               </label>
               <Input
                 type="date"
                 id="membersince"
                 name="membersince"
-                value={
-                  editingUser
-                    ? editingUser.membersince || ""
-                    : newUser.membersince
-                }
-                onChange={
-                  editingUser ? handleEditingUserChange : handleNewUserChange
-                }
+                value={editingUser ? editingUser.membersince || "" : newUser.membersince}
+                onChange={editingUser ? handleEditingUserChange : handleNewUserChange}
               />
             </div>
             <div>
-              <label
-                htmlFor="birthdate"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
+              <label htmlFor="birthdate" className="block text-gray-700 text-sm font-bold mb-2">
                 Birthdate:
               </label>
               <Input
                 type="date"
                 id="birthdate"
                 name="birthdate"
-                value={
-                  editingUser ? editingUser.birthdate || "" : newUser.birthdate
-                }
-                onChange={
-                  editingUser ? handleEditingUserChange : handleNewUserChange
-                }
+                value={editingUser ? editingUser.birthdate || "" : newUser.birthdate}
+                onChange={editingUser ? handleEditingUserChange : handleNewUserChange}
               />
             </div>
             <div>
-              <label
-                htmlFor="photo"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
+              <label htmlFor="photo" className="block text-gray-700 text-sm font-bold mb-2">
                 Photo URL:
               </label>
               <Input
@@ -375,28 +345,19 @@ const AdminUsersPage = () => {
                 id="photo"
                 name="photo"
                 value={editingUser ? editingUser.photo || "" : newUser.photo}
-                onChange={
-                  editingUser ? handleEditingUserChange : handleNewUserChange
-                }
+                onChange={editingUser ? handleEditingUserChange : handleNewUserChange}
               />
             </div>
             <div>
-              <label
-                htmlFor="roles"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
+              <label htmlFor="roles" className="block text-gray-700 text-sm font-bold mb-2">
                 Roles:
               </label>
               <Select
-                onValueChange={
-                  editingUser
-                    ? handleEditingUserRoleChange
-                    : handleNewUserRoleChange
-                }
+                onValueChange={editingUser ? handleEditingUserRoleChange : handleNewUserRoleChange}
                 value={
                   editingUser
-                    ? editingUser.roles.map((role) => String(role.id)[0])
-                    : newUser.roleIds.map(String)[0]
+                    ? String(editingUser.roles[0]?.id || "") // Select only the first role's ID, or empty string
+                    : String(newUser.roleIds[0] || "") // Select only the first roleId, or empty string
                 }
               >
                 <SelectTrigger className="w-full">
@@ -412,15 +373,9 @@ const AdminUsersPage = () => {
               </Select>
             </div>
             <div className="md:col-span-2 flex space-x-2">
-              <Button type="submit">
-                {editingUser ? "Update User" : "Add User"}
-              </Button>
+              <Button type="submit">{editingUser ? "Update User" : "Add User"}</Button>
               {editingUser && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setEditingUser(null)}
-                >
+                <Button type="button" variant="outline" onClick={() => setEditingUser(null)}>
                   Cancel
                 </Button>
               )}
@@ -450,23 +405,27 @@ const AdminUsersPage = () => {
                     <TableRow key={user.id}>
                       <TableCell>{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
-                      <TableCell>
-                        {user.roles.map((role) => role.name).join(", ")}
-                      </TableCell>
+                      <TableCell>{user.roles.map((role) => role.name).join(", ")}</TableCell>
                       <TableCell>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setEditingUser(user)}
+                          onClick={() =>
+                            setEditingUser({
+                              ...user,
+                              phone: user.phone || "",
+                              address: user.address || "",
+                              membersince: user.membersince || "",
+                              birthdate: user.birthdate || "",
+                              photo: user.photo || "",
+                              roles: user.roles || [], // Ensure roles is an array
+                            })
+                          }
                           className="mr-2"
                         >
                           Edit
                         </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteUser(user.id)}
-                        >
+                        <Button variant="destructive" size="sm" onClick={() => handleDeleteUser(user.id)}>
                           Delete
                         </Button>
                       </TableCell>

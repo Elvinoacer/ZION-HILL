@@ -1,18 +1,38 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import CreateEventModal from "@/components/CreateEventModal";
+import { PlusCircle } from "lucide-react";
+import { toast } from "sonner";
 
+// This interface should be compatible with the Event model for the modal
 interface OutreachProgram {
   id: string;
   title: string;
-  description?: string;
+  description?: string | null;
   date?: string;
-  location?: string;
+  location?: string | null;
+  // Fields needed for CreateEventModal's eventToEdit prop
+  type: any; // Ideally, this would be the EventType enum
+  imageUrl?: string | null;
+  time?: string | null;
+  ministryId?: string | null;
+  capacity?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 const AdminOutreachPage = () => {
@@ -20,120 +40,72 @@ const AdminOutreachPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [newProgram, setNewProgram] = useState({
-    title: '',
-    description: '',
-    date: '',
-    location: '',
-  });
-
   const [editingProgram, setEditingProgram] = useState<OutreachProgram | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
+  const [programToDeleteId, setProgramToDeleteId] = useState<string | null>(null);
 
   const fetchOutreachPrograms = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch('/api/outreach-programs');
-      if (!res.ok) throw new Error('Failed to fetch outreach programs');
+      // Assuming outreach programs are events of type 'TRIP' or 'EVENT'
+      // You might need to adjust the query parameter based on your EventType enum
+      const res = await fetch("/api/events?type=TRIP"); 
+      if (!res.ok) throw new Error("Failed to fetch outreach programs");
       const data = await res.json();
       setOutreachPrograms(data);
     } catch (err: any) {
       setError(err.message);
+      toast.error("Failed to load outreach programs.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchOutreachPrograms();
-    setLoading(false);
   }, []);
 
-  const handleNewProgramChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNewProgram((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleOpenModalForEdit = (program: OutreachProgram) => {
+    setEditingProgram(program);
+    setIsModalOpen(true);
   };
 
-  const handleEditingProgramChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setEditingProgram((prev) => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
+  const handleOpenModalForCreate = () => {
+    setEditingProgram(null);
+    setIsModalOpen(true);
   };
 
-  const handleAddProgram = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleDeleteProgram = (id: string) => {
+    setProgramToDeleteId(id);
+    setShowConfirmDeleteDialog(true);
+  };
+
+  const confirmDeleteProgram = async () => {
     setError(null);
+    if (!programToDeleteId) return;
+
+    const toastId = toast.loading("Deleting program...");
     try {
-      const res = await fetch('/api/outreach-programs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newProgram),
+      // Use the events API endpoint for deletion
+      const res = await fetch(`/api/events/${programToDeleteId}`, {
+        method: "DELETE",
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to add outreach program');
+        throw new Error(errorData.error || "Failed to delete outreach program");
       }
-
-      setNewProgram({
-        title: '',
-        description: '',
-        date: '',
-        location: '',
-      });
+      
+      toast.success("Outreach program deleted successfully.", { id: toastId });
       fetchOutreachPrograms(); // Refresh list
     } catch (err: any) {
       setError(err.message);
-    }
-  };
-
-  const handleUpdateProgram = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (!editingProgram) return;
-
-    try {
-      const res = await fetch(`/api/outreach-programs?id=${editingProgram.id}` , {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(editingProgram),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to update outreach program');
-      }
-
-      setEditingProgram(null);
-      fetchOutreachPrograms(); // Refresh list
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
-
-  const handleDeleteProgram = async (id: string) => {
-    setError(null);
-    try {
-      const res = await fetch(`/api/outreach-programs?id=${id}` , {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to delete outreach program');
-      }
-
-      fetchOutreachPrograms(); // Refresh list
-    } catch (err: any) {
-      setError(err.message);
+      toast.error(`Error: ${err.message}`, { id: toastId });
+    } finally {
+      setShowConfirmDeleteDialog(false);
+      setProgramToDeleteId(null);
     }
   };
 
@@ -156,74 +128,45 @@ const AdminOutreachPage = () => {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">Outreach Programs Management</h1>
-      <p className="text-lg text-gray-600 mb-4">
-        Manage community outreach initiatives and mission trips.
-      </p>
+    <div className="container mx-auto py-10 px-4">
+      <header className="flex justify-between items-center mb-10">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">Outreach Programs Management</h1>
+          <p className="text-lg text-gray-600">Manage community outreach initiatives and mission trips.</p>
+        </div>
+        <Button onClick={handleOpenModalForCreate}>
+          <PlusCircle className="mr-2 h-4 w-4" />
+          Add New Program
+        </Button>
+      </header>
 
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>{editingProgram ? 'Edit Outreach Program' : 'Add New Outreach Program'}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={editingProgram ? handleUpdateProgram : handleAddProgram} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">Title:</label>
-              <Input type="text" id="title" name="title" value={editingProgram ? editingProgram.title : newProgram.title} onChange={editingProgram ? handleEditingProgramChange : handleNewProgramChange} required />
-            </div>
-            <div>
-              <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">Description:</label>
-              <Textarea id="description" name="description" value={editingProgram ? editingProgram.description || '' : newProgram.description} onChange={editingProgram ? handleEditingProgramChange : handleNewProgramChange} />
-            </div>
-            <div>
-              <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">Date:</label>
-              <Input type="date" id="date" name="date" value={editingProgram ? editingProgram.date?.split('T')[0] || '' : newProgram.date} onChange={editingProgram ? handleEditingProgramChange : handleNewProgramChange} />
-            </div>
-            <div>
-              <label htmlFor="location" className="block text-gray-700 text-sm font-bold mb-2">Location:</label>
-              <Input type="text" id="location" name="location" value={editingProgram ? editingProgram.location || '' : newProgram.location} onChange={editingProgram ? handleEditingProgramChange : handleNewProgramChange} />
-            </div>
-            <div className="md:col-span-2 flex space-x-2">
-              <Button type="submit">
-                {editingProgram ? 'Update Program' : 'Add Program'}
-              </Button>
-              {editingProgram && (
-                <Button type="button" variant="outline" onClick={() => setEditingProgram(null)}>
-                  Cancel
-                </Button>
-              )}
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Existing Outreach Programs</CardTitle>
+      {/* Table */}
+      <Card className="shadow-lg border border-gray-100">
+        <CardHeader className="bg-gray-50 border-b">
+          <CardTitle className="text-lg font-semibold text-gray-800">Existing Outreach Programs</CardTitle>
         </CardHeader>
         <CardContent>
           {outreachPrograms.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className="bg-gray-100">
                     <TableHead>Title</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Location</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {outreachPrograms.map((program) => (
-                    <TableRow key={program.id}>
-                      <TableCell>{program.title}</TableCell>
-                      <TableCell>{program.description || 'N/A'}</TableCell>
-                      <TableCell>{program.date ? new Date(program.date).toLocaleDateString() : 'N/A'}</TableCell>
-                      <TableCell>{program.location || 'N/A'}</TableCell>
-                      <TableCell>
-                        <Button variant="outline" size="sm" onClick={() => setEditingProgram(program)} className="mr-2">
+                    <TableRow key={program.id} className="hover:bg-gray-50 transition-colors">
+                      <TableCell className="font-medium text-gray-800">{program.title}</TableCell>
+                      <TableCell className="text-gray-600">{program.description || "N/A"}</TableCell>
+                      <TableCell>{program.date ? new Date(program.date).toLocaleDateString() : "N/A"}</TableCell>
+                      <TableCell>{program.location || "N/A"}</TableCell>
+                      <TableCell className="flex justify-center gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleOpenModalForEdit(program)}>
                           Edit
                         </Button>
                         <Button variant="destructive" size="sm" onClick={() => handleDeleteProgram(program.id)}>
@@ -236,10 +179,32 @@ const AdminOutreachPage = () => {
               </Table>
             </div>
           ) : (
-            <p>No outreach programs found.</p>
+            <p className="text-gray-500 text-center py-6">No outreach programs found.</p>
           )}
         </CardContent>
       </Card>
+
+      <CreateEventModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onEventCreated={fetchOutreachPrograms}
+        eventToEdit={editingProgram || undefined}
+      />
+
+      <AlertDialog open={showConfirmDeleteDialog} onOpenChange={setShowConfirmDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the outreach program.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteProgram}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

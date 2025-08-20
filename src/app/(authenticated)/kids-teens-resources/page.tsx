@@ -49,60 +49,128 @@ const KidsTeensResources = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("kids");
 
-  useEffect(() => {
-    const fetchResources = async () => {
-      try {
-        const response = await fetch("/api/kids-teens-resources");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+  const getPreviewComponent = (url: string, type: string) => {
+    if (!url) return null;
 
-        const categorizedResources = {
-          kids: [],
-          teens: [],
-          parents: [],
-        };
+    const lowerCaseUrl = url.toLowerCase();
 
-        data.forEach((resource) => {
-          if (resource.tags.includes("kids")) {
-            categorizedResources.kids.push(resource);
-          } else if (resource.tags.includes("teens")) {
-            categorizedResources.teens.push(resource);
-          } else if (resource.tags.includes("parents")) {
-            categorizedResources.parents.push(resource);
-          }
-        });
-
-        setAllResources(categorizedResources);
-      } catch (error) {
-        console.error("Failed to fetch resources:", error);
-        setError(error);
-      } finally {
-        setLoading(false);
+    if (type === 'IMAGE' || lowerCaseUrl.match(/\.(jpeg|jpg|png|gif|webp|svg)$/)) {
+      return <img src={url} alt="Preview" className="w-full h-48 object-contain rounded-md" />;
+    } else if (type === 'VIDEO' || lowerCaseUrl.match(/\.(mp4|webm|ogg)$/) || lowerCaseUrl.includes('youtube.com') || lowerCaseUrl.includes('youtu.be')) {
+      // Basic YouTube embed
+      if (lowerCaseUrl.includes('youtube.com/watch?v=')) {
+        const videoId = url.split('v=')[1]?.split('&')[0];
+        return (
+          <iframe
+            className="w-full h-48 rounded-md"
+            src={`https://www.youtube.com/embed/${videoId}`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="YouTube video player"
+          ></iframe>
+        );
+      } else if (lowerCaseUrl.includes('youtu.be/')) {
+        const videoId = url.split('youtu.be/')[1]?.split('&')[0];
+        return (
+          <iframe
+            className="w-full h-48 rounded-md"
+            src={`https://www.youtube.com/embed/${videoId}`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="YouTube video player"
+          ></iframe>
+        );
+      } else {
+        return (
+          <video controls className="w-full h-48 object-contain rounded-md">
+            <source src={url} type={`video/${lowerCaseUrl.split('.').pop()}`} />
+          </video>
+        );
       }
-    };
-
-    fetchResources();
-  }, []);
+    } else if (type === 'DOCUMENT' || lowerCaseUrl.match(/\.(pdf)$/)) {
+      return (
+        <iframe
+          src={url}
+          className="w-full h-48 rounded-md"
+          style={{ border: 'none' }}
+          title="Document Preview"
+        ></iframe>
+      );
+    } else if (type === 'AUDIO' || lowerCaseUrl.match(/\.(mp3|wav|ogg)$/)) {
+      return (
+        <audio controls className="w-full rounded-md">
+          <source src={url} type={`audio/${lowerCaseUrl.split('.').pop()}`} />
+        </audio>
+      );
+    } else {
+      return (
+        <div className="w-full h-48 flex items-center justify-center bg-gray-100 rounded-md text-gray-500">
+          No preview available for this type.
+        </div>
+      );
+    }
+  };
 
   const getIconForType = (type) => {
     switch (type) {
-      case "Video":
+      case "VIDEO":
         return <Video className="h-5 w-5 text-blue-500" />;
-      case "Activity":
-      case "Study Material":
-        return <BookOpen className="h-5 w-5 text-green-500" />;
-      case "Vlog":
-      case "Music":
-      case "Podcast":
+      case "AUDIO":
         return <Mic className="h-5 w-5 text-purple-500" />;
-      case "Guide":
-        return <Users className="h-5 w-5 text-amber-500" />;
+      case "IMAGE":
+        return <ImageIcon className="h-5 w-5 text-yellow-500" />;
+      case "DOCUMENT":
+        return <BookOpen className="h-5 w-5 text-green-500" />;
+      case "RESOURCE":
+      case "ACTIVITY":
+        return <BookOpen className="h-5 w-5 text-green-500" />;
       default:
         return null;
     }
   };
+
+  const fetchResources = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/kids-teens-resources");
+      if (!response.ok) {
+        setLoading(false); // Ensure loader is off on HTTP error
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      const categorizedResources = {
+        kids: [],
+        teens: [],
+        parents: [],
+      };
+
+      data.forEach((resource) => {
+        if (resource.tags.includes("kids")) {
+          categorizedResources.kids.push(resource);
+        } else if (resource.tags.includes("teens")) {
+          categorizedResources.teens.push(resource);
+        } else if (resource.tags.includes("parents")) {
+          categorizedResources.parents.push(resource);
+        }
+      });
+
+      setAllResources(categorizedResources);
+    } catch (error) {
+      console.error("Failed to fetch resources:", error);
+      setError(error);
+      toast.error("Failed to load resources."); // Updated toast call
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchResources();
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -169,11 +237,17 @@ const KidsTeensResources = () => {
     <motion.div key={index} variants={itemVariants} whileHover={{ y: -5 }}>
       <Card className="h-full bg-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden border border-gray-100 group">
         <div className="relative h-40 overflow-hidden">
-          <img
-            src={resource.url || "/images/resource-placeholder.jpg"}
-            alt={resource.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+          {resource.url && resource.type && getPreviewComponent(resource.url, resource.type) ? (
+            <div className="w-full h-full flex items-center justify-center bg-gray-100">
+              {getPreviewComponent(resource.url, resource.type)}
+            </div>
+          ) : (
+            <img
+              src={resource.imageUrl || "/images/resource-placeholder.jpg"}
+              alt={resource.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          )}
           <Badge variant="secondary" className="absolute top-2 left-2 z-10">
             {resource.type}
           </Badge>
@@ -227,10 +301,10 @@ const KidsTeensResources = () => {
   );
 
   const renderFilter = (category) => {
-    const options = [
-      "all",
-      ...new Set(allResources[category].map((r) => r.type)),
+    const assetTypes = [
+      "VIDEO", "AUDIO", "IMAGE", "DOCUMENT", "LOGO", "FONT", "TEMPLATE", "SERMON", "RESOURCE", "ACTIVITY"
     ];
+    const options = ["all", ...assetTypes];
     return (
       <Select
         value={filters[category]}

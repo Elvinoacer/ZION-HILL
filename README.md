@@ -1101,3 +1101,5 @@ Mark requests as “Pastor Prayed”
 Baptism/Ordinance Tracking
 Manage candidate lists
 Generate certificates
+
+**we can have non christian counselors, I have left the table for that in the schema.prisma**

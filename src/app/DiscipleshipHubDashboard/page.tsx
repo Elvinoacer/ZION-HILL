@@ -8,6 +8,9 @@ import GroupFacilitation from "@/components/admin/discipleship/GroupFacilitation
 import MemberCare from "@/components/admin/discipleship/MemberCare";
 import ResourceDistribution from "@/components/admin/discipleship/ResourceDistribution";
 import CommunicationChannels from "@/components/admin/discipleship/CommunicationChannels";
+import ManageThemeOfTheWeekPage from "@/app/(authenticated)/discipleship/theme-of-the-week/manage/page";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useDiscipleshipStore } from "@/store";
 
 const theme = {
@@ -24,7 +27,15 @@ const theme = {
 
 export default function DiscipleshipHubDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const pathname = usePathname();
   const [activeSection, setActiveSection] = useState("facilitation");
+
+  useEffect(() => {
+    const active =
+      sections.find((section) => pathname.startsWith(section.href))?.id ||
+      "facilitation";
+    setActiveSection(active);
+  }, [pathname]);
 
   const {
     currentStudy,
@@ -44,9 +55,9 @@ export default function DiscipleshipHubDashboard() {
   } = useDiscipleshipStore();
 
   useEffect(() => {
-    fetchCurrentStudy();
-    fetchProgress();
-    fetchResources();
+    // fetchCurrentStudy();
+    // fetchProgress();
+    // fetchResources();
     fetchLessons();
     fetchGroups();
     fetchPrayerRequests();
@@ -59,17 +70,41 @@ export default function DiscipleshipHubDashboard() {
     fetchPrayerRequests,
   ]);
 
-  if (loading) return <div className="text-center py-8">Loading discipleship data...</div>;
-  if (error) return <div className="text-center py-8 text-red-500">Error: {error}</div>;
+  if (loading)
+    return <div className="text-center py-8">Loading discipleship data...</div>;
+  if (error)
+    return <div className="text-center py-8 text-red-500">Error: {error}</div>;
 
   const sections = [
-    { id: "facilitation", label: "Group Facilitation", icon: Users },
-    { id: "membercare", label: "Member Care", icon: Heart },
-    { id: "resources", label: "Resource Distribution", icon: Book },
+    {
+      id: "facilitation",
+      label: "Group Facilitation",
+      icon: Users,
+      href: "/discipleship",
+    },
+    {
+      id: "membercare",
+      label: "Member Care",
+      icon: Heart,
+      href: "/discipleship/membercare",
+    },
+    {
+      id: "resources",
+      label: "Resource Distribution",
+      icon: Book,
+      href: "/discipleship/resources",
+    },
     {
       id: "communication",
       label: "Communication Channels",
       icon: MessageSquare,
+      href: "/discipleship/communication",
+    },
+    {
+      id: "themes",
+      label: "Manage Themes",
+      icon: Book,
+      href: "/discipleship/theme-of-the-week/manage",
     },
   ];
 
@@ -147,20 +182,22 @@ export default function DiscipleshipHubDashboard() {
           </div>
           <nav className="mt-4">
             {sections.map((section) => (
-              <motion.button
-                key={section.id}
-                className={`w-full flex items-center p-4 text-left ${
-                  activeSection === section.id
-                    ? `${theme.primary} text-white`
-                    : `${theme.secondary} ${theme.textSecondary} ${theme.secondaryHover}`
-                }`}
-                onClick={() => setActiveSection(section.id)}
-                whileHover={{ scale: 1.03 }}
-                aria-current={activeSection === section.id ? "page" : undefined}
-              >
-                <section.icon className="h-5 w-5 mr-2" aria-hidden="true" />
-                {!sidebarCollapsed && section.label}
-              </motion.button>
+              <Link href={section.href} key={section.id}>
+                <motion.button
+                  className={`w-full flex items-center p-4 text-left ${
+                    activeSection === section.id
+                      ? `${theme.primary} text-white`
+                      : `${theme.secondary} ${theme.textSecondary} ${theme.secondaryHover}`
+                  }`}
+                  whileHover={{ scale: 1.03 }}
+                  aria-current={
+                    activeSection === section.id ? "page" : undefined
+                  }
+                >
+                  <section.icon className="h-5 w-5 mr-2" aria-hidden="true" />
+                  {!sidebarCollapsed && section.label}
+                </motion.button>
+              </Link>
             ))}
           </nav>
         </motion.div>
@@ -178,10 +215,20 @@ export default function DiscipleshipHubDashboard() {
             role="main"
             aria-labelledby="dashboard-heading"
           >
-            {activeSection === "facilitation" && <GroupFacilitation currentStudy={currentStudy} prayerRequests={prayerRequests} />}
+            {activeSection === "facilitation" && (
+              <GroupFacilitation
+                currentStudy={currentStudy}
+                prayerRequests={prayerRequests}
+              />
+            )}
             {activeSection === "membercare" && <MemberCare />}
-            {activeSection === "resources" && <ResourceDistribution resources={resources} />}
-            {activeSection === "communication" && <CommunicationChannels prayerRequests={prayerRequests} />}
+            {activeSection === "resources" && (
+              <ResourceDistribution resources={resources} />
+            )}
+            {activeSection === "communication" && (
+              <CommunicationChannels prayerRequests={prayerRequests} />
+            )}
+            {activeSection === "themes" && <ManageThemeOfTheWeekPage />}
           </motion.div>
         </div>
       </div>

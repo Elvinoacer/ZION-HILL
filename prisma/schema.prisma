@@ -14,15 +14,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -44,73 +43,190 @@ model VerificationToken {
 }
 
 model User {
-  id                  String               @id @default(cuid())
-  name                String?
-  email               String?              @unique
-  emailVerified       DateTime?
-  image               String?
-  phone               String?
-  address             String?
-  membersince         String?
-  birthdate           String?
-  photo               String?
-  password            String?
-  isActive            Boolean              @default(true)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  familyId            String?
-  createFamily        Family?              @relation("createdBy")
-  family              Family?              @relation("members", fields: [familyId], references: [id])
-  roles               RoleName[]
-  createdTickets      Ticket[]             @relation("CreatedTickets")
-  assignedTickets     Ticket[]             @relation("AssignedTickets")
-  ledMinistries       Ministry[]
-  ledGroups           Group[]
-  counselingSessions  CounselingSession[]  @relation("Counselor")
-  attendedSessions    CounselingSession[]  @relation("Client")
-  auditLogs           AuditLog[]
-  uploadedAssets      Asset[]
-  sermons             Sermon[]
-  waiverSignatures    WaiverSignature[]
-  transactions        Transaction[]
-  feedback            Feedback[]
-  shifts              VolunteerShift[]
-  bibleStudyProgress  BibleStudyProgress[]
-  ministryMemberships MinistryMember[]
-  parentalControl     ParentalControl?
-  sentMessages        Message[]            @relation("SentMessages")
-  pushSubscriptions   PushSubscription[]
-  accounts            Account[]
-  sessions            Session[]
-  ForumTopic          ForumTopic[]
-  ForumPost           ForumPost[]
-  postFeedbacks       PostFeedback[]
-  topicFeedbacks      TopicFeedback[]
-  polls               Poll[]
-  votes               Vote[]
-  Role                Role?                @relation(fields: [roleId], references: [id])
-  roleId              Int?
-  christian           Boolean? // Added for therapist filtering
-  prayerRequest       PrayerRequest[]
-  receivedMessages    Message[]            @relation("ReceivedMessages")
-  participants        Participant[] // Add this line
+  id             String     @id @default(cuid())
+  name           String?
+  email          String?    @unique
+  emailVerified  DateTime?
+  image          String?
+  phone          String?
+  address        String?
+  membersince    String?
+  birthdate      String?
+  photo          String?
+  password       String?
+  isActive       Boolean    @default(true)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  familyId       String?
+  roles          RoleName[]
+  roleId         Int?
+  christian      Boolean?
+  accounts       Account[]
+  uploadedAssets Asset[]
+  auditLogs      AuditLog[]
+
+  attendedSessions          CounselingSession[]       @relation("Client")
+  counselingSessions        CounselingSession[]       @relation("Counselor")
+  createFamily              Family?                   @relation("createdBy")
+  feedback                  Feedback[]
+  ForumPost                 ForumPost[]
+  ForumTopic                ForumTopic[]
+  ledGroups                 Group[]
+  receivedMessages          Message[]                 @relation("ReceivedMessages")
+  sentMessages              Message[]                 @relation("SentMessages")
+  ledMinistries             Ministry[]
+  ministryMemberships       MinistryMember[]
+  parentalControl           ParentalControl?
+  participants              Participant[]
+  polls                     Poll[]
+  postFeedbacks             PostFeedback[]
+  prayerRequest             PrayerRequest[]
+  pushSubscriptions         PushSubscription[]
+  sermons                   Sermon[]
+  sessions                  Session[]
+  assignedTickets           Ticket[]                  @relation("AssignedTickets")
+  createdTickets            Ticket[]                  @relation("CreatedTickets")
+  topicFeedbacks            TopicFeedback[]
+  transactions              Transaction[]
+  family                    Family?                   @relation("members", fields: [familyId], references: [id])
+  Role                      Role?                     @relation(fields: [roleId], references: [id])
+  shifts                    VolunteerShift[]
+  votes                     Vote[]
+  waiverSignatures          WaiverSignature[]
+  canvasDesigns             CanvasDesign[] // Add this line
+  baptismApplicationStatus  BaptismStatus?
+  baptismClassCompleted     Boolean?                  @default(false)
+  baptismDate               DateTime?
+  certificates              Certificate[]
+  volunteeringOpportunities VolunteeringOpportunity[]
+  volunteeringApplications  VolunteeringApplication[]
+  projectApplications       ProjectApplication[] // Add this line
+  followUps                 FollowUp[]
+  bibleStudyEnrollments     BibleStudyEnrollment[]
+  createdBibleStudyCourses  BibleStudyCourse[]
+  RecurringGift             RecurringGift[]
+  financialSupportRequests  FinancialSupportRequest[]
+  ministryJoinRequests      MinistryJoinRequest[] // Add this line
+  SongProposal              SongProposal[]
+  songLikes                 SongLike[]
+  createdWorshipSets        WorshipSet[]
+  sentWorshipMessages       WorshipMessage[]          @relation("WorshipMessageSender")
+  receivedWorshipMessages   WorshipMessage[]          @relation("WorshipMessageRecipient")
 }
 
-enum MessageType {
-  GENERAL
-  EVENT_QUERY
-  SUPPORT
-  FEEDBACK
+model Certificate {
+  id               String            @id @default(cuid())
+  userId           String?
+  user             User?             @relation(fields: [userId], references: [id])
+  certificateType  String
+  cloudinaryUrl    String
+  issuedDate       DateTime          @default(now())
+  eventName        String? // Added this field
+  pastorName       String?
+  churchName       String?
+  churchLocation   String?
+  certificateId    String?           @unique
+  briefDescription String?
+  recipientName    String?
+  courseId         String?
+  course           BibleStudyCourse? @relation(fields: [courseId], references: [id])
+}
+
+enum CertificateFrequency {
+  QUARTERLY
+  ANNUALLY
+  BIANNUALLY
+}
+
+model BibleStudyCourse {
+  id                   String                 @id @default(cuid())
+  title                String
+  description          String?
+  certificateFrequency CertificateFrequency
+  startDate            DateTime
+  endDate              DateTime
+  adminId              String
+  admin                User                   @relation(fields: [adminId], references: [id])
+  lessons              Lesson[]
+  enrollments          BibleStudyEnrollment[]
+  certificates         Certificate[]
+}
+
+model Lesson {
+  id           String           @id @default(cuid())
+  title        String
+  order        Int
+  courseId     String
+  course       BibleStudyCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  pdfUrl       String?
+  imageUrl     String?
+  externalLink String?
+  content      String?
+  questions    LessonQuestion[]
+  progress     LessonProgress[]
+  quizAttempts QuizAttempt[]
+}
+
+model LessonQuestion {
+  id                 String   @id @default(cuid())
+  lessonId           String
+  lesson             Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  text               String
+  options            String[]
+  correctAnswerIndex Int
+}
+
+model BibleStudyEnrollment {
+  id           String           @id @default(cuid())
+  userId       String
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId     String
+  course       BibleStudyCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  enrolledAt   DateTime         @default(now())
+  progress     LessonProgress[]
+  quizAttempts QuizAttempt[]
+
+  @@unique([userId, courseId])
+}
+
+model LessonProgress {
+  id           String               @id @default(cuid())
+  enrollmentId String
+  enrollment   BibleStudyEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lessonId     String
+  lesson       Lesson               @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completedAt  DateTime?
+
+  @@unique([enrollmentId, lessonId])
+}
+
+model QuizAttempt {
+  id           String               @id @default(cuid())
+  enrollmentId String
+  enrollment   BibleStudyEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lessonId     String
+  lesson       Lesson               @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  score        Float
+  summary      Json
+  attemptedAt  DateTime             @default(now())
+}
+
+enum BaptismStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SCHEDULED
+  COMPLETED
 }
 
 model Family {
   id          String   @id @default(cuid())
   name        String
   createdById String   @unique
-  createdBy   User     @relation("createdBy", fields: [createdById], references: [id])
-  members     User[]   @relation("members")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  createdBy   User     @relation("createdBy", fields: [createdById], references: [id])
+  members     User[]   @relation("members")
 }
 
 model Role {
@@ -119,35 +235,58 @@ model Role {
   users User[]
 }
 
-enum RoleName {
-  ADMIN
-  MEMBER
-  GUEST
-  PRAYER_MANAGER
-  COUNSELOR
-  VOLUNTEER
+model Ministry {
+  id                   String                @id @default(cuid())
+  name                 String
+  description          String?
+  leaderId             String
+  photo                String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  events               Event[]
+  groups               Group[]
+  leader               User                  @relation(fields: [leaderId], references: [id])
+  members              MinistryMember[]
+  budgets              MinistryBudget[]
+  ministryJoinRequests MinistryJoinRequest[] // Add this line
 }
 
-model Ministry {
-  id          String           @id @default(cuid())
-  name        String
-  description String?
-  leaderId    String
-  leader      User             @relation(fields: [leaderId], references: [id])
-  groups      Group[]
-  events      Event[]
-  members     MinistryMember[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+model MinistryBudget {
+  id              String   @id @default(cuid())
+  ministryId      String
+  ministry        Ministry @relation(fields: [ministryId], references: [id])
+  fiscalYear      Int
+  allocatedAmount Float
+  spentAmount     Float    @default(0)
+  status          String   @default("PENDING")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([ministryId, fiscalYear])
 }
 
 model MinistryMember {
   ministryId String
   userId     String
-  ministry   Ministry @relation(fields: [ministryId], references: [id])
+  active     Boolean  @default(true)
+  joinDate   DateTime @default(now())
+  role       String?
+  ministry   Ministry @relation(fields: [ministryId], references: [id], onDelete: Cascade)
   user       User     @relation(fields: [userId], references: [id])
 
   @@id([ministryId, userId])
+}
+
+model MinistryJoinRequest {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  ministryId  String
+  ministry    Ministry @relation(fields: [ministryId], references: [id])
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  requestedAt DateTime @default(now())
+
+  @@unique([userId, ministryId])
 }
 
 model Group {
@@ -155,62 +294,100 @@ model Group {
   name        String
   description String?
   ministryId  String
-  ministry    Ministry @relation(fields: [ministryId], references: [id])
   leaderId    String
-  leader      User     @relation(fields: [leaderId], references: [id])
-  meetings    Event[]
   createdAt   DateTime @default(now())
+  meetings    Event[]
+  leader      User     @relation(fields: [leaderId], references: [id])
+  ministry    Ministry @relation(fields: [ministryId], references: [id], onDelete: Cascade)
 }
 
 model Event {
   id                  String               @id @default(cuid())
   title               String
-  description         String? // Added for event description
-  imageUrl            String? // Added for event image
+  description         String?
+  imageUrl            String?
   type                EventType
-  date                DateTime
+  date                DateTime?
   location            String?
   tags                String[]
   latitude            Float?
   longitude           Float?
-  time                String? // Added for event time
+  time                String?
   ministryId          String?
-  ministry            Ministry?            @relation(fields: [ministryId], references: [id])
   groupId             String?
-  group               Group?               @relation(fields: [groupId], references: [id])
-  resourceAllocations ResourceAllocation[]
-  participants        Participant[]
-  financials          Financials[]
-  sponsors            Sponsor[]
-  feedback            Feedback[]
-  media               Asset[]
   createdAt           DateTime             @default(now())
-  worshipResources    WorshipResource[]
+  media               Asset[]
+  group               Group?               @relation(fields: [groupId], references: [id])
+  ministry            Ministry?            @relation(fields: [ministryId], references: [id], onDelete: Cascade)
+  feedback            Feedback[]
+  financials          Financials?
   Message             Message[]
+  participants        Participant[]
+  resourceAllocations ResourceAllocation[]
+  sponsors            Sponsor[]
+  worshipResources    WorshipResource[]
+  projectApplications ProjectApplication[] // Add this line
+}
+
+model WorshipSet {
+  id            String   @id @default(cuid())
+  title         String
+  date          DateTime
+  leaderId      String
+  leader        User     @relation(fields: [leaderId], references: [id])
+  arrangedSongs String[] // Ordered list of SongProposal IDs
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model WorshipResource {
   id        String    @id @default(cuid())
   title     String
   url       String
-  type      AssetType
+  assetType AssetType @map("type")
   serviceId String
-  service   Event     @relation(fields: [serviceId], references: [id])
   createdAt DateTime  @default(now())
+  service   Event     @relation(fields: [serviceId], references: [id])
 }
 
 model Announcement {
   id        String   @id @default(cuid())
+  title     String
   content   String
+  tags      String[] @default([])
   createdAt DateTime @default(now())
 }
 
 model SongProposal {
-  id        String   @id @default(cuid())
-  title     String
-  artist    String
-  userId    String
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  title      String
+  artist     String
+  youtubeUrl String? // Optional YouTube link
+  spotifyUrl String? // Optional Spotify link
+  userId     String // ID of the user who submitted the proposal
+  user       User     @relation(fields: [userId], references: [id])
+  likes      Int      @default(0) // Added for like functionality
+  createdAt  DateTime @default(now())
+  likesByUsers SongLike[]
+}
+
+model SongLike {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  songProposalId String
+  songProposal  SongProposal @relation(fields: [songProposalId], references: [id])
+  createdAt     DateTime    @default(now())
+
+  @@unique([userId, songProposalId]) // Ensures a user can like a song only once
+}
+
+enum ResourceType {
+  PDF
+  VIDEO
+  ARTICLE
+  IMAGE
+  LINK
 }
 
 model Resource {
@@ -220,43 +397,37 @@ model Resource {
   url                 String
   category            Category
   type                ResourceType
-  resourceAllocations ResourceAllocation[]
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
-}
-
-enum Category {
-  KIDS
-  TEENS
-  PARENTS
+  resourceAllocations ResourceAllocation[]
 }
 
 model ResourceAllocation {
   id         String   @id @default(cuid())
   eventId    String
   resourceId String
+  quantity   Int
   event      Event    @relation(fields: [eventId], references: [id])
   resource   Resource @relation(fields: [resourceId], references: [id])
-  quantity   Int
 }
 
 model Participant {
   id      String @id @default(cuid())
   eventId String
   userId  String
-  status  String // Registered, Waitlisted, Invited
-  event   Event  @relation(fields: [eventId], references: [id])
-  user    User   @relation(fields: [userId], references: [id]) // Add this line
+  status  String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Financials {
   id             String @id @default(cuid())
   eventId        String @unique
-  event          Event  @relation(fields: [eventId], references: [id])
   budget         Float
   expenses       Float
   revenue        Float
-  vendorPayments Json // { vendor: string; status: "Paid" | "Pending" }[]
+  vendorPayments Json
+  event          Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model Sponsor {
@@ -280,24 +451,27 @@ model Feedback {
   sentiment Sentiment
   comment   String
   tags      String[]
+  imageUrl  String? // Added for image support
   createdAt DateTime  @default(now())
   event     Event?    @relation(fields: [eventId], references: [id])
   user      User      @relation(fields: [userId], references: [id])
 }
 
 model Asset {
-  id         String    @id @default(cuid())
-  title      String
-  type       AssetType
-  url        String
-  uploaderId String
-  uploader   User      @relation(fields: [uploaderId], references: [id])
-  eventId    String?
-  event      Event?    @relation(fields: [eventId], references: [id])
-  sermonId   String?   @unique
-  sermon     Sermon?
-  tags       String[]
-  createdAt  DateTime  @default(now())
+  id          String    @id @default(cuid())
+  title       String
+  content     String? // Added for blog post content
+  type        AssetType
+  url         String?
+  uploaderId  String
+  eventId     String?
+  sermonId    String?   @unique
+  tags        String[]
+  createdAt   DateTime  @default(now())
+  event       Event?    @relation(fields: [eventId], references: [id])
+  uploader    User      @relation(fields: [uploaderId], references: [id])
+  sermon      Sermon?
+  description String?
 }
 
 model Sermon {
@@ -305,43 +479,93 @@ model Sermon {
   title      String
   date       DateTime
   speakerId  String
-  speaker    User     @relation(fields: [speakerId], references: [id])
   videoAsset Asset    @relation(fields: [id], references: [sermonId])
+  speaker    User     @relation(fields: [speakerId], references: [id])
 }
 
 model Transaction {
-  id          String            @id @default(cuid())
-  type        TransactionType
-  amount      Float
-  method      TransactionMethod
-  description String?
-  userId      String?
-  user        User?             @relation(fields: [userId], references: [id])
-  fundId      String?
-  fund        Fund?             @relation(fields: [fundId], references: [id])
-  date        DateTime          @default(now())
-  anomaly     Boolean           @default(false)
+  id                   String               @id @default(cuid())
+  type                 TransactionType
+  amount               Float
+  method               TransactionMethod
+  description          String?
+  userId               String?
+  email                String?
+  donationPlanId       String?
+  donorName            String?
+  donorEmail           String?
+  recurring            Boolean              @default(false)
+  date                 DateTime             @default(now())
+  anomaly              Boolean              @default(false)
+  reconciliationStatus ReconciliationStatus @default(PENDING)
+  donationPlan         DonationPlan?        @relation(fields: [donationPlanId], references: [id])
+  user                 User?                @relation(fields: [userId], references: [id])
 }
 
-model Fund {
-  id           String        @id @default(cuid())
+enum ReconciliationStatus {
+  PENDING
+  APPROVED
+  FLAGGED
+}
+
+model DonationPlan {
+  id           String           @id @default(cuid())
+  name         String
+  description  String?
+  email        String?
+  imageUrl     String?
+  goalAmount   Float?
+  type         DonationPlanType
+  fundId       String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  fund         DonationFund?    @relation(fields: [fundId], references: [id])
+  transactions Transaction[]
+}
+
+enum DonationPlanType {
+  PROJECT
+  MINISTRY
+  USER_REQUEST
+  GENERAL
+}
+
+model DonationFund {
+  id           String         @id @default(cuid())
   name         String
   description  String?
   goalAmount   String?
   raisedAmount String?
-  transactions Transaction[]
+  plans        DonationPlan[]
+}
+
+model Gateway {
+  id       String @id @default(cuid())
+  provider String @unique // e.g., "Stripe", "PayPal", "MPesa"
+  status   String // "Online", "Offline"
+}
+
+model RecurringGift {
+  id        String   @id @default(cuid())
+  donorId   String // Assuming this links to a User or a separate Donor model
+  amount    Float
+  startDate DateTime @default(now())
+  endDate   DateTime
+  status    String // e.g., "Active", "Paused", "LowGiving", "Expired"
+  userId    String? // Optional link to User model
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 model Ticket {
   id         String   @id @default(cuid())
   issue      String
   priority   Urgency
-  status     String // Open, In-Progress, Closed
+  status     String
   creatorId  String
   assigneeId String?
-  creator    User     @relation("CreatedTickets", fields: [creatorId], references: [id])
-  assignee   User?    @relation("AssignedTickets", fields: [assigneeId], references: [id])
   createdAt  DateTime @default(now())
+  assignee   User?    @relation("AssignedTickets", fields: [assigneeId], references: [id])
+  creator    User     @relation("CreatedTickets", fields: [creatorId], references: [id])
 }
 
 model Partner {
@@ -352,16 +576,38 @@ model Partner {
   contact String
 }
 
+model CounselingTopic {
+  id                 String              @id @default(cuid())
+  name               String              @unique
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  counselingSessions CounselingSession[]
+}
+
 model CounselingSession {
-  id          String   @id @default(cuid())
-  counselorId String
-  clientId    String
+  id          String           @id @default(cuid())
+  counselorId String?
+  clientId    String?
   date        DateTime
-  status      String // Scheduled, Completed, Cancelled
-  notes       String? // Should be encrypted
+  status      String
+  notes       String?
+  topicId     String?
   progress    Int
-  counselor   User     @relation("Counselor", fields: [counselorId], references: [id])
-  client      User     @relation("Client", fields: [clientId], references: [id])
+  client      User?            @relation("Client", fields: [clientId], references: [id])
+  counselor   User?            @relation("Counselor", fields: [counselorId], references: [id])
+  topic       CounselingTopic? @relation(fields: [topicId], references: [id])
+  followUps   FollowUp[]
+}
+
+model FollowUp {
+  id                  String             @id @default(cuid())
+  userId              String
+  counselingSessionId String?
+  days                Int
+  response            String
+  followUpDate        DateTime           @default(now())
+  user                User               @relation(fields: [userId], references: [id])
+  counselingSession   CounselingSession? @relation(fields: [counselingSessionId], references: [id])
 }
 
 model Waiver {
@@ -376,8 +622,8 @@ model WaiverSignature {
   waiverId String
   userId   String
   signedAt DateTime @default(now())
-  waiver   Waiver   @relation(fields: [waiverId], references: [id])
   user     User     @relation(fields: [userId], references: [id])
+  waiver   Waiver   @relation(fields: [waiverId], references: [id])
 }
 
 model AuditLog {
@@ -392,38 +638,12 @@ model AuditLog {
 model VolunteerShift {
   id              String   @id @default(cuid())
   userId          String
-  user            User     @relation(fields: [userId], references: [id])
   eventId         String
   time            String
   conflictCheck   Boolean  @default(false)
   replacementPool String[]
   checkedIn       Boolean  @default(false)
-}
-
-model BibleStudy {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  lessons     Lesson[]
-}
-
-model Lesson {
-  id           String               @id @default(cuid())
-  title        String
-  content      String
-  bibleStudyId String
-  bibleStudy   BibleStudy           @relation(fields: [bibleStudyId], references: [id])
-  progress     BibleStudyProgress[]
-}
-
-model BibleStudyProgress {
-  id             String  @id @default(cuid())
-  userId         String
-  lessonId       String
-  completed      Boolean @default(false)
-  targetSessions Int     @default(3)
-  user           User    @relation(fields: [userId], references: [id])
-  lesson         Lesson  @relation(fields: [lessonId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
 }
 
 model PrayerRequest {
@@ -434,15 +654,9 @@ model PrayerRequest {
   userId        String?
   createdAt     DateTime     @default(now())
   status        PrayerStatus @default(PENDING)
-  dailyRoomUrl  String? // New field for Daily.co room URL
-  dailyRoomName String? // New field for Daily.co room name
+  dailyRoomUrl  String?
+  dailyRoomName String?
   user          User?        @relation(fields: [userId], references: [id])
-}
-
-enum PrayerStatus {
-  ONGOING
-  PENDING
-  PRAYED
 }
 
 model ThemeOfTheWeek {
@@ -457,37 +671,37 @@ model ThemeOfTheWeek {
 model ParentalControl {
   id                    String  @id @default(cuid())
   userId                String  @unique
-  user                  User    @relation(fields: [userId], references: [id])
   contentFilter         Boolean @default(false)
   activityMonitoring    Boolean @default(false)
   screenTimeLimit       Boolean @default(false)
   screenTimeHours       Int     @default(0)
   messagingRestrictions Boolean @default(false)
+  user                  User    @relation(fields: [userId], references: [id])
 }
 
 model Message {
   id          String      @id @default(cuid())
   senderId    String
-  sender      User        @relation("SentMessages", fields: [senderId], references: [id])
-  recipientId String // ID of the user who receives the message
-  recipient   User        @relation("ReceivedMessages", fields: [recipientId], references: [id])
-  eventId     String? // Optional: ID of the event the message is related to
-  event       Event?      @relation(fields: [eventId], references: [id])
+  recipientId String? // Make recipientId nullable for community messages
+  eventId     String?
   subject     String
   content     String
   read        Boolean     @default(false)
-  type        MessageType @default(GENERAL) // e.g., GENERAL, EVENT_QUERY, SUPPORT
+  type        MessageType @default(GENERAL)
   createdAt   DateTime    @default(now())
+  event       Event?      @relation(fields: [eventId], references: [id])
+  recipient   User?       @relation("ReceivedMessages", fields: [recipientId], references: [id])
+  sender      User        @relation("SentMessages", fields: [senderId], references: [id])
 }
 
 model PushSubscription {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
   endpoint  String   @unique
   p256dh    String
   auth      String
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model ForumTopic {
@@ -495,41 +709,41 @@ model ForumTopic {
   title          String
   content        String
   userId         String
-  user           User            @relation(fields: [userId], references: [id])
-  imageUrl       String? // New field for image URL
-  videoUrl       String? // New field for video URL
-  likes          Int             @default(0) // New field for likes count
-  dislikes       Int             @default(0) // New field for dislikes count
+  imageUrl       String?
+  videoUrl       String?
+  likes          Int             @default(0)
+  dislikes       Int             @default(0)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   posts          ForumPost[]
-  topicFeedbacks TopicFeedback[] // Opposite relation field for TopicFeedback
+  user           User            @relation(fields: [userId], references: [id])
+  topicFeedbacks TopicFeedback[]
 }
 
 model ForumPost {
   id        String         @id @default(cuid())
   content   String
   userId    String
-  user      User           @relation(fields: [userId], references: [id])
   topicId   String
-  topic     ForumTopic     @relation(fields: [topicId], references: [id])
   imageUrl  String?
   videoUrl  String?
   likes     Int            @default(0)
   dislikes  Int            @default(0)
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
+  topic     ForumTopic     @relation(fields: [topicId], references: [id])
+  user      User           @relation(fields: [userId], references: [id])
   feedback  PostFeedback[]
 }
 
 model TopicFeedback {
   id        String       @id @default(cuid())
   userId    String
-  user      User         @relation(fields: [userId], references: [id])
   topicId   String
-  topic     ForumTopic   @relation(fields: [topicId], references: [id])
-  type      FeedbackType // LIKE or DISLIKE
+  type      FeedbackType
   createdAt DateTime     @default(now())
+  topic     ForumTopic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id])
 
   @@unique([userId, topicId])
 }
@@ -537,13 +751,20 @@ model TopicFeedback {
 model PostFeedback {
   id        String       @id @default(cuid())
   userId    String
-  user      User         @relation(fields: [userId], references: [id])
   postId    String
-  post      ForumPost    @relation(fields: [postId], references: [id])
-  type      FeedbackType // LIKE or DISLIKE
+  type      FeedbackType
   createdAt DateTime     @default(now())
+  post      ForumPost    @relation(fields: [postId], references: [id])
+  user      User         @relation(fields: [userId], references: [id])
 
   @@unique([userId, postId])
+}
+
+model FinancialSetting {
+  id                String   @id @default(cuid())
+  annualBudgetLimit Float
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Poll {
@@ -551,8 +772,8 @@ model Poll {
   title       String
   description String?
   createdAt   DateTime     @default(now())
-  createdBy   User         @relation(fields: [createdById], references: [id])
   createdById String
+  createdBy   User         @relation(fields: [createdById], references: [id])
   options     PollOption[]
   votes       Vote[]
 }
@@ -568,17 +789,115 @@ model PollOption {
 model Vote {
   id        String     @id @default(cuid())
   userId    String
-  user      User       @relation(fields: [userId], references: [id])
   pollId    String
-  poll      Poll       @relation(fields: [pollId], references: [id])
   optionId  String
-  option    PollOption @relation(fields: [optionId], references: [id])
   createdAt DateTime   @default(now())
+  option    PollOption @relation(fields: [optionId], references: [id])
+  poll      Poll       @relation(fields: [pollId], references: [id])
+  user      User       @relation(fields: [userId], references: [id])
 
-  @@unique([userId, pollId]) // A user can only vote once per poll
+  @@unique([userId, pollId])
 }
 
-// ENUMS
+model Institution {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  description String?
+  address     String?
+  contactInfo String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PastorQuestion {
+  id          String  @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  topic       String
+  description String
+}
+
+model CanvasDesign {
+  id        String   @id @default(cuid())
+  name      String
+  imageUrl  String
+  jsonData  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model WorshipMessage {
+  id                String      @id @default(cuid())
+  content           String
+  createdAt         DateTime    @default(now())
+  senderId          String
+  sender            User        @relation("WorshipMessageSender", fields: [senderId], references: [id])
+  recipientId       String
+  recipient         User        @relation("WorshipMessageRecipient", fields: [recipientId], references: [id])
+  worshipMinistryId String?
+  messageType       MessageType @default(GENERAL) // Added messageType
+  read              Boolean     @default(false)
+
+  @@index([worshipMinistryId])
+}
+
+enum MessageType {
+  GENERAL
+  EVENT_QUERY
+  SUPPORT
+  FEEDBACK
+  MINISTRY_INQUIRY
+  WORSHIP_TEAM
+  PASTORAL_CARE // Added PASTORAL_CARE
+}
+
+enum RoleName {
+  ADMIN
+  MEMBER
+  GUEST
+  PRAYER_MANAGER
+  COUNSELOR
+  VOLUNTEER
+  EVENTS_MANAGER
+  SENIOR_PASTOR
+  FINANCE_ADMINISTRATOR
+  VOLUNTEER_COORDINATOR
+  WORSHIP_LEADER
+  OVERALL_MINISTRIES_COORDINATOR
+  MEN_MINISTRY_COORDINATOR
+  WOMEN_MINISTRY_COORDINATOR
+  YOUTH_MINISTRY_COORDINATOR
+  COUPLES_AND_FAMILY_MINISTRY_COORDINATOR
+  CHILDREN_MINISTRY_COORDINATOR
+  YOUNG_ADULTS_MINISTRY_COORDINATOR
+  ELDERS_MINISTRY_COORDINATOR
+  SINGLES_MINISTRY_COORDINATOR
+  OUTREACH_DIRECTOR
+  DISCIPLESHIP_LEADER
+  TECH_MEDIA_MANAGER
+  SMALL_GROUPS_LEADER
+  CHILDREN_YOUTH_DIRECTOR
+  SECRETARY
+  COMMUNICATIONS_OFFICER
+  MISSIONS_PASTOR
+}
+
+enum Category {
+  KIDS
+  TEENS
+  PARENTS
+}
+
+enum PrayerStatus {
+  ONGOING
+  PENDING
+  PRAYED
+}
 
 enum FeedbackType {
   LIKE
@@ -593,6 +912,7 @@ enum EventType {
   CLASS
   EVENT
   BOOKING
+  SERMON
 }
 
 enum AssetType {
@@ -643,36 +963,82 @@ enum PartnerType {
   BUSINESS
 }
 
-enum ResourceType {
-  EQUIPMENT
-  VENUE
-  TEAM
-  VEHICLE
-  VIDEO
-  AUDIO
-  IMAGE
-  DOCUMENT
-  ACTIVITY
-  TEMPLATE
+model VolunteeringOpportunity {
+  id                String                    @id @default(cuid())
+  title             String
+  description       String?
+  type              String
+  imageUrl          String?
+  requiredPeople    Int                       @default(1)
+  currentApplicants Int                       @default(0)
+  assignedPeople    Int                       @default(0)
+  isAssigned        Boolean                   @default(false)
+  coordinatorId     String
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+  coordinator       User                      @relation(fields: [coordinatorId], references: [id])
+  applications      VolunteeringApplication[]
+  customFields      Json?
 }
 
-model Institution {
-  id          String   @id @default(cuid())
-  name        String
-  type        String
-  description String?
-  address     String?
-  contactInfo String?
-  imageUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model VolunteeringApplication {
+  id               String                  @id @default(cuid())
+  opportunityId    String
+  applicantId      String
+  status           ApplicationStatus       @default(PENDING)
+  appliedAt        DateTime                @default(now())
+  opportunity      VolunteeringOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  applicant        User                    @relation(fields: [applicantId], references: [id])
+  coordinatorNotes String?
 }
 
-model PastorQuestion {
-  id          String  @id @default(cuid())
-  name        String
-  email       String?
-  phone       String?
-  topic       String
-  description String
+model ProjectApplication {
+  id          String            @id @default(cuid())
+  projectId   String
+  applicantId String
+  notes       String?
+  status      ApplicationStatus @default(PENDING)
+  appliedAt   DateTime          @default(now())
+  project     Event             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  applicant   User              @relation(fields: [applicantId], references: [id])
+
+  @@unique([projectId, applicantId])
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model FinancialSupportRequest {
+  id              String                 @id @default(cuid())
+  userId          String? // Optional, for anonymous requests
+  user            User?                  @relation(fields: [userId], references: [id])
+  name            String? // Name of requester if not a registered user
+  email           String?
+  phone           String?
+  amountRequested Float
+  reason          String
+  status          FinancialSupportStatus @default(PENDING)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+}
+
+enum FinancialSupportStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  IN_REVIEW
+}
+
+model LiveStream {
+  id          String    @id @default(cuid())
+  streamUrl   String?
+  isLive      Boolean   @default(false)
+  platform    String?
+  mediaType   String?
+  viewerCount Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

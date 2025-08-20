@@ -1,21 +1,54 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma"; // Assuming prisma client is available here
 
 export async function GET() {
   try {
-    // In a real application, this would involve complex aggregation queries
-    // on CounselingSession data to identify trends (e.g., most common issues).
-    // For now, returning dummy data.
-    const trends = [
-      { id: 1, need: "Anxiety", count: 25 },
-      { id: 2, need: "Grief", count: 18 },
-      { id: 3, need: "Relationship Issues", count: 30 },
-      { id: 4, need: "Depression", count: 22 },
-      { id: 5, need: "Stress Management", count: 15 },
-    ];
-    return NextResponse.json(trends);
-  } catch (error: any) {
-    console.error("Error fetching trends data:", error);
-    return NextResponse.json({ error: 'Failed to fetch trends data', details: error.message }, { status: 500 });
+    const trends = await prisma.counselingSession.groupBy({
+      by: ["topicId"],
+      _count: {
+        topicId: true,
+      },
+      where: {
+        topicId: {
+          not: null, // Only count sessions with a defined topic
+        },
+      },
+      orderBy: {
+        _count: {
+          topicId: "desc",
+        },
+      },
+    });
+
+    // Fetch topic names for the topicIds
+    const topicIds = trends.map((t) => t.topicId);
+    const topics = await prisma.counselingTopic.findMany({
+      where: {
+        id: {
+          in: topicIds,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    const topicMap = new Map(topics.map((topic) => [topic.id, topic.name]));
+
+    // Map the results to the format expected by the frontend
+    const formattedTrends = trends.map((t, index) => ({
+      id: index + 1, // Simple ID for frontend, can be improved if needed
+      need: topicMap.get(t.topicId!) || "Unknown",
+      count: t._count.topicId,
+    }));
+
+    return NextResponse.json(formattedTrends);
+  } catch (error) {
+    console.error("Error fetching counseling trends:", error);
+    return NextResponse.json(
+      { message: "Error fetching trends" },
+      { status: 500 }
+    );
   }
 }

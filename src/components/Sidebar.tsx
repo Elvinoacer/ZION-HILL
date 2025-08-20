@@ -48,6 +48,8 @@ const SidebarContent = ({ setSidebarOpen }) => {
       icon: <Icons.newspaper />,
       path: "/newsletter-subscriptions",
     },
+    { name: "Volunteering", icon: <Icons.handshake />, path: "/volunteering" },
+    { name: "Certificates", icon: <Icons.checkCircle />, path: "/certificates" }, // Added
   ];
 
   const memberNavItems = [
@@ -141,6 +143,18 @@ const SidebarContent = ({ setSidebarOpen }) => {
       path: "/family-life",
       requiredRoles: ["MEMBER", "ADMIN"],
     },
+    {
+      name: "Volunteering",
+      icon: <Icons.handshake />,
+      path: "/volunteering",
+      requiredRoles: ["MEMBER", "ADMIN"],
+    },
+    {
+      name: "Certificates",
+      icon: <Icons.checkCircle />,
+      path: "/certificates",
+      requiredRoles: ["MEMBER", "ADMIN"],
+    },
   ];
 
   const adminNavItems = [
@@ -197,6 +211,12 @@ const SidebarContent = ({ setSidebarOpen }) => {
       icon: <Icons.pray />,
       path: "/admin/prayer-requests",
       requiredRoles: ["ADMIN", "PRAYER_MANAGER"],
+    },
+    {
+      name: "Project Management",
+      icon: <Icons.building />,
+      path: "/admin/projects",
+      requiredRoles: ["ADMIN"],
     },
   ];
 

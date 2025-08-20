@@ -19,7 +19,7 @@ export async function GET(request: Request) {
         }
         const user = await prisma.user.findUnique({
           where: { id: userId },
-          include: { roles: true, family: true },
+          include: { family: true },
         });
         return NextResponse.json(user);
       case "family-members":
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
         }
         const userRoles = await prisma.user.findUnique({
           where: { id: userId },
-          include: { roles: true },
+          // include: { roles: true },
         });
         return NextResponse.json(userRoles?.roles);
       default:

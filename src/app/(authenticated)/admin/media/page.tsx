@@ -1,51 +1,140 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from 'next/image';
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useSession } from 'next-auth/react';
-import { Loader2 } from 'lucide-react';
+import {
+  Search,
+  PlusCircle,
+  Edit,
+  Trash2,
+  Loader2,
+  Video,
+  Mic,
+  BookOpen,
+  Image as ImageIcon,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 interface MediaAsset {
   id: string;
   title: string;
   url: string;
-  type: string; // Corresponds to AssetType enum
+  type: string;
   tags: string[];
+  description?: string;
   uploaderId: string;
   createdAt: string;
 }
+
+const ASSETS_PER_PAGE = 9;
 
 const AdminMediaPage = () => {
   const { data: session } = useSession();
   const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [fileUploadLoading, setFileUploadLoading] = useState(false);
-
-  const [newMedia, setNewMedia] = useState({
-    title: '',
-    url: '',
-    type: '',
-    tags: '',
+  const [error, setError] = useState<any>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentResource, setCurrentResource] = useState<MediaAsset | null>(null);
+  const [formState, setFormState] = useState({
+    title: "",
+    type: "",
+    tags: "",
+    url: "",
+    description: "",
   });
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const [editingMedia, setEditingMedia] = useState<MediaAsset | null>(null);
+  const getPreviewComponent = (url: string, type: string) => {
+    if (!url) return null;
+    const lowerCaseUrl = url.toLowerCase();
+    if (type === "IMAGE" || lowerCaseUrl.match(/\.(jpeg|jpg|png|gif|webp|svg)$/)) {
+      return <img src={url} alt="Preview" className="w-full h-48 object-contain rounded-md" />;
+    }
+    if (
+      type === "VIDEO" ||
+      lowerCaseUrl.match(/\.(mp4|webm|ogg)$/) ||
+      lowerCaseUrl.includes("youtube.com") ||
+      lowerCaseUrl.includes("youtu.be")
+    ) {
+      if (lowerCaseUrl.includes("youtube.com/watch?v=")) {
+        const videoId = url.split("v=")[1]?.split("&")[0];
+        return (
+          <iframe
+            className="w-full h-48 rounded-md"
+            src={`https://www.youtube.com/embed/${videoId}`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="YouTube video player"
+          ></iframe>
+        );
+      }
+      if (lowerCaseUrl.includes("youtu.be/")) {
+        const videoId = url.split("youtu.be/")[1]?.split("&")[0];
+        return (
+          <iframe
+            className="w-full h-48 rounded-md"
+            src={`https://www.youtube.com/embed/${videoId}`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="YouTube video player"
+          ></iframe>
+        );
+      }
+      return (
+        <video controls className="w-full h-48 object-contain rounded-md">
+          <source src={url} type={`video/${lowerCaseUrl.split(".").pop()}`} />
+        </video>
+      );
+    }
+    if (type === "DOCUMENT" || lowerCaseUrl.match(/\.(pdf)$/)) {
+      return (
+        <iframe
+          src={url}
+          className="w-full h-48 rounded-md"
+          style={{ border: "none" }}
+          title="Document Preview"
+        ></iframe>
+      );
+    }
+    if (type === "AUDIO" || lowerCaseUrl.match(/\.(mp3|wav|ogg)$/)) {
+      return (
+        <audio controls className="w-full rounded-md">
+          <source src={url} type={`audio/${lowerCaseUrl.split(".").pop()}`} />
+        </audio>
+      );
+    }
+    return (
+      <div className="w-full h-48 flex items-center justify-center bg-gray-100 rounded-md text-gray-500">
+        No preview available for this type.
+      </div>
+    );
+  };
 
   const fetchMediaAssets = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch('/api/media');
-      if (!res.ok) throw new Error('Failed to fetch media assets');
-      const data = await res.json();
+      const response = await fetch("/api/media");
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
       setMediaAssets(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error: any) {
+      console.error("Failed to fetch media assets:", error);
+      setError(error);
       toast.error("Failed to load media assets.");
     } finally {
       setLoading(false);
@@ -56,303 +145,310 @@ const AdminMediaPage = () => {
     fetchMediaAssets();
   }, []);
 
-  const handleNewMediaChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNewMedia((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormState((prevState) => ({ ...prevState, [id]: value }));
+    if (id === "url") setPreviewUrl(value);
   };
 
-  const handleEditingMediaChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setEditingMedia((prev) => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
-  };
-
-  const handleNewMediaTypeChange = (value: string) => {
-    setNewMedia((prev) => ({
-      ...prev,
-      type: value,
-    }));
-  };
-
-  const handleEditingMediaTypeChange = (value: string) => {
-    setEditingMedia((prev) => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        type: value,
-      };
-    });
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setFileUploadLoading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const res = await fetch('/api/upload-image', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to upload file');
-      }
-
-      const data = await res.json();
-      const fileUrl = data.url; // Assuming the API returns { url: '...' }
-
-      if (editingMedia) {
-        setEditingMedia((prev) => ({
-          ...prev!,
-          url: fileUrl,
-        }));
-      } else {
-        setNewMedia((prev) => ({
-          ...prev,
-          url: fileUrl,
-        }));
-      }
-    } catch (err: any) {
-      setError(err.message);
-      toast.error("Failed to upload file.");
-    } finally {
-      setFileUploadLoading(false);
-    }
-  };
-
-  const handleAddMedia = async (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     setError(null);
+
     if (!session?.user?.id) {
-      toast.error("You must be logged in to upload media.");
+      toast.error("User not authenticated. Please log in.");
+      setLoading(false);
       return;
     }
 
-    try {
-      const res = await fetch('/api/media', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...newMedia,
-          tags: newMedia.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
-          uploaderId: session.user.id,
-        }),
-      });
+    const resourceData = {
+      title: formState.title,
+      type: formState.type,
+      tags: formState.tags.split(",").map((tag) => tag.trim()).filter((tag) => tag !== ""),
+      url: formState.url,
+      description: formState.description,
+      uploaderId: session.user.id,
+    };
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to add media asset');
+    try {
+      let response;
+      if (currentResource) {
+        response = await fetch(`/api/media?id=${currentResource.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(resourceData),
+        });
+      } else {
+        response = await fetch("/api/media", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(resourceData),
+        });
       }
 
-      setNewMedia({
-        title: '',
-        url: '',
-        type: '',
-        tags: '',
-      });
-      fetchMediaAssets(); // Refresh list
-      toast.success("Media asset added successfully!");
-    } catch (err: any) {
-      setError(err.message);
-      toast.error(`Failed to add media asset: ${err.message}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      toast.success(`Media asset ${currentResource ? "updated" : "created"} successfully.`);
+      setIsDialogOpen(false);
+      setFormState({ title: "", type: "", tags: "", url: "", description: "" });
+      setCurrentResource(null);
+      setPreviewUrl(null);
+      fetchMediaAssets();
+    } catch (apiError: any) {
+      console.error(`Failed to ${currentResource ? "update" : "create"} media asset:`, apiError);
+      setError(apiError);
+      toast.error(`Failed to ${currentResource ? "update" : "create"} media asset: ${apiError.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleUpdateMedia = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (!editingMedia) return;
-
-    try {
-      const res = await fetch(`/api/media?id=${editingMedia.id}` , {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...editingMedia,
-          tags: editingMedia.tags.toString().split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
-        }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to update media asset');
-      }
-
-      setEditingMedia(null);
-      fetchMediaAssets(); // Refresh list
-      toast.success("Media asset updated successfully!");
-    } catch (err: any) {
-      setError(err.message);
-      toast.error(`Failed to update media asset: ${err.message}`);
-    }
+  const handleEditClick = (resource: MediaAsset) => {
+    setCurrentResource(resource);
+    setFormState({
+      title: resource.title,
+      type: resource.type,
+      tags: resource.tags.join(", "),
+      url: resource.url || "",
+      description: resource.description || "",
+    });
+    setPreviewUrl(resource.url || null);
+    setIsDialogOpen(true);
   };
 
-  const handleDeleteMedia = async (id: string) => {
+  const handleDeleteClick = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this media asset?")) return;
+
+    setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/media?id=${id}` , {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to delete media asset');
+      const response = await fetch(`/api/media?id=${id}`, { method: "DELETE" });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
-
-      fetchMediaAssets(); // Refresh list
-      toast.success("Media asset deleted successfully!");
-    } catch (err: any) {
-      setError(err.message);
-      toast.error(`Failed to delete media asset: ${err.message}`);
+      toast.success("Media asset deleted successfully.");
+      fetchMediaAssets();
+    } catch (error: any) {
+      console.error("Failed to delete media asset:", error);
+      setError(error);
+      toast.error(`Failed to delete media asset: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) {
+  const getIconForType = (type: string) => {
+    switch (type) {
+      case "VIDEO": return <Video className="h-5 w-5 text-blue-500" />;
+      case "DOCUMENT": return <BookOpen className="h-5 w-5 text-green-500" />;
+      case "AUDIO": return <Mic className="h-5 w-5 text-purple-500" />;
+      case "IMAGE": return <ImageIcon className="h-5 w-5 text-yellow-500" />;
+      default: return null;
+    }
+  };
+
+  const filteredAssets = useMemo(() => {
+    return mediaAssets.filter(asset => {
+      const query = searchQuery.toLowerCase();
+      return (
+        asset.title.toLowerCase().includes(query) ||
+        (asset.description && asset.description.toLowerCase().includes(query)) ||
+        asset.tags.some(tag => tag.toLowerCase().includes(query))
+      );
+    });
+  }, [mediaAssets, searchQuery]);
+
+  const paginatedAssets = useMemo(() => {
+    const startIndex = (currentPage - 1) * ASSETS_PER_PAGE;
+    return filteredAssets.slice(startIndex, startIndex + ASSETS_PER_PAGE);
+  }, [filteredAssets, currentPage]);
+
+  const totalPages = Math.ceil(filteredAssets.length / ASSETS_PER_PAGE);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  if (loading && mediaAssets.length === 0) {
     return (
-      <div className="container mx-auto py-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">Manage Media Assets</h1>
-        <p className="text-lg text-gray-600">Loading media assets...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+        <p className="ml-4 text-lg text-gray-600">Loading media assets...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto py-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">Manage Media Assets</h1>
-        <p className="text-lg text-red-500">Error: {error}</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-red-600">
+        <p>Error: {error.message}. Failed to load media assets. Please try again later.</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">Manage Media Assets</h1>
-      <p className="text-lg text-gray-600 mb-4">
-        Upload, edit, and organize church media assets (images, videos, audio).
-      </p>
-
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>{editingMedia ? 'Edit Media Asset' : 'Add New Media Asset'}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={editingMedia ? handleUpdateMedia : handleAddMedia} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">Title:</label>
-              <Input type="text" id="title" name="title" value={editingMedia ? editingMedia.title : newMedia.title} onChange={editingMedia ? handleEditingMediaChange : handleNewMediaChange} required />
-            </div>
-            <div>
-              <label htmlFor="type" className="block text-gray-700 text-sm font-bold mb-2">Type:</label>
-              <Select onValueChange={editingMedia ? handleEditingMediaTypeChange : handleNewMediaTypeChange} value={editingMedia ? editingMedia.type : newMedia.type}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="IMAGE">Image</SelectItem>
-                  <SelectItem value="VIDEO">Video</SelectItem>
-                  <SelectItem value="AUDIO">Audio</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label htmlFor="tags" className="block text-gray-700 text-sm font-bold mb-2">Tags (comma-separated):</label>
-              <Input type="text" id="tags" name="tags" value={editingMedia ? editingMedia.tags.join(', ') : newMedia.tags} onChange={editingMedia ? handleEditingMediaChange : handleNewMediaChange} />
-            </div>
-            <div>
-              <label htmlFor="file" className="block text-gray-700 text-sm font-bold mb-2">File:</label>
-              <Input type="file" id="file" name="file" onChange={handleFileUpload} disabled={fileUploadLoading} accept="image/*,video/*,audio/*" />
-              {fileUploadLoading && <p className="text-sm text-gray-500 mt-1">Uploading file...</p>}
-              {(editingMedia?.url || newMedia.url) && (
-                <div className="mt-2">
-                  {editingMedia?.type?.startsWith('IMAGE') || newMedia.type.startsWith('IMAGE') ? (
-                    <Image src={editingMedia?.url || newMedia.url || ''} alt="Media Preview" width={100} height={100} className="rounded-md object-cover" />
-                  ) : editingMedia?.type?.startsWith('VIDEO') || newMedia.type.startsWith('VIDEO') ? (
-                    <video src={editingMedia?.url || newMedia.url || ''} controls width={100} height={100} className="rounded-md object-cover" />
-                  ) : editingMedia?.type?.startsWith('AUDIO') || newMedia.type.startsWith('AUDIO') ? (
-                    <audio src={editingMedia?.url || newMedia.url || ''} controls className="rounded-md" />
-                  ) : null}
-                </div>
-              )}
-            </div>
-            <div className="md:col-span-2 flex space-x-2">
-              <Button type="submit">
-                {editingMedia ? 'Update Media Asset' : 'Add Media Asset'}
+    <motion.div
+      className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Manage Media Assets</h1>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                onClick={() => {
+                  setCurrentResource(null);
+                  setFormState({ title: "", type: "", tags: "", url: "", description: "" });
+                  setPreviewUrl(null);
+                  setIsDialogOpen(true);
+                }}
+              >
+                <PlusCircle className="mr-2 h-4 w-4" /> Add New Asset
               </Button>
-              {editingMedia && (
-                <Button type="button" variant="outline" onClick={() => setEditingMedia(null)}>
-                  Cancel
-                </Button>
-              )}
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>{currentResource ? "Edit Media Asset" : "Add New Media Asset"}</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleFormSubmit} className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="title" className="text-right">Title</Label>
+                  <Input id="title" value={formState.title} onChange={handleInputChange} className="col-span-3" required />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="type" className="text-right">Type</Label>
+                  <Select onValueChange={(value) => setFormState((prevState) => ({ ...prevState, type: value }))} value={formState.type}>
+                    <SelectTrigger className="col-span-3"><SelectValue placeholder="Select a type" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="VIDEO">Video</SelectItem>
+                      <SelectItem value="AUDIO">Audio</SelectItem>
+                      <SelectItem value="IMAGE">Image</SelectItem>
+                      <SelectItem value="DOCUMENT">Document</SelectItem>
+                      <SelectItem value="LOGO">Logo</SelectItem>
+                      <SelectItem value="FONT">Font</SelectItem>
+                      <SelectItem value="TEMPLATE">Template</SelectItem>
+                      <SelectItem value="SERMON">Sermon</SelectItem>
+                      <SelectItem value="RESOURCE">Resource</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="tags" className="text-right">Tags</Label>
+                  <Input id="tags" value={formState.tags} onChange={handleInputChange} className="col-span-3" placeholder="e.g., worship, sermon, event (comma-separated)" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="url" className="text-right">URL</Label>
+                  <Input id="url" value={formState.url} onChange={handleInputChange} className="col-span-3" placeholder="Enter URL for the media asset" required />
+                </div>
+                {previewUrl && formState.type && (
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <div className="col-span-4">{getPreviewComponent(previewUrl, formState.type)}</div>
+                  </div>
+                )}
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="description" className="text-right">Description</Label>
+                  <Textarea id="description" value={formState.description} onChange={handleInputChange} className="col-span-3" placeholder="Enter a brief description" />
+                </div>
+                <DialogFooter>
+                  <Button type="submit" disabled={loading}>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {currentResource ? "Save Changes" : "Create Asset"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Existing Media Assets</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {mediaAssets.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>URL</TableHead>
-                    <TableHead>Tags</TableHead>
-                    <TableHead>Uploader ID</TableHead>
-                    <TableHead>Created At</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mediaAssets.map((asset) => (
-                    <TableRow key={asset.id}>
-                      <TableCell>{asset.title}</TableCell>
-                      <TableCell>{asset.type}</TableCell>
-                      <TableCell><a href={asset.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View</a></TableCell>
-                      <TableCell>{asset.tags.join(', ')}</TableCell>
-                      <TableCell>{asset.uploaderId}</TableCell>
-                      <TableCell>{new Date(asset.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <Button variant="outline" size="sm" onClick={() => setEditingMedia(asset)} className="mr-2">
-                          Edit
-                        </Button>
-                        <Button variant="destructive" size="sm" onClick={() => handleDeleteMedia(asset.id)}>
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Input
+              placeholder="Search by title, description, or tag..."
+              className="pl-10 w-full max-w-md"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1); // Reset to first page on new search
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {paginatedAssets.length === 0 ? (
+            <p className="col-span-full text-center text-gray-500">
+              No media assets found. {searchQuery && "Try a different search term."}
+            </p>
           ) : (
-            <p>No media assets found.</p>
+            paginatedAssets.map((asset) => (
+              <Card key={asset.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-lg font-semibold text-gray-800">{asset.title}</CardTitle>
+                  {getIconForType(asset.type)}
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-500 mb-4">Type: {asset.type}</p>
+                  <p className="text-sm text-gray-500 mb-4">Tags: {asset.tags.join(", ")}</p>
+                  {asset.url && (
+                    <p className="text-sm text-blue-600 truncate mb-4">
+                      <a href={asset.url} target="_blank" rel="noopener noreferrer">View Asset</a>
+                    </p>
+                  )}
+                  {asset.url && asset.type && (
+                    <div className="mb-4">{getPreviewComponent(asset.url, asset.type)}</div>
+                  )}
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm" onClick={() => handleEditClick(asset)}>
+                      <Edit className="mr-2 h-4 w-4" /> Edit
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(asset.id)}>
+                      <Trash2 className="mr-2 h-4 w-4" /> Delete
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-8 space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="ml-2">Previous</span>
+            </Button>
+            <span className="text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              <span className="mr-2">Next</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 };
 

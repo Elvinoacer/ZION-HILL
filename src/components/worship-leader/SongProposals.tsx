@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Music, ThumbsUp, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSession } from "next-auth/react";
 
 interface SongProposal {
   id: string;
@@ -15,9 +16,12 @@ interface SongProposal {
   };
   likes: number;
   createdAt: string;
+  hasLiked?: boolean; // New property to indicate if the current user has liked it
+  likesByUsers?: { userId: string }[]; // Add this line
 }
 
 const SongProposals = () => {
+  const { data: session } = useSession();
   const [proposals, setProposals] = useState<SongProposal[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,8 +30,17 @@ const SongProposals = () => {
     try {
       const res = await fetch("/api/song-proposals");
       if (!res.ok) throw new Error("Failed to fetch song proposals");
-      const data = await res.json();
-      setProposals(data);
+      const data: SongProposal[] = await res.json();
+
+      // Determine if the current user has liked each proposal
+      const proposalsWithLikeStatus = data.map((proposal) => ({
+        ...proposal,
+        hasLiked: proposal.likesByUsers?.some(
+          (like) => like.userId === session?.user?.id
+        ),
+      }));
+
+      setProposals(proposalsWithLikeStatus);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -120,9 +133,9 @@ const SongProposals = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleLike(proposal.id)}
-                        className="flex items-center space-x-1 text-gray-500 hover:text-pink-500"
+                        className={`flex items-center space-x-1 ${proposal.hasLiked ? "text-pink-500" : "text-gray-500 hover:text-pink-500"}`}
                       >
-                        <ThumbsUp className="h-4 w-4" />
+                        <ThumbsUp className={`h-4 w-4 ${proposal.hasLiked ? "fill-pink-500" : ""}`} />
                         <span>{proposal.likes}</span>
                       </Button>
                     </div>

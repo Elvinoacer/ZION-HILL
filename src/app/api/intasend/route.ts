@@ -1,14 +1,33 @@
-import { NextResponse } from 'next/server';
-import IntaSend from 'intasend-node';
+import { NextResponse } from "next/server";
+import IntaSend from "intasend-node";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
-  const { amount, phone, fundId, description } = await request.json();
+  const { amount, phone, donationPlanId, description, name, email, recurring } = await request.json();
 
-  if (!amount || !phone) {
-    return NextResponse.json({ error: 'Amount and phone number are required' }, { status: 400 });
+  if (!amount || !phone || !donationPlanId) {
+    return NextResponse.json(
+      { error: "Amount, phone number, and donation plan are required" },
+      { status: 400 }
+    );
   }
 
   try {
+    // 1. Create a pending transaction in your database
+    const newTransaction = await prisma.transaction.create({
+      data: {
+        type: "DONATION",
+        amount: amount,
+        method: "MPESA", // Assuming M-Pesa for STK push
+        description: description || `Donation to plan ${donationPlanId}`,
+        donationPlanId: donationPlanId,
+        donorName: name || "Anonymous Donor",
+        donorEmail: email || null,
+        recurring: recurring || false,
+        reconciliationStatus: "PENDING",
+      },
+    });
+
     const intasend = new IntaSend(
       process.env.INTASEND_PUBLISHABLE_KEY as string,
       process.env.INTASEND_SECRET_KEY as string,
@@ -19,22 +38,21 @@ export async function POST(request: Request) {
     const intasendResponse = await collection.mpesaStkPush({
       amount: amount,
       phone_number: phone,
-      api_ref: `donation-${Date.now()}`,
-      // You might want to add a callback URL here for status updates
-      // callback_url: 'YOUR_CALLBACK_URL',
-      // You can also pass other details like first_name, last_name, email, host if needed
+      api_ref: newTransaction.id, // Use your transaction ID as the API reference
+      first_name: name || undefined,
+      email: email || undefined,
+      callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/intasend-webhook`,
     });
 
-    // Save the transaction to your database
-    // This part assumes you have a way to link the IntaSend transaction to your local transaction
-    // For simplicity, I'm just returning the IntaSend response for now.
-    // In a real application, you'd save the transaction details and status.
-
-    return NextResponse.json(intasendResponse);
+    // 3. Return your transaction ID along with IntaSend's response
+    return NextResponse.json({ ...intasendResponse, transactionId: newTransaction.id });
   } catch (error: any) {
-    console.error('IntaSend API Error:', error.response?.data || error.message);
+    console.error("IntaSend API Error:", error.response?.data || error.message);
     return NextResponse.json(
-      { error: error.response?.data?.message || 'Failed to initiate M-Pesa STK Push' },
+      {
+        error:
+          error.response?.data?.message || "Failed to initiate M-Pesa STK Push",
+      },
       { status: error.response?.status || 500 }
     );
   }

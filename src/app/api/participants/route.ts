@@ -2,10 +2,24 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const serviceId = searchParams.get('serviceId');
+
   try {
-    const participants = await prisma.participant.findMany();
+    let participants;
+    if (serviceId) {
+      participants = await prisma.participant.findMany({
+        where: { eventId: serviceId },
+        include: { user: true }, // Include user details
+      });
+    } else {
+      participants = await prisma.participant.findMany({
+        include: { user: true }, // Include user details even if no serviceId
+      });
+    }
     return NextResponse.json(participants);
   } catch (error) {
+    console.error("Error fetching participants:", error);
     return NextResponse.json({ error: 'Error fetching participants' }, { status: 500 });
   }
 }

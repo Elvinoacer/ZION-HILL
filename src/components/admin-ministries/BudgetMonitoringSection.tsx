@@ -1,5 +1,6 @@
 "use client";
-// import { ExpenseApproval, BudgetSetter } from "@/components/admin/budget";
+import { ExpenseApproval } from "@/components/admin/budget/ExpenseApproval";
+// import { BudgetSetter } from "@/components/admin/budget";
 
 export function BudgetMonitoringSection() {
   return (
@@ -27,7 +28,7 @@ export function BudgetMonitoringSection() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-6 rounded-xl shadow">
           <h3 className="text-lg font-medium mb-4">Expense Reports</h3>
-          {/* <ExpenseApproval /> */}
+          <ExpenseApproval />
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow">

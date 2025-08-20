@@ -59,12 +59,19 @@ async function main() {
         photo: faker.image.avatar(),
         isActive: faker.datatype.boolean(),
         roles: {
-          connect: [
-            {
-              id: createdRoles[
-                faker.number.int({ min: 0, max: createdRoles.length - 1 })
-              ].id,
-            },
+          set: [
+            faker.helpers.arrayElement([
+              "ADMIN",
+              "MEMBER",
+              "GUEST",
+              "PRAYER_MANAGER",
+              "COUNSELOR",
+              "VOLUNTEER",
+              "EVENTS_MANAGER",
+              "SENIOR_PASTOR",
+              "FINANCE_ADMINISTRATOR",
+              "VOLUNTEER_COORDINATOR",
+            ]),
           ],
         },
       },
@@ -76,21 +83,50 @@ async function main() {
   // Create Families
   const families = [];
   for (let i = 0; i < 3; i++) {
+    // Get a random user to be the creator of the family
+    const creator = users[faker.number.int({ min: 0, max: users.length - 1 })];
+
+    // Get 2 unique users to be members (excluding the creator)
+    const potentialMembers = users.filter((u) => u.id !== creator.id);
+    const shuffledMembers = faker.helpers.shuffle(potentialMembers);
+    const members = shuffledMembers.slice(0, 2);
+
     const family = await prisma.family.create({
       data: {
         name: faker.lorem.words(2) + " Family",
+        createdBy: {
+          connect: {
+            id: creator.id,
+          },
+        },
         members: {
-          connect: users.slice(i * 2, (i + 1) * 2).map((u) => ({ id: u.id })), // Connect 2 users per family
+          connect: [{ id: members[0].id }, { id: members[1].id }],
         },
       },
     });
     families.push(family);
     console.log(`Created family: ${family.name}`);
   }
-
   // Create Ministries
   const ministries = [];
-  for (let i = 0; i < 5; i++) {
+  // Ensure Worship Ministry exists
+  const worshipMinistry = await prisma.ministry.upsert({
+    where: { name: "Worship Ministry" },
+    update: {},
+    create: {
+      name: "Worship Ministry",
+      description: "Ministry responsible for leading worship services and managing worship teams.",
+      leader: {
+        connect: {
+          id: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
+        },
+      },
+    },
+  });
+  ministries.push(worshipMinistry);
+  console.log(`Created or found ministry: ${worshipMinistry.name}`);
+
+  for (let i = 0; i < 4; i++) { // Create 4 additional random ministries
     const ministry = await prisma.ministry.create({
       data: {
         name: faker.lorem.words(2) + " Ministry",
@@ -122,7 +158,7 @@ async function main() {
       });
     }
   }
-  console.log('Created ministry members.');
+  console.log("Created ministry members.");
 
   // Create Events
   const events = [];
@@ -217,11 +253,12 @@ async function main() {
     // Create the Asset with the sermonId
     const videoAsset = await prisma.asset.create({
       data: {
-        title: faker.lorem.words(2) + ' Video Asset',
-        type: 'VIDEO', // Ensure it's a video asset
+        title: faker.lorem.words(2) + " Video Asset",
+        type: "VIDEO", // Ensure it's a video asset
         url: faker.internet.url(),
-        uploaderId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
-        tags: ['sermon-video'],
+        uploaderId:
+          users[faker.number.int({ min: 0, max: users.length - 1 })].id,
+        tags: ["sermon-video"],
         sermonId: sermonId, // Link this asset to the sermon ID
       },
     });
@@ -230,14 +267,14 @@ async function main() {
     const sermon = await prisma.sermon.create({
       data: {
         id: sermonId, // Use the same ID as the sermonId in the asset
-        title: faker.lorem.words(4) + ' Sermon',
+        title: faker.lorem.words(4) + " Sermon",
         date: faker.date.past(),
         speakerId: speaker.id,
       },
     });
     console.log(`Created sermon: ${sermon.title}`);
   }
-  console.log('Created sermons.');
+  console.log("Created sermons.");
 
   // Create Funds
   const funds = [];
@@ -506,6 +543,9 @@ async function main() {
   }
   console.log("Created push subscriptions.");
 
+  // Call the baptism seed function
+  await seedBaptismData();
+
   console.log("Seeding finished.");
 }
 
@@ -517,3 +557,5 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+const seedBaptismData = require('./baptism-seed');

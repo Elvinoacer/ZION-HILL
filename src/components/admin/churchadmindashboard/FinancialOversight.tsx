@@ -73,9 +73,7 @@ export default function FinancialOversight({ transactions }: FinancialOversightP
                         {ministry.name}
                       </div>
                       <div className="text-sm text-gray-600">
-                        Allocated: ${ministry.allocatedBudget} | Spent: $
-                        {ministry.spentBudget} | Remaining: $
-                        {ministry.allocatedBudget - ministry.spentBudget}
+                        Allocated: KES {ministry.allocatedBudget} | Spent: KES {ministry.spentBudget} | Remaining: KES {ministry.allocatedBudget - ministry.spentBudget}
                       </div>
                     </div>
                   </motion.div>
@@ -105,7 +103,7 @@ export default function FinancialOversight({ transactions }: FinancialOversightP
                   <PieChart className="h-5 w-5 text-blue-600 mr-2" />
                   <div>
                     <div className="font-semibold text-gray-900">
-                      ${transaction.amount.toNumber()} - {transaction.description}
+                      KES {transaction.amount} - {transaction.description}
                     </div>
                     <div className="text-sm text-gray-600">
                       Matched: {transaction.matched ? "Yes" : "No"}
@@ -153,7 +151,7 @@ function DraggableFund({ id, amount }: { id: string; amount: number }) {
       }`}
     >
       <DollarSign className="h-5 w-5 text-blue-600 mr-2" />
-      <span>${amount}</span>
+      <span>KES {amount}</span>
     </div>
   );
 }

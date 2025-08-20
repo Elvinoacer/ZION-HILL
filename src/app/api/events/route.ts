@@ -13,6 +13,9 @@ export async function GET(req: NextRequest) {
       // Fetch a single event by ID
       const event = await prisma.event.findUnique({
         where: { id },
+        include: {
+          participants: true,
+        },
       });
       if (!event) {
         return NextResponse.json({ error: "Event not found" }, { status: 404 });
@@ -26,6 +29,9 @@ export async function GET(req: NextRequest) {
           date: "asc",
         },
         take: take ? parseInt(take, 10) : undefined,
+        include: {
+          participants: true,
+        },
       });
       return NextResponse.json(events);
     }
@@ -41,7 +47,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const {
+    let {
       title,
       type,
       date,
@@ -72,6 +78,18 @@ export async function POST(req: NextRequest) {
         { error: "Invalid event type" },
         { status: 400 }
       );
+    }
+
+    // If ministryId is not provided and the event type is SERVICE, try to find the 'Worship' ministry and assign its ID
+    if (!ministryId && type === "SERVICE") {
+      const worshipMinistry = await prisma.ministry.findFirst({
+        where: { name: "Worship" }, // Assuming the worship ministry is named "Worship"
+      });
+      if (worshipMinistry) {
+        ministryId = worshipMinistry.id;
+      } else {
+        console.warn("Worship ministry not found. Service will be created without a ministryId.");
+      }
     }
 
     const eventDate = new Date(date);

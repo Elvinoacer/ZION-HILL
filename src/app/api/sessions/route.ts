@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {
   try {
     const sessions = await prisma.session.findMany();
     return NextResponse.json(sessions);
   } catch (error) {
-    return NextResponse.json({ error: 'Error fetching sessions' }, { status: 500 });
+    return NextResponse.json({ error: "Error fetching sessions" }, { status: 500 });
   }
 }
 
@@ -16,17 +16,20 @@ export async function POST(request: Request) {
     const newSession = await prisma.session.create({ data: body });
     return NextResponse.json(newSession, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Error creating session' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Error creating session" },
+      { status: 500 }
+    );
   }
 }
 
 export async function PUT(request: Request) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
+  const id = searchParams.get("id");
   const body = await request.json();
 
   if (!id) {
-    return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
+    return NextResponse.json({ error: "Session ID is required" }, { status: 400 });
   }
 
   try {
@@ -36,22 +39,22 @@ export async function PUT(request: Request) {
     });
     return NextResponse.json(updatedSession);
   } catch (error) {
-    return NextResponse.json({ error: 'Error updating session' }, { status: 500 });
+    return NextResponse.json({ error: "Error updating session" }, { status: 500 });
   }
 }
 
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
+  const id = searchParams.get("id");
 
   if (!id) {
-    return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
+    return NextResponse.json({ error: "Session ID is required" }, { status: 400 });
   }
 
   try {
     await prisma.session.delete({ where: { id } });
-    return NextResponse.json({ message: 'Session deleted successfully' });
+    return NextResponse.json({ message: "Session deleted successfully" });
   } catch (error) {
-    return NextResponse.json({ error: 'Error deleting session' }, { status: 500 });
+    return NextResponse.json({ error: "Error deleting session" }, { status: 500 });
   }
 }

@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+
 interface Event {
   id: string;
   title: string;
@@ -25,6 +28,8 @@ const SecretaryDashboard = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [documents, setDocuments] = useState<ResourceAsset[]>([]);
   const [templates, setTemplates] = useState<ResourceAsset[]>([]);
+  const [testimony, setTestimony] = useState("");
+  const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -49,13 +54,13 @@ const SecretaryDashboard = () => {
             setEvents(eventsData);
 
             // Fetch Documents
-            const documentsRes = await fetch("/api/resources?type=DOCUMENT");
+            const documentsRes = await fetch("/api/resources?type=PDF");
             if (!documentsRes.ok) throw new Error("Failed to fetch documents");
             const documentsData = await documentsRes.json();
             setDocuments(documentsData);
 
             // Fetch Templates
-            const templatesRes = await fetch("/api/resources?type=TEMPLATE");
+            const templatesRes = await fetch("/api/resources?type=PDF");
             if (!templatesRes.ok) throw new Error("Failed to fetch templates");
             const templatesData = await templatesRes.json();
             setTemplates(templatesData);
@@ -98,6 +103,55 @@ const SecretaryDashboard = () => {
       </div>
     );
   }
+
+  const handleTestimonySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!testimony || !image) {
+      toast.error("Please provide both a testimony and an image.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("file", image);
+
+      const uploadRes = await fetch("/api/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Failed to upload image.");
+      }
+
+      const uploadData = await uploadRes.json();
+      const imageUrl = uploadData.url;
+
+      const feedbackRes = await fetch("/api/testimonials", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          comment: testimony,
+          imageUrl: imageUrl,
+          sentiment: "POSITIVE", // Assuming testimony is positive
+          userId: session?.user?.id,
+          tags: ["testimony"],
+        }),
+      });
+
+      if (!feedbackRes.ok) {
+        throw new Error("Failed to submit testimony.");
+      }
+
+      toast.success("Testimony submitted successfully!");
+      setTestimony("");
+      setImage(null);
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
 
   return (
     <div className="container mx-auto py-8">
@@ -245,6 +299,29 @@ const SecretaryDashboard = () => {
               Automated "Thank You" emails and connection card processing.
             </p>
             <Button className="w-full">Process Visitors (Placeholder)</Button>
+          </CardContent>
+        </Card>
+
+        {/* Add Testimony */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Add Testimony</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleTestimonySubmit}>
+              <Textarea
+                placeholder="Write a testimony..."
+                value={testimony}
+                onChange={(e) => setTestimony(e.target.value)}
+                className="mb-4"
+              />
+              <Input
+                type="file"
+                onChange={(e) => setImage(e.target.files ? e.target.files[0] : null)}
+                className="mb-4"
+              />
+              <Button type="submit" className="w-full">Submit Testimony</Button>
+            </form>
           </CardContent>
         </Card>
       </div>

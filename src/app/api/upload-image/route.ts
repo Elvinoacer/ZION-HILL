@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
+//src/app/api/upload-image/route.ts
+import { NextResponse } from "next/server";
+import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -10,34 +11,47 @@ cloudinary.config({
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get("file") as File;
 
     if (!file) {
-      return NextResponse.json({ error: 'No file uploaded.' }, { status: 400 });
+      return NextResponse.json({ error: "No file uploaded." }, { status: 400 });
     }
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    return new Promise((resolve, reject) => {
+    const result: any = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: 'church-web-v2' }, // Optional: specify a folder in Cloudinary
+        {
+          folder: "church-web-v2",
+          resource_type: "auto",
+          timeout: 60000,
+        },
         (error, result) => {
           if (error) {
-            console.error("Cloudinary upload error:", error);
-            return resolve(NextResponse.json({ error: 'Cloudinary upload failed.' }, { status: 500 }));
-          }
-          if (result && result.secure_url) {
-            return resolve(NextResponse.json({ url: result.secure_url }));
+            reject(error);
           } else {
-            return resolve(NextResponse.json({ error: 'Cloudinary upload failed: No secure_url returned.' }, { status: 500 }));
+            resolve(result);
           }
         }
-      ).end(buffer);
+      );
+      uploadStream.end(buffer);
     });
 
+    if (result && result.secure_url) {
+      return NextResponse.json({ url: result.secure_url });
+    } else {
+      console.error("Cloudinary upload result missing secure_url:", result);
+      return NextResponse.json(
+        { error: "Cloudinary upload failed: No secure_url returned." },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error("Error in upload-image API:", error);
-    return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error." },
+      { status: 500 }
+    );
   }
 }

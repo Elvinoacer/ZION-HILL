@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     } else {
       // Fallback: find any user with the ADMIN RoleName enum
       const adminUser = await prisma.user.findFirst({
-        where: { roles: { has: "ADMIN" } },
+        where: { roles: { has: "EVENTS_MANAGER" } },
         select: { id: true },
       });
       if (adminUser) {

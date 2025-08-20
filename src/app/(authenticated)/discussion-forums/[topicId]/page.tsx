@@ -378,7 +378,7 @@ const TopicPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <RelatedTopicsCard />
+            <RelatedTopicsCard currentTopicId={topicId} />
           </motion.div>
 
           <motion.div
@@ -954,36 +954,105 @@ const CommunityGuidelinesCard = () => (
   </Card>
 );
 
-const RelatedTopicsCard = () => (
-  <Card className="dark:bg-gray-800 dark:border-gray-700">
-    <CardHeader>
-      <CardTitle className="text-lg">Related Discussions</CardTitle>
-      <CardDescription>Explore similar topics</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <div className="space-y-4">
-        {[...Array(3)].map((_, i) => (
-          <Link key={i} href="#" className="block group">
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg p-2">
-                <MessageSquare className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                  How to optimize React performance in large applications
-                </h3>
-                <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  <span>24 responses</span>
-                  <span className="mx-1.5">•</span>
-                  <span>142 likes</span>
+const RelatedTopicsCard = ({ currentTopicId }: { currentTopicId: string }) => {
+  const [relatedTopics, setRelatedTopics] = useState<ForumTopic[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRelated = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await safeFetch<ForumTopic[]>(
+          `/api/discussion-forums/topics/related?excludeId=${currentTopicId}`
+        );
+        setRelatedTopics(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (currentTopicId) {
+      fetchRelated();
+    }
+  }, [currentTopicId]);
+
+  if (loading) {
+    return (
+      <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-lg">Related Discussions</CardTitle>
+          <CardDescription>Explore similar topics</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-start space-x-3">
+                <Skeleton className="h-10 w-10 rounded-lg" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-48" />
+                  <Skeleton className="h-3 w-32" />
                 </div>
               </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-);
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-lg">Related Discussions</CardTitle>
+          <CardDescription>Explore similar topics</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-red-500">Error loading related topics: {error}</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (relatedTopics.length === 0) {
+    return null; // Or a message indicating no related topics
+  }
+
+  return (
+    <Card className="dark:bg-gray-800 dark:border-gray-700">
+      <CardHeader>
+        <CardTitle className="text-lg">Related Discussions</CardTitle>
+        <CardDescription>Explore similar topics</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {relatedTopics.map((topic) => (
+            <Link key={topic.id} href={`/discussion-forums/${topic.id}`} className="block group">
+              <div className="flex items-start space-x-3">
+                <div className="flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg p-2">
+                  <MessageSquare className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {topic.title}
+                  </h3>
+                  <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <span>{topic._count.posts} responses</span>
+                    <span className="mx-1.5"> • </span>
+                    <span>{topic.likes} likes</span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 export default TopicPage;

@@ -4,20 +4,19 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MessageSquare, User } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface Announcement {
   id: string;
+  title: string;
   content: string;
   createdAt: string;
-  user: {
-    name: string;
-    image?: string;
-  };
 }
 
 const AnnouncementBoard = () => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [newAnnouncement, setNewAnnouncement] = useState("");
+  const [newAnnouncementTitle, setNewAnnouncementTitle] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
@@ -48,7 +47,10 @@ const AnnouncementBoard = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content: newAnnouncement }),
+        body: JSON.stringify({
+          title: newAnnouncementTitle,
+          content: newAnnouncement,
+        }),
       });
 
       if (!res.ok) {
@@ -57,6 +59,7 @@ const AnnouncementBoard = () => {
       }
 
       setNewAnnouncement("");
+      setNewAnnouncementTitle("");
       fetchAnnouncements();
     } catch (err: any) {
       setError(err.message);
@@ -77,6 +80,14 @@ const AnnouncementBoard = () => {
           <MessageSquare className="h-5 w-5 text-amber-600" />
           <span>New Announcement</span>
         </h4>
+        <Input
+          type="text"
+          placeholder="Announcement Title"
+          value={newAnnouncementTitle}
+          onChange={(e) => setNewAnnouncementTitle(e.target.value)}
+          required
+          className="mb-4"
+        />
         <Textarea
           placeholder="Share updates with your team..."
           value={newAnnouncement}
@@ -126,23 +137,44 @@ const AnnouncementBoard = () => {
                   key={announcement.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="p-4 rounded-lg bg-white shadow-xs border border-gray-100"
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  whileHover={{
+                    y: -2,
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+                    borderColor: "rgba(249, 168, 37, 0.3)",
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 15,
+                  }}
+                  className="p-5 rounded-xl bg-white shadow-sm border border-gray-100 hover:border-amber-100 transition-colors duration-200"
                 >
-                  <div className="flex items-start space-x-3">
-                    <div className="p-2 rounded-full bg-amber-100 text-amber-600">
+                  <div className="flex items-start gap-4">
+                    <div className="p-2.5 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 text-amber-600 shadow-inner flex-shrink-0">
                       <User className="h-5 w-5" />
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2">
-                        <p className="font-medium text-gray-700">
-                          {announcement.user.name}
-                        </p>
-                        <span className="text-xs text-gray-400">
-                          {new Date(announcement.createdAt).toLocaleString()}
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col gap-1">
+                        <h3 className="font-semibold text-gray-800">
+                          {announcement.title}
+                        </h3>
+                        <span className="text-xs text-gray-500">
+                          {new Date(announcement.createdAt).toLocaleString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
                         </span>
                       </div>
-                      <p className="mt-1 text-gray-600 whitespace-pre-line">
+
+                      <p className="mt-3 text-gray-600 whitespace-pre-line leading-relaxed">
                         {announcement.content}
                       </p>
                     </div>

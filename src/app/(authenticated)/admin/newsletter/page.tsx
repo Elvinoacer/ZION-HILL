@@ -1,16 +1,47 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import TiptapEditor from '@/components/TiptapEditor';
 
 const AdminNewsletterPage = () => {
   const [subject, setSubject] = useState('');
   const [htmlContent, setHtmlContent] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [templates, setTemplates] = useState<string[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const res = await fetch('/api/newsletter-templates');
+        const data = await res.json();
+        setTemplates(data);
+      } catch (err) {
+        console.error("Failed to fetch templates", err);
+      }
+    };
+    fetchTemplates();
+  }, []);
+
+  useEffect(() => {
+    if (selectedTemplate) {
+      const fetchTemplateContent = async () => {
+        try {
+          const res = await fetch(`/api/newsletter-templates?template=${selectedTemplate}`);
+          const data = await res.json();
+          setHtmlContent(data.content);
+        } catch (err) {
+          console.error("Failed to fetch template content", err);
+        }
+      };
+      fetchTemplateContent();
+    }
+  }, [selectedTemplate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +70,7 @@ const AdminNewsletterPage = () => {
       setMessage('Newsletter sent successfully!');
       setSubject('');
       setHtmlContent('');
+      setSelectedTemplate(null);
     } catch (err: any) {
       setError(err.message);
     }
@@ -58,6 +90,21 @@ const AdminNewsletterPage = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
+              <label htmlFor="template" className="block text-gray-700 text-sm font-bold mb-2">Select a Template:</label>
+              <Select onValueChange={setSelectedTemplate} value={selectedTemplate || ""}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a template" />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.map((template) => (
+                    <SelectItem key={template} value={template}>
+                      {template}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
               <label htmlFor="subject" className="block text-gray-700 text-sm font-bold mb-2">Subject:</label>
               <Input
                 type="text"
@@ -68,13 +115,10 @@ const AdminNewsletterPage = () => {
               />
             </div>
             <div>
-              <label htmlFor="htmlContent" className="block text-gray-700 text-sm font-bold mb-2">HTML Content:</label>
-              <Textarea
-                id="htmlContent"
-                value={htmlContent}
-                onChange={(e) => setHtmlContent(e.target.value)}
-                required
-                rows={10}
+              <label htmlFor="htmlContent" className="block text-gray-700 text-sm font-bold mb-2">Content:</label>
+              <TiptapEditor
+                content={htmlContent}
+                onChange={setHtmlContent}
               />
             </div>
             {message && <p className="text-green-500 text-sm">{message}</p>}

@@ -40,9 +40,9 @@ export default function OnlineGivingOptimization() {
                 No payment gateways found.
               </div>
             ) : (
-              gateways.map((gateway, index) => (
+              Object.values(gateways || {}).map((gateway: any, index: number) => (
                 <motion.div
-                  key={gateway.id}
+                  key={gateway.id || (gateway.provider ? `${gateway.provider}-${index}` : index)}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}

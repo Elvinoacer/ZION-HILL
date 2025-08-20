@@ -35,6 +35,8 @@ app.prepare().then(() => {
           data: {
             senderId: data.senderId,
             content: data.content,
+            subject: "Community Message", // Default subject for community chat
+            recipientId: null, // Set to null for community messages
           },
           include: { sender: true },
         });

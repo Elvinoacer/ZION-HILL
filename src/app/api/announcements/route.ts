@@ -3,11 +3,13 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const { content } = await req.json();
+    const { title, content, tags } = await req.json();
 
     const announcement = await prisma.announcement.create({
       data: {
+        title,
         content,
+        tags,
       },
     });
 

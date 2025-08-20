@@ -12,10 +12,10 @@ export async function GET(request: Request) {
         const itineraries = await prisma.event.findMany({ where: { type: 'TRIP' } });
         return NextResponse.json(itineraries);
       case 'fundraisers':
-        const fundraisers = await prisma.fund.findMany();
+        const fundraisers = await prisma.donationFund.findMany();
         return NextResponse.json(fundraisers);
       case 'missionaries':
-        const missionaries = await prisma.user.findMany({ where: { roles: { some: { name: 'VOLUNTEER' } } } });
+        const missionaries = await prisma.user.findMany({ where: { roles: { has: 'VOLUNTEER' } } });
         return NextResponse.json(missionaries);
       case 'documents':
         const documents = await prisma.asset.findMany({ where: { type: 'DOCUMENT' } });
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
         const outreachLocations = await prisma.event.findMany({ where: { type: 'EVENT' } });
         return NextResponse.json(outreachLocations);
       case 'volunteers':
-        const volunteers = await prisma.user.findMany({ where: { roles: { some: { name: 'VOLUNTEER' } } } });
+        const volunteers = await prisma.user.findMany({ where: { roles: { has: 'VOLUNTEER' } } });
         return NextResponse.json(volunteers);
       case 'metrics':
         // This is a placeholder. You'll need to define how to calculate these metrics.

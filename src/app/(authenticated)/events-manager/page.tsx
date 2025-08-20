@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import {
@@ -11,9 +11,26 @@ import {
   Users,
   MessageSquare,
   Plus,
+  Edit,
+  Trash2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import EventsOverview from "@/components/EventsOverview";
+import { Button } from "@/components/ui/button";
+import CreateEventModal from "@/components/CreateEventModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useEventStore } from "@/store/eventStore";
+import { toast } from "sonner";
 
 interface Event {
   id: string;
@@ -23,6 +40,13 @@ interface Event {
   type: string;
   attendees?: number;
   capacity?: number;
+  description?: string;
+  imageUrl?: string;
+  latitude?: number;
+  longitude?: number;
+  time?: string;
+  ministryId?: string;
+  groupId?: string;
 }
 
 interface Financials {
@@ -42,46 +66,67 @@ interface Sponsor {
 
 const EventsManagerDashboard = () => {
   const { data: session, status } = useSession();
+  const { deleteEvent, fetchEvents } = useEventStore();
   const [events, setEvents] = useState<Event[]>([]);
   const [financials, setFinancials] = useState<Financials[]>([]);
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCreateEventModal, setShowCreateEventModal] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [showEditEventModal, setShowEditEventModal] = useState(false);
+
+  const handleEdit = (event: Event) => {
+    setEditingEvent(event);
+    setShowEditEventModal(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteEvent(id);
+      toast.success("Event deleted successfully!");
+      fetchEvents(); // Refresh events after deletion
+    } catch (err: any) {
+      toast.error(`Failed to delete event: ${err.message}`);
+    }
+  };
+
+  
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true); // Set loading true at the very beginning
       try {
-        setLoading(true);
         // Parallel fetching for better performance
-        const [eventsRes, financialsRes, sponsorsRes] = await Promise.all([
-          fetch("/api/events"),
+        const [financialsRes, sponsorsRes, eventsRes] = await Promise.all([
           fetch("/api/financials"),
           fetch("/api/sponsors"),
+          fetch("/api/events"), // Fetch events here
         ]);
 
-        if (!eventsRes.ok) throw new Error("Failed to fetch events");
         if (!financialsRes.ok) throw new Error("Failed to fetch financials");
         if (!sponsorsRes.ok) throw new Error("Failed to fetch sponsors");
+        if (!eventsRes.ok) throw new Error("Failed to fetch events"); // Check events response
 
-        const [eventsData, financialsData, sponsorsData] = await Promise.all([
-          eventsRes.json(),
+        const [financialsData, sponsorsData, eventsData] = await Promise.all([
           financialsRes.json(),
           sponsorsRes.json(),
+          eventsRes.json(), // Parse events data
         ]);
 
-        setEvents(eventsData);
         setFinancials(financialsData);
         setSponsors(sponsorsData);
+        setEvents(eventsData); // Set events state here
       } catch (err: any) {
         setError(err.message);
       } finally {
-        setLoading(false);
+        setLoading(false); // Set loading false after all fetches and state updates
       }
     };
 
     fetchData();
-  }, []);
+  }, []); // Dependencies should be empty if all fetches are inside
 
   useEffect(() => {
     const fetchUnreadMessages = async () => {
@@ -260,7 +305,7 @@ const EventsManagerDashboard = () => {
                   Total Budget
                 </h3>
                 <p className="text-2xl font-bold text-gray-900 mt-1">
-                  $
+                  KES
                   {totalBudget.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                   })}
@@ -272,7 +317,7 @@ const EventsManagerDashboard = () => {
             </div>
             <div className="mt-4 flex items-center text-sm text-green-600 font-medium">
               <span>
-                ${totalSponsorship.toLocaleString("en-US")} from sponsors
+                KES {totalSponsorship.toLocaleString("en-US")} from sponsors
               </span>
               <ArrowRight className="ml-1 h-4 w-4" />
             </div>
@@ -335,18 +380,23 @@ const EventsManagerDashboard = () => {
               <h2 className="text-xl font-semibold text-gray-800">
                 Upcoming Events
               </h2>
-              <Link
-                href="/events-manager/create"
-                className="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center transition-colors"
+              <Button
+                onClick={() => setShowCreateEventModal(true)}
+                variant="link"
+                className="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center transition-colors p-0 h-auto"
               >
                 Create New <Plus className="ml-1 h-4 w-4" />
-              </Link>
+              </Button>
             </div>
 
             {events.length > 0 ? (
               <div className="space-y-4">
                 {events
-                  .filter((event) => new Date(event.date) >= new Date())
+                  .filter((event) => {
+                    const eventDate = new Date(event.date);
+                    const now = new Date();
+                    return eventDate >= now;
+                  })
                   .slice(0, 5)
                   .map((event) => (
                     <motion.div
@@ -380,12 +430,65 @@ const EventsManagerDashboard = () => {
                                 {event.attendees}/{event.capacity} attendees
                               </p>
                             )}
+                          <div className="flex justify-end space-x-2 mt-2">
+                            <Link href={`/events-manager/dashboard/${event.id}`} passHref>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label="View RSVPs"
+                              >
+                                <Users className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEdit(event)}
+                              aria-label="Edit event"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  aria-label="Delete event"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Are you absolutely sure?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will
+                                    permanently delete your event and remove
+                                    its data from our servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDelete(event.id)}
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
                         </div>
                       </div>
                     </motion.div>
                   ))}
-                {events.filter((event) => new Date(event.date) >= new Date())
-                  .length > 5 && (
+                {events.filter((event) => {
+                    const eventDate = new Date(event.date);
+                    const now = new Date();
+                    return eventDate >= now;
+                  }).length > 5 && (
                   <div className="text-center mt-4">
                     <Link
                       href="/events-manager/events"
@@ -400,19 +503,19 @@ const EventsManagerDashboard = () => {
               <div className="text-center py-8">
                 <Calendar className="mx-auto h-12 w-12 text-gray-400" />
                 <h3 className="mt-2 text-sm font-medium text-gray-900">
-                  No events
+                  No upcoming events found
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  Get started by creating a new event.
+                  Check back later for upcoming church events and activities.
                 </p>
                 <div className="mt-6">
-                  <Link
-                    href="/events-manager/create"
+                  <Button
+                    onClick={() => setShowCreateEventModal(true)}
                     className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
                     <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
                     New Event
-                  </Link>
+                  </Button>
                 </div>
               </div>
             )}
@@ -444,7 +547,7 @@ const EventsManagerDashboard = () => {
                               {event?.title || `Event ${finance.eventId}`}
                             </h3>
                             <p className="text-xs text-gray-500 mt-1">
-                              Budget: $
+                              Budget: KES
                               {finance.budget.toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
                               })}
@@ -458,7 +561,7 @@ const EventsManagerDashboard = () => {
                                   : "text-red-600"
                               }`}
                             >
-                              $
+                              KES
                               {(
                                 finance.revenue - finance.expenses
                               ).toLocaleString("en-US", {
@@ -546,7 +649,7 @@ const EventsManagerDashboard = () => {
                             {sponsor.name}
                           </h3>
                           <p className="text-sm text-gray-500">
-                            ${sponsor.amount.toLocaleString("en-US")}
+                            KES {sponsor.amount.toLocaleString("en-US")}
                           </p>
                           {sponsor.contactEmail && (
                             <p className="text-xs text-gray-400 mt-1">
@@ -589,8 +692,24 @@ const EventsManagerDashboard = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          <EventsOverview events={events} />
+          <EventsOverview events={events} currentUserId={session?.user?.id} />
         </motion.div>
+
+        <CreateEventModal
+          isOpen={showCreateEventModal || showEditEventModal}
+          onClose={() => {
+            setShowCreateEventModal(false);
+            setShowEditEventModal(false);
+            setEditingEvent(null);
+          }}
+          onEventCreated={fetchEvents}
+          editingEvent={editingEvent}
+          onEventUpdated={() => {
+            fetchEvents();
+            setShowEditEventModal(false);
+            setEditingEvent(null);
+          }}
+        />
       </motion.div>
     </div>
   );

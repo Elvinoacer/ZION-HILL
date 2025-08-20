@@ -18,12 +18,23 @@ import { CSS } from "@dnd-kit/utilities";
 import { motion, AnimatePresence } from "framer-motion";
 import { Music, GripVertical } from "lucide-react";
 import { Button } from "../ui/button";
+import { toast } from "sonner";
 
 interface Song {
   id: string;
   title: string;
   artist: string;
-  duration: string;
+  youtubeUrl?: string;
+  spotifyUrl?: string;
+  userId: string;
+  user: {
+    name: string;
+    image?: string;
+  };
+  likes: number;
+  createdAt: string;
+  hasLiked?: boolean;
+  likesByUsers?: { userId: string }[];
 }
 
 interface SortableSongItemProps {
@@ -61,19 +72,39 @@ const SortableSongItem: React.FC<SortableSongItemProps> = ({ id, song }) => {
         <p className="font-medium text-gray-700 truncate">{song.title}</p>
         <p className="text-sm text-gray-500 truncate">{song.artist}</p>
       </div>
-      <div className="text-sm text-gray-400 ml-2">{song.duration}</div>
+      <div className="text-sm text-gray-400 ml-2">
+        {song.youtubeUrl && (
+          <a href={song.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-red-500 hover:underline">
+            YouTube
+          </a>
+        )}
+        {song.spotifyUrl && (
+          <a href={song.spotifyUrl} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:underline ml-2">
+            Spotify
+          </a>
+        )}
+      </div>
     </motion.li>
   );
 };
 
 interface SongArrangementProps {
   songs: Song[];
+  worshipSetId: string; // New prop
+  allSongProposals: Song[]; // New prop: all available songs
 }
 
 const SongArrangement: React.FC<SongArrangementProps> = ({
   songs: initialSongs,
+  worshipSetId,
+  allSongProposals,
 }) => {
   const [songs, setSongs] = useState<Song[]>(initialSongs);
+
+  // Filter available songs: those not already in the current arrangement
+  const availableSongs = allSongProposals.filter(
+    (proposal) => !songs.some((arrangedSong) => arrangedSong.id === proposal.id)
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -90,6 +121,40 @@ const SongArrangement: React.FC<SongArrangementProps> = ({
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
         return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  const handleAddSongToArrangement = (songToAdd: Song) => {
+    setSongs((prevSongs) => [...prevSongs, songToAdd]);
+    // Automatically save the arrangement after adding a song
+    // This will trigger handleSaveArrangement with the updated 'songs' state
+    // A small delay might be needed if state update is not immediate
+    setTimeout(() => {
+      handleSaveArrangement();
+    }, 0);
+  };
+
+  const handleSaveArrangement = async () => {
+    try {
+      const arrangedSongIds = songs.map(song => song.id);
+      const res = await fetch(`/api/worship-sets?id=${worshipSetId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ arrangedSongs: arrangedSongIds }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to save arrangement");
+      }
+
+      toast.success("Song arrangement saved successfully!");
+    } catch (err: any) {
+      toast.error("Error saving arrangement", {
+        description: err.message,
       });
     }
   };
@@ -125,9 +190,47 @@ const SongArrangement: React.FC<SongArrangementProps> = ({
       </DndContext>
 
       <div className="flex justify-end">
-        <Button className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600">
+        <Button
+          onClick={handleSaveArrangement}
+          className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
+        >
           Save Arrangement
         </Button>
+      </div>
+
+      <div className="mt-8 space-y-4">
+        <h4 className="font-semibold text-lg text-gray-700 flex items-center space-x-2">
+          <Music className="h-5 w-5 text-gray-600" />
+          <span>Available Songs</span>
+        </h4>
+        {availableSongs.length > 0 ? (
+          <ul className="space-y-2">
+            {availableSongs.map((song) => (
+              <motion.li
+                key={song.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between p-3 rounded-lg bg-white shadow-xs border border-gray-100"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-700 truncate">{song.title}</p>
+                  <p className="text-sm text-gray-500 truncate">{song.artist}</p>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => handleAddSongToArrangement(song)}
+                  className="ml-4 bg-green-500 hover:bg-green-600"
+                >
+                  Add
+                </Button>
+              </motion.li>
+            ))}
+          </ul>
+        ) : (
+          <div className="text-center py-4 text-gray-500">
+            <p>All available songs are already in the arrangement.</p>
+          </div>
+        )}
       </div>
     </motion.div>
   );

@@ -3,34 +3,29 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format, parseISO } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils"; // Assuming cn utility exists
-import { Textarea } from "@/components/ui/textarea"; // Import Textarea
-import Image from "next/image"; // Import Image component
+import { CalendarIcon, Edit, Trash2, Plus, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import CreateEventModal from "@/components/CreateEventModal";
 
 interface Event {
   id: string;
@@ -38,28 +33,29 @@ interface Event {
   date: string;
   location?: string;
   type: string;
-  description?: string; // Added description
-  imageUrl?: string; // Added imageUrl
+  description?: string;
+  imageUrl?: string;
 }
 
 const AdminEventsPage = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [imageUploadLoading, setImageUploadLoading] = useState(false); // State for image upload loading
-
-  const [newEvent, setNewEvent] = useState({
-    title: "",
-    date: "",
-    location: "",
-    type: "",
-    description: "",
-    imageUrl: "",
-  });
-
+  const [imageUploadLoading, setImageUploadLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
-  const [datePickerOpen, setDatePickerOpen] = useState(false);
-  const [disabledDates, setDisabledDates] = useState<Date[]>([]);
+
+  const eventTypes = [
+    { value: "SERVICE", label: "Service", color: "bg-blue-100 text-blue-800" },
+    { value: "MEETING", label: "Meeting", color: "bg-green-100 text-green-800" },
+    { value: "TRIP", label: "Trip", color: "bg-yellow-100 text-yellow-800" },
+    { value: "APPOINTMENT", label: "Appointment", color: "bg-purple-100 text-purple-800" },
+    { value: "CLASS", label: "Class", color: "bg-indigo-100 text-indigo-800" },
+    { value: "EVENT", label: "Event", color: "bg-pink-100 text-pink-800" },
+    { value: "BOOKING", label: "Booking", color: "bg-gray-100 text-gray-800" },
+  ];
 
   const fetchEvents = async () => {
     try {
@@ -67,160 +63,28 @@ const AdminEventsPage = () => {
       if (!res.ok) throw new Error("Failed to fetch events");
       const data = await res.json();
       setEvents(data);
-      // Extract dates for disabling
-      const dates = data.map((event: Event) => parseISO(event.date));
-      setDisabledDates(dates);
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchEvents();
-    setLoading(false);
   }, []);
 
-  const handleNewEventChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setNewEvent((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const confirmDelete = (id: string) => {
+    setEventToDelete(id);
+    setDeleteDialogOpen(true);
   };
 
-  const handleEditingEventChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setEditingEvent((prev) => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
-  };
+  const handleDeleteEvent = async () => {
+    if (!eventToDelete) return;
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setImageUploadLoading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await fetch("/api/upload-image", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to upload image");
-      }
-
-      const data = await res.json();
-      const imageUrl = data.url; // Assuming the API returns { url: '...' }
-
-      if (editingEvent) {
-        setEditingEvent((prev) => ({
-          ...prev!,
-          imageUrl: imageUrl,
-        }));
-      } else {
-        setNewEvent((prev) => ({
-          ...prev,
-          imageUrl: imageUrl,
-        }));
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setImageUploadLoading(false);
-    }
-  };
-
-  const handleNewEventTypeChange = (value: string) => {
-    setNewEvent((prev) => ({
-      ...prev,
-      type: value,
-    }));
-  };
-
-  const handleEditingEventTypeChange = (value: string) => {
-    setEditingEvent((prev) => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        type: value,
-      };
-    });
-  };
-
-  const handleAddEvent = async (e: React.FormEvent) => {
-    e.preventDefault();
     setError(null);
     try {
-      const res = await fetch("/api/events", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newEvent),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to add event");
-      }
-
-      setNewEvent({
-        title: "",
-        date: "",
-        location: "",
-        type: "",
-        description: "",
-        imageUrl: "",
-      });
-      fetchEvents(); // Refresh event list
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
-
-  const handleUpdateEvent = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (!editingEvent) return;
-
-    try {
-      const res = await fetch(`/api/events?id=${editingEvent.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editingEvent),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to update event");
-      }
-
-      setEditingEvent(null);
-      fetchEvents(); // Refresh event list
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
-
-  const handleDeleteEvent = async (id: string) => {
-    setError(null);
-    try {
-      const res = await fetch(`/api/events?id=${id}`, {
+      const res = await fetch(`/api/events?id=${eventToDelete}`, {
         method: "DELETE",
       });
 
@@ -229,315 +93,197 @@ const AdminEventsPage = () => {
         throw new Error(errorData.error || "Failed to delete event");
       }
 
-      fetchEvents(); // Refresh event list
+      fetchEvents();
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      setDeleteDialogOpen(false);
+      setEventToDelete(null);
     }
   };
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">
-          Event Management
-        </h1>
-        <p className="text-lg text-gray-600">Loading events...</p>
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        <div className="flex flex-col items-center justify-center min-h-[300px]">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-4" />
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Event Management</h1>
+          <p className="text-gray-600">Loading events...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto py-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">
-          Event Management
-        </h1>
-        <p className="text-lg text-red-500">Error: {error}</p>
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Event Management</h1>
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">Error: {error}</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">
-        Event Management
-      </h1>
-      <p className="text-lg text-gray-600 mb-4">
-        Plan and manage church events, including services, conferences, and
-        training sessions.
-      </p>
+    <div className="container mx-auto py-8 px-4 max-w-7xl">
+      {/* Header Section */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Event Management</h1>
+        <p className="text-lg text-gray-600">
+          Plan and manage church events, including services, conferences, and training sessions.
+        </p>
+      </div>
 
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>{editingEvent ? "Edit Event" : "Add New Event"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form
-            onSubmit={editingEvent ? handleUpdateEvent : handleAddEvent}
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          >
-            <div>
-              <label
-                htmlFor="title"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-                Title:
-              </label>
-              <Input
-                type="text"
-                id="title"
-                name="title"
-                value={editingEvent ? editingEvent.title : newEvent.title}
-                onChange={
-                  editingEvent ? handleEditingEventChange : handleNewEventChange
-                }
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="date"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-                Date:
-              </label>
-              <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !editingEvent?.date &&
-                        !newEvent.date &&
-                        "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {editingEvent?.date
-                      ? format(parseISO(editingEvent.date), "PPP")
-                      : newEvent.date
-                      ? format(parseISO(newEvent.date), "PPP")
-                      : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <DayPicker
-                    mode="single"
-                    selected={
-                      editingEvent
-                        ? parseISO(editingEvent.date)
-                        : newEvent.date
-                        ? parseISO(newEvent.date)
-                        : undefined
-                    }
-                    onSelect={(date) => {
-                      if (date) {
-                        if (editingEvent) {
-                          setEditingEvent((prev) => ({
-                            ...prev!,
-                            date: date.toISOString(),
-                          }));
-                        } else {
-                          setNewEvent((prev) => ({
-                            ...prev,
-                            date: date.toISOString(),
-                          }));
-                        }
-                        setDatePickerOpen(false);
-                      }
-                    }}
-                    disabled={disabledDates}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            <div>
-              <label
-                htmlFor="location"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-                Location:
-              </label>
-              <Input
-                type="text"
-                id="location"
-                name="location"
-                value={
-                  editingEvent ? editingEvent.location || "" : newEvent.location
-                }
-                onChange={
-                  editingEvent ? handleEditingEventChange : handleNewEventChange
-                }
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="description"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-                Description:
-              </label>
-              <Textarea
-                id="description"
-                name="description"
-                value={
-                  editingEvent
-                    ? editingEvent.description || ""
-                    : newEvent.description
-                }
-                onChange={
-                  editingEvent ? handleEditingEventChange : handleNewEventChange
-                }
-                rows={4}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="imageUrl"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-                Image:
-              </label>
-              <Input
-                type="file"
-                id="imageUrl"
-                name="imageUrl"
-                onChange={handleImageUpload}
-                disabled={imageUploadLoading}
-                accept="image/*"
-              />
-              {imageUploadLoading && (
-                <p className="text-sm text-gray-500 mt-1">Uploading image...</p>
-              )}
-              {(editingEvent?.imageUrl || newEvent.imageUrl) && (
-                <div className="mt-2">
-                  <Image
-                    src={editingEvent?.imageUrl || newEvent.imageUrl || ""}
-                    alt="Event Image Preview"
-                    width={100}
-                    height={100}
-                    className="rounded-md object-cover"
-                  />
-                </div>
-              )}
-            </div>
-            <div>
-              <label
-                htmlFor="type"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-                Type:
-              </label>
-              <Select
-                onValueChange={
-                  editingEvent
-                    ? handleEditingEventTypeChange
-                    : handleNewEventTypeChange
-                }
-                value={editingEvent ? editingEvent.type : newEvent.type}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="SERVICE">Service</SelectItem>
-                  <SelectItem value="MEETING">Meeting</SelectItem>
-                  <SelectItem value="TRIP">Trip</SelectItem>
-                  <SelectItem value="APPOINTMENT">Appointment</SelectItem>
-                  <SelectItem value="CLASS">Class</SelectItem>
-                  <SelectItem value="EVENT">Event</SelectItem>
-                  <SelectItem value="BOOKING">Booking</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="md:col-span-2 flex space-x-2">
-              <Button type="submit">
-                {editingEvent ? "Update Event" : "Add Event"}
-              </Button>
-              {editingEvent && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setEditingEvent(null)}
-                >
-                  Cancel
-                </Button>
-              )}
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+      {/* Add New Event Button */}
+      <div className="mb-8 flex justify-end">
+        <Button onClick={() => { setIsModalOpen(true); setEditingEvent(null); }} className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md shadow-sm">
+          <Plus className="h-4 w-4 mr-2" />
+          Add New Event
+        </Button>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Existing Events</CardTitle>
+      {/* Events List */}
+      <Card className="border border-gray-200 shadow-lg rounded-xl overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+          <CardTitle className="text-white">Existing Events</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {events.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-gray-50">
                   <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Image</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="text-gray-600 font-medium">Title</TableHead>
+                    <TableHead className="text-gray-600 font-medium">Date</TableHead>
+                    <TableHead className="text-gray-600 font-medium">Location</TableHead>
+                    <TableHead className="text-gray-600 font-medium">Type</TableHead>
+                    <TableHead className="text-gray-600 font-medium">Image</TableHead>
+                    <TableHead className="text-gray-600 font-medium text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {events.map((event) => (
-                    <TableRow key={event.id}>
-                      <TableCell>{event.title}</TableCell>
-                      <TableCell>
-                        {new Date(event.date).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>{event.location || "N/A"}</TableCell>
-                      <TableCell>{event.description || "N/A"}</TableCell>
-                      <TableCell>
-                        {event.imageUrl ? (
-                          <Image
-                            src={event.imageUrl}
-                            alt="Event Image"
-                            width={50}
-                            height={50}
-                            className="rounded-md object-cover"
-                          />
-                        ) : (
-                          "N/A"
-                        )}
-                      </TableCell>
-                      <TableCell>{event.type}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditingEvent(event)}
-                          className="mr-2"
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteEvent(event.id)}
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {events.map((event) => {
+                    const eventType = eventTypes.find((t) => t.value === event.type);
+                    return (
+                      <TableRow key={event.id} className="hover:bg-gray-50">
+                        <TableCell className="font-medium">
+                          <div className="flex items-center">
+                            {event.imageUrl && (
+                              <div className="relative w-10 h-10 rounded-md overflow-hidden mr-3 shadow-sm">
+                                <Image src={event.imageUrl} alt="Event Image" fill className="object-cover" />
+                              </div>
+                            )}
+                            <div>
+                              <p className="text-gray-900 font-medium">{event.title}</p>
+                              {event.description && (
+                                <p className="text-gray-500 text-sm line-clamp-1">{event.description}</p>
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-gray-700">{event.date ? format(parseISO(event.date), "MMM d, yyyy") : "N/A"}</div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-gray-700">{event.location || "N/A"}</div>
+                        </TableCell>
+                        <TableCell>
+                          {eventType ? (
+                            <Badge className={`${eventType.color} rounded-md shadow-sm`}>{eventType.label}</Badge>
+                          ) : (
+                            event.type
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {event.imageUrl ? (
+                            <div className="relative w-10 h-10 rounded-md overflow-hidden shadow-sm">
+                              <Image src={event.imageUrl} alt="Event Image" fill className="object-cover" />
+                            </div>
+                          ) : (
+                            <span className="text-gray-500">N/A</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => { setEditingEvent(event); setIsModalOpen(true); }}
+                              className="text-gray-600 hover:text-gray-900 border-gray-300 hover:bg-gray-50 rounded-md shadow-sm"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => confirmDelete(event.id)}
+                              className="text-white hover:bg-red-700 rounded-md shadow-sm"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
           ) : (
-            <p>No events found.</p>
+            <div className="p-8 text-center">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1"
+                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <h3 className="mt-2 text-lg font-medium text-gray-900">No events found</h3>
+              <p className="mt-1 text-gray-500">Get started by adding a new event.</p>
+            </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="max-w-md rounded-lg shadow-xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-gray-800">Confirm Deletion</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-600">
+              Are you sure you want to delete this event? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md shadow-sm">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteEvent}
+              className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 rounded-md shadow-sm"
+            >
+              Delete Event
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <CreateEventModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onEventCreated={fetchEvents} eventToEdit={editingEvent} />
     </div>
   );
 };

@@ -18,6 +18,33 @@ export async function GET(request: Request) {
           },
         });
         return NextResponse.json(therapists);
+      case "counselor-sessions":
+        const counselorId = searchParams.get("counselorId");
+        if (!counselorId) {
+          return NextResponse.json({ message: "Counselor ID is required" }, { status: 400 });
+        }
+        const counselorSessions = await prisma.counselingSession.findMany({
+          where: {
+            counselorId: counselorId,
+          },
+          include: {
+            client: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+            topic: {
+              select: {
+                name: true,
+              },
+            },
+          },
+          orderBy: {
+            date: "desc",
+          },
+        });
+        return NextResponse.json(counselorSessions);
       case "groups":
         const groups = await prisma.group.findMany();
         return NextResponse.json(groups);

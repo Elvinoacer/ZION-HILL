@@ -10,13 +10,13 @@ export async function POST(request: Request) {
     const jitsiUrl = `https://meet.jit.si/${roomName}`;
 
     if (prayerRequestId) {
-      await prisma.prayerRequest.update({
-        where: { id: prayerRequestId },
-        data: {
-          dailyRoomUrl: jitsiUrl,
-          dailyRoomName: roomName,
-        },
-      });
+      const updatedPrayerRequest = await prisma.prayerRequest.update({
+      where: { id: typeof prayerRequestId === 'object' && prayerRequestId.id ? prayerRequestId.id : prayerRequestId },
+      data: {
+        dailyRoomUrl: jitsiUrl,
+        dailyRoomName: roomName,
+      },
+    });
     }
 
     return NextResponse.json({ url: jitsiUrl, name: roomName });

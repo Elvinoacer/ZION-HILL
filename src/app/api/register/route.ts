@@ -26,12 +26,7 @@ export async function POST(request: Request) {
         email,
         password: hashedPassword,
         // You might want to assign a default role here, e.g., 'MEMBER'
-        roles: {
-          connectOrCreate: {
-            where: { name: 'MEMBER' },
-            create: { name: 'MEMBER' },
-          },
-        },
+        roles: ['MEMBER'], // Assign 'MEMBER' enum directly as an array
       },
     });
 

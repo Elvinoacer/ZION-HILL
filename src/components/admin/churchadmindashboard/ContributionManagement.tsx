@@ -22,7 +22,7 @@ export default function ContributionManagement({ donations }: ContributionManage
         : filter === "paymentMethod"
         ? donation.paymentMethod || "N/A"
         : donation.demographic || "N/A";
-    acc[key] = (acc[key] || 0) + donation.amount.toNumber(); // Assuming amount is Decimal from Prisma
+    acc[key] = (acc[key] || 0) + donation.amount;
     return acc;
   }, {} as Record<string, number>);
 
@@ -91,7 +91,7 @@ export default function ContributionManagement({ donations }: ContributionManage
                   <DollarSign className="h-5 w-5 text-blue-600 mr-2" />
                   <div>
                     <div className="font-semibold text-gray-900">
-                      ${donation.amount.toNumber()} - {donation.fundId || "N/A"}
+                      KES {donation.amount} - {donation.fundId || "N/A"}
                     </div>
                     <div className="text-sm text-gray-600">
                       {donation.paymentMethod || "N/A"} | {donation.demographic || "N/A"} |{" "}

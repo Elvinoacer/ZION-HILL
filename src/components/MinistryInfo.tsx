@@ -1,14 +1,38 @@
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { motion } from "framer-motion";
 import { BookOpen, Users, Calendar, BarChart2, X } from "lucide-react";
-import { useState } from "react";
-import { Ministry, User } from "@prisma/client";
+import { useState, useEffect } from "react"; // Import useEffect
+import Image from "next/image";
+import {
+  Ministry,
+  User,
+  MinistryMember,
+  Group,
+  Event,
+} from "@/generated/prisma";
+
 import { useMinistryStore } from "@/store";
+import { useSession } from "next-auth/react";
 
 interface MinistryInfoProps {
-  ministry: Ministry & { leader: User | null };
+  ministry: Ministry & {
+    leader: User | null;
+    members: MinistryMember[];
+    groups: Group[];
+    events: Event[];
+  };
 }
 
 export default function MinistryInfo({ ministry }: MinistryInfoProps) {
+  const { data: session } = useSession();
   const { updateMinistry } = useMinistryStore();
   const [showEditModal, setShowEditModal] = useState(false);
   const [editData, setEditData] = useState({
@@ -17,21 +41,51 @@ export default function MinistryInfo({ ministry }: MinistryInfoProps) {
     leaderId: ministry.leaderId || "",
   });
 
+  const [fetchedGrowthData, setFetchedGrowthData] = useState<any[]>([]);
+  const [isGrowthDataLoading, setIsGrowthDataLoading] = useState(true);
+  const [growthDataError, setGrowthDataError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchGrowthData = async () => {
+      if (!ministry?.id) return;
+      setIsGrowthDataLoading(true);
+      setGrowthDataError(null);
+      try {
+        const response = await fetch(
+          `/api/ministries/${ministry.id}/growth-data`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch growth data");
+        }
+        const data = await response.json();
+        setFetchedGrowthData(data);
+      } catch (err: any) {
+        setGrowthDataError(err.message);
+      } finally {
+        setIsGrowthDataLoading(false);
+      }
+    };
+
+    fetchGrowthData();
+  }, [ministry?.id]);
+
+  console.log("Ministry Info:", ministry);
+
   const stats = [
     {
       icon: <Users className="h-5 w-5" aria-hidden="true" />,
       label: "Members",
-      value: ministry.membersCount || 0,
+      value: ministry.members.length || 0,
     },
     {
       icon: <BookOpen className="h-5 w-5" aria-hidden="true" />,
-      label: "Active Programs",
-      value: ministry.activePrograms || 0,
+      label: "Active Groups",
+      value: ministry.groups.length || 0, // Use ministry.groups.length
     },
     {
       icon: <Calendar className="h-5 w-5" aria-hidden="true" />,
       label: "Upcoming Events",
-      value: ministry.upcomingEvents || 0,
+      value: ministry.events.length || 0, // Use ministry.events.length
     },
   ];
 
@@ -64,15 +118,31 @@ export default function MinistryInfo({ ministry }: MinistryInfoProps) {
           >
             {ministry.name}
           </h3>
-          <p className="text-gray-600">Leader: {ministry.leader?.name || "N/A"}</p>
+          <p className="text-gray-600 flex items-center">
+            {ministry.leader?.photo && (
+              <Image
+                src={ministry.leader.photo}
+                alt={`${ministry.leader.name}'s photo`}
+                width={24}
+                height={24}
+                className="rounded-full ml-2 mr-1"
+              />
+            )}
+            Led by &nbsp;
+            <span className="font-medium text-gray-800">
+              {ministry.leader?.name || "N/A"}
+            </span>
+          </p>
         </div>
-        <button
-          onClick={() => setShowEditModal(true)}
-          className="text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-          aria-label="Edit ministry details"
-        >
-          Edit Ministry
-        </button>
+        {ministry?.leader?.id && ministry.leader.id === session?.user.id && (
+          <button
+            onClick={() => setShowEditModal(true)}
+            className="text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+            aria-label="Edit ministry details"
+          >
+            Edit Ministry
+          </button>
+        )}
       </div>
 
       <p className="text-gray-700 mb-6">{ministry.description}</p>
@@ -100,11 +170,45 @@ export default function MinistryInfo({ ministry }: MinistryInfoProps) {
           <BarChart2 className="mr-2 h-5 w-5" aria-hidden="true" /> Ministry
           Growth
         </h4>
-        <div
-          className="h-40 bg-gradient-to-r from-gray-100 to-gray-200 rounded-lg flex items-center justify-center text-gray-500"
-          aria-hidden="true"
-        >
-          [Growth Chart Placeholder]
+        <div className="h-40 w-full">
+          {" "}
+          {/* Adjusted height and width */}
+          {isGrowthDataLoading ? (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              Loading growth data...
+            </div>
+          ) : growthDataError ? (
+            <div className="flex items-center justify-center h-full text-red-500">
+              Error loading chart: {growthDataError}
+            </div>
+          ) : fetchedGrowthData.length === 0 ? (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              No growth data available.
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={fetchedGrowthData}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="members"
+                  stroke="#8884d8"
+                  activeDot={{ r: 8 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 
@@ -123,21 +227,69 @@ export default function MinistryInfo({ ministry }: MinistryInfoProps) {
             >
               <X className="h-6 w-6" />
             </button>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Edit Ministry</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              Edit Ministry
+            </h2>
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
-                <input type="text" id="name" name="name" value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required />
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={editData.name}
+                  onChange={(e) =>
+                    setEditData({ ...editData, name: e.target.value })
+                  }
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  required
+                />
               </div>
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
-                <textarea id="description" name="description" value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} rows={3} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"></textarea>
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={editData.description}
+                  onChange={(e) =>
+                    setEditData({ ...editData, description: e.target.value })
+                  }
+                  rows={3}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                ></textarea>
               </div>
               <div>
-                <label htmlFor="leaderId" className="block text-sm font-medium text-gray-700">Leader ID</label>
-                <input type="text" id="leaderId" name="leaderId" value={editData.leaderId} onChange={(e) => setEditData({ ...editData, leaderId: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                <label
+                  htmlFor="leaderId"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Leader ID
+                </label>
+                <input
+                  type="text"
+                  id="leaderId"
+                  name="leaderId"
+                  value={editData.leaderId}
+                  onChange={(e) =>
+                    setEditData({ ...editData, leaderId: e.target.value })
+                  }
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                />
               </div>
-              <button type="submit" className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+              >
                 Save Changes
               </button>
             </form>

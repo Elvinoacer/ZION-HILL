@@ -4,6 +4,14 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: NextRequest) {
   try {
     const proposals = await prisma.songProposal.findMany({
+      include: {
+        user: true, // Include the related User model
+        likesByUsers: {
+          select: {
+            userId: true,
+          },
+        },
+      },
       orderBy: {
         createdAt: "desc",
       },

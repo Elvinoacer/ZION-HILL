@@ -3,6 +3,8 @@ import { create } from "zustand";
 interface UserProfile {
   name: string;
   email: string;
+  baptismApplicationStatus?: string; // Add baptism status
+  baptismDate?: string; // Add baptism date
   // Add other profile fields as needed
 }
 
@@ -39,6 +41,16 @@ interface PrayerRequest {
   isUrgent: boolean;
 }
 
+interface CounselingSession {
+  id: string;
+  topic?: string | null;
+  status: string;
+  date: string; // Assuming it will be returned as a string
+  counselor?: {
+    name: string | null;
+  } | null;
+}
+
 interface DashboardState {
   profile: UserProfile | null;
   upcomingEvents: Event[];
@@ -46,6 +58,8 @@ interface DashboardState {
   givingHistory: Transaction[];
   bibleStudyProgress: BibleStudy | null;
   prayerRequests: PrayerRequest[];
+  counselingSessions: CounselingSession[]; // Added
+  newVolunteeringOpportunitiesCount: number; // New state property
   loading: boolean;
   error: string | null;
   fetchDashboardData: (userId: string) => Promise<void>;
@@ -58,6 +72,8 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   givingHistory: [],
   bibleStudyProgress: null,
   prayerRequests: [],
+  counselingSessions: [], // Added
+  newVolunteeringOpportunitiesCount: 0, // Initialize new state property
   loading: false,
   error: null,
   fetchDashboardData: async (userId) => {
@@ -79,6 +95,8 @@ export const useDashboardStore = create<DashboardState>((set) => ({
         donationsResult,
         bibleStudyResult,
         prayerRequestsResult,
+        counselingSessionsResult, // Added
+        newVolunteeringOpportunitiesCountResult, // Added
       ] = await Promise.allSettled([
         safeFetch(`/api/member-profile?userId=${userId}`, "Failed to fetch profile"),
         safeFetch("/api/events?type=EVENT", "Failed to fetch events"),
@@ -86,6 +104,8 @@ export const useDashboardStore = create<DashboardState>((set) => ({
         safeFetch("/api/donations", "Failed to fetch donations"),
         safeFetch("/api/bible-study", "Failed to fetch bible study progress"),
         safeFetch("/api/prayer-requests", "Failed to fetch prayer requests"),
+        safeFetch(`/api/user-counseling-sessions?userId=${userId}`, "Failed to fetch counseling sessions"), // Added
+        safeFetch(`/api/volunteering-opportunities/new-count?userId=${userId}`, "Failed to fetch new volunteering opportunities count"), // Added
       ]);
 
       const update: Partial<DashboardState> = {};
@@ -99,32 +119,35 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 
       if (eventsResult.status === "fulfilled") {
         update.upcomingEvents = eventsResult.value;
-      } else {
-        aggregatedErrors.push(eventsResult.reason.message);
       }
 
       if (sermonsResult.status === "fulfilled") {
         update.recentSermons = sermonsResult.value;
-      } else {
-        aggregatedErrors.push(sermonsResult.reason.message);
       }
 
       if (donationsResult.status === "fulfilled") {
         update.givingHistory = donationsResult.value;
-      } else {
-        aggregatedErrors.push(donationsResult.reason.message);
       }
 
       if (bibleStudyResult.status === "fulfilled") {
         update.bibleStudyProgress = bibleStudyResult.value;
-      } else {
-        aggregatedErrors.push(bibleStudyResult.reason.message);
       }
 
       if (prayerRequestsResult.status === "fulfilled") {
         update.prayerRequests = prayerRequestsResult.value;
+      }
+
+      // Added counseling sessions result handling
+      if (counselingSessionsResult.status === "fulfilled") {
+        update.counselingSessions = counselingSessionsResult.value;
       } else {
-        aggregatedErrors.push(prayerRequestsResult.reason.message);
+        aggregatedErrors.push(counselingSessionsResult.reason.message);
+      }
+
+      if (newVolunteeringOpportunitiesCountResult.status === "fulfilled") {
+        update.newVolunteeringOpportunitiesCount = newVolunteeringOpportunitiesCountResult.value;
+      } else {
+        aggregatedErrors.push(newVolunteeringOpportunitiesCountResult.reason.message);
       }
 
       if (aggregatedErrors.length > 0) {
@@ -132,7 +155,6 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       }
       set(update);
 
-      set(update);
     } catch (err: any) {
       set({ error: err.message });
     } finally {

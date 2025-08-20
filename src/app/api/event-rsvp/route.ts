@@ -61,14 +61,25 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const eventId = searchParams.get('eventId');
-
-  if (!eventId) {
-    return NextResponse.json({ error: 'Event ID is required' }, { status: 400 });
-  }
+  const userId = searchParams.get('userId');
 
   try {
+    let whereClause: any = {};
+
+    if (eventId) {
+      whereClause.eventId = eventId;
+    }
+    if (userId) {
+      whereClause.userId = userId;
+    }
+
+    // If neither eventId nor userId is provided, return an empty array
+    if (!eventId && !userId) {
+        return NextResponse.json([]);
+    }
+
     const rsvps = await prisma.participant.findMany({
-      where: { eventId },
+      where: whereClause,
       include: { // Include the related User model
         user: {
           select: { // Select specific fields from User

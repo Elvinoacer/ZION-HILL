@@ -149,3 +149,21 @@ export interface CommunityPartner {
     date: string;
   }[];
 }
+
+export enum BaptismStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+  SCHEDULED = "SCHEDULED",
+  COMPLETED = "COMPLETED",
+}
+
+export interface BaptismCandidate {
+  id: string;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  baptismApplicationStatus: BaptismStatus | null;
+  baptismClassCompleted: boolean | null;
+  baptismDate: Date | null;
+}

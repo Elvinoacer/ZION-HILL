@@ -56,78 +56,277 @@ const AdminDashboardPage = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
-        <p className="text-lg text-gray-600">Loading metrics...</p>
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        <div className="flex flex-col items-center justify-center min-h-[300px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mb-4"></div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
+          <p className="text-lg text-gray-600">Loading metrics...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto py-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
-        <p className="text-lg text-red-500">Error: {error}</p>
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">Error: {error}</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
-      <p className="text-lg text-gray-600 mb-4">
-        Welcome to the administration panel. From here, you can manage various aspects of the church operations.
-      </p>
+    <div className="container mx-auto py-8 px-4 max-w-7xl">
+      {/* Header Section */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
+        <p className="text-lg text-gray-600">
+          Welcome to the administration panel. From here, you can manage various aspects of the church operations.
+        </p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">Total Users</h2>
-          <p className="text-4xl font-bold text-indigo-600">{metrics?.totalUsers}</p>
+      {/* Metrics Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        {/* Users Card */}
+        <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Users</h2>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{metrics?.totalUsers}</p>
+            </div>
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+          </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">Total Ministries</h2>
-          <p className="text-4xl font-bold text-indigo-600">{metrics?.totalMinistries}</p>
+
+        {/* Ministries Card */}
+        <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Ministries</h2>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{metrics?.totalMinistries}</p>
+            </div>
+            <div className="bg-green-100 p-3 rounded-lg">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+          </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">Total Events</h2>
-          <p className="text-4xl font-bold text-indigo-600">{metrics?.totalEvents}</p>
+
+        {/* Events Card */}
+        <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-purple-500">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Events</h2>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{metrics?.totalEvents}</p>
+            </div>
+            <div className="bg-purple-100 p-3 rounded-lg">
+              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+          </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">Total Donations</h2>
-          <p className="text-4xl font-bold text-indigo-600">{metrics?.totalDonations}</p>
+
+        {/* Donations Card */}
+        <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-amber-500">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Donations</h2>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{metrics?.totalDonations}</p>
+            </div>
+            <div className="bg-amber-100 p-3 rounded-lg">
+              <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 
+      {/* Management Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">User Management</h2>
-          <p className="text-gray-600 mb-4">Manage users and roles.</p>
-          <Link href="/admin/users" className="text-blue-600 hover:underline">Go to User Management</Link>
+        {/* User Management */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          <div className="p-6">
+            <div className="flex items-center mb-4">
+              <div className="bg-blue-100 p-3 rounded-lg mr-4">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-800">User Management</h2>
+            </div>
+            <p className="text-gray-600 mb-6">Manage users and their roles within the church community.</p>
+            <Link href="/admin/users" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+              Go to User Management
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Ministry Management</h2>
-          <p className="text-gray-600 mb-4">Oversee church ministries.</p>
-          <Link href="/admin/ministries" className="text-blue-600 hover:underline">Go to Ministry Management</Link>
+
+        {/* Ministry Management */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          <div className="p-6">
+            <div className="flex items-center mb-4">
+              <div className="bg-green-100 p-3 rounded-lg mr-4">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-800">Ministry Management</h2>
+            </div>
+            <p className="text-gray-600 mb-6">Oversee and organize all church ministries and groups.</p>
+            <Link href="/admin/ministries" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+              Go to Ministry Management
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Event Management</h2>
-          <p className="text-gray-600 mb-4">Plan and manage church events.</p>
-          <Link href="/admin/events" className="text-blue-600 hover:underline">Go to Event Management</Link>
+
+        {/* Event Management */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          <div className="p-6">
+            <div className="flex items-center mb-4">
+              <div className="bg-purple-100 p-3 rounded-lg mr-4">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-800">Event Management</h2>
+            </div>
+            <p className="text-gray-600 mb-6">Plan and manage all church events and activities.</p>
+            <Link href="/admin/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+              Go to Event Management
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Financial Overview</h2>
-          <p className="text-gray-600 mb-4">Track donations and expenses.</p>
-          <Link href="/admin/financials" className="text-blue-600 hover:underline">Go to Financial Overview</Link>
+
+        {/* Financial Overview */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          <div className="p-6">
+            <div className="flex items-center mb-4">
+              <div className="bg-amber-100 p-3 rounded-lg mr-4">
+                <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-800">Financial Overview</h2>
+            </div>
+            <p className="text-gray-600 mb-6">Track donations, expenses, and financial reports.</p>
+            <Link href="/admin/financials" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+              Go to Financial Overview
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Outreach Programs</h2>
-          <p className="text-gray-600 mb-4">Manage community outreach initiatives.</p>
-          <Link href="/admin/outreach" className="text-blue-600 hover:underline">Go to Outreach Programs</Link>
+
+        {/* Outreach Programs */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          <div className="p-6">
+            <div className="flex items-center mb-4">
+              <div className="bg-teal-100 p-3 rounded-lg mr-4">
+                <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-800">Outreach Programs</h2>
+            </div>
+            <p className="text-gray-600 mb-6">Manage community outreach and mission programs.</p>
+            <Link href="/admin/outreach" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+              Go to Outreach Programs
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Pastoral Care</h2>
-          <p className="text-gray-600 mb-4">Manage counseling sessions and support groups.</p>
-          <Link href="/admin/pastoral-care" className="text-blue-600 hover:underline">Go to Pastoral Care</Link>
+
+        {/* Pastoral Care */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          <div className="p-6">
+            <div className="flex items-center mb-4">
+              <div className="bg-indigo-100 p-3 rounded-lg mr-4">
+                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-800">Pastoral Care</h2>
+            </div>
+            <p className="text-gray-600 mb-6">Manage counseling sessions and support groups.</p>
+            <Link href="/admin/pastoral-care" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+              Go to Pastoral Care
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
+        {/* Role Management */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          <div className="p-6">
+            <div className="flex items-center mb-4">
+              <div className="bg-red-100 p-3 rounded-lg mr-4">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-800">Role Management</h2>
+            </div>
+            <p className="text-gray-600 mb-6">Manage user roles and permissions within the system.</p>
+            <Link href="/admin/role-management" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+              Go to Role Management
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
+        {/* Institutions Management */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          <div className="p-6">
+            <div className="flex items-center mb-4">
+              <div className="bg-orange-100 p-3 rounded-lg mr-4">
+                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-800">Institutions Management</h2>
+            </div>
+            <p className="text-gray-600 mb-6">Manage church-owned schools, clinics, and other institutions.</p>
+            <Link href="/admin/institutions" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+              Go to Institutions Management
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

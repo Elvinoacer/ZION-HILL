@@ -10,6 +10,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { safeFetch } from "@/lib/api";
@@ -46,7 +61,7 @@ interface ForumTopic {
   userFeedback?: "LIKE" | "DISLIKE" | null;
 }
 
-export const DiscussionForumsPage = () => {
+export default function DiscussionForumsPage() {
   const { data: session } = useSession();
   const [state, setState] = useState({
     topics: [] as ForumTopic[],
@@ -58,6 +73,9 @@ export const DiscussionForumsPage = () => {
     error: null as string | null,
     isCreatingTopic: false,
   });
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // New state
+  const [topicToDeleteId, setTopicToDeleteId] = useState<string | null>(null); // New state
 
   const {
     topics,
@@ -211,6 +229,32 @@ export const DiscussionForumsPage = () => {
     }
   };
 
+  const onDeleteTopic = (topicId: string) => {
+    setTopicToDeleteId(topicId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteTopic = async () => {
+    if (!topicToDeleteId) return;
+
+    try {
+      await safeFetch(`/api/discussion-forums/topics/${topicToDeleteId}`, {
+        method: "DELETE",
+      });
+
+      setState((prev) => ({
+        ...prev,
+        topics: prev.topics.filter((topic) => topic.id !== topicToDeleteId),
+      }));
+      setTopicToDeleteId(null);
+      setShowDeleteConfirm(false);
+    } catch (err: any) {
+      setState((prev) => ({ ...prev, error: err.message }));
+      setTopicToDeleteId(null);
+      setShowDeleteConfirm(false);
+    }
+  };
+
   const getYouTubeVideoId = (url: string) => {
     const regex =
       /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[\?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
@@ -309,6 +353,7 @@ export const DiscussionForumsPage = () => {
             session={session}
             handleFeedback={handleFeedback}
             getYouTubeVideoId={getYouTubeVideoId}
+            onDeleteTopic={onDeleteTopic} // Pass the onDeleteTopic function
           />
         </div>
 
@@ -317,9 +362,28 @@ export const DiscussionForumsPage = () => {
           <PopularTopics topics={topics} />
         </div>
       </div>
+
+      {/* AlertDialog for delete confirmation */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this
+              discussion and all its associated comments and feedback.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteTopic}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
-};
+}
 
 const LoadingState = () => (
   <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -552,16 +616,18 @@ const FormField = ({
   </div>
 );
 
-const TopicsList = ({
+const TopicsList: React.FC<{
+  topics: ForumTopic;
+  session: any;
+  handleFeedback: (topicId: string, type: "LIKE" | "DISLIKE") => void;
+  getYouTubeVideoId: (url: string) => string | null;
+  onDeleteTopic: (topicId: string) => void;
+}> = ({
   topics,
   session,
   handleFeedback,
   getYouTubeVideoId,
-}: {
-  topics: ForumTopic[];
-  session: any;
-  handleFeedback: (topicId: string, type: "LIKE" | "DISLIKE") => void;
-  getYouTubeVideoId: (url: string) => string | null;
+  onDeleteTopic,
 }) => (
   <div className="space-y-4">
     <h2 className="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
@@ -585,6 +651,7 @@ const TopicsList = ({
                 session={session}
                 handleFeedback={handleFeedback}
                 getYouTubeVideoId={getYouTubeVideoId}
+                onDelete={onDeleteTopic} // Pass the onDeleteTopic function
               />
             </motion.div>
           ))}
@@ -611,19 +678,60 @@ const TopicItem = ({
   session,
   handleFeedback,
   getYouTubeVideoId,
+  onDelete,
 }: {
   topic: ForumTopic;
   session: any;
   handleFeedback: (topicId: string, type: "LIKE" | "DISLIKE") => void;
   getYouTubeVideoId: (url: string) => string | null;
+  onDelete: (topicId: string) => void; // Added
 }) => {
   const videoId = topic.videoUrl ? getYouTubeVideoId(topic.videoUrl) : null;
   const [expanded, setExpanded] = useState(false);
 
   return (
     <Card className="hover:shadow-md transition-shadow duration-200 dark:bg-gray-800 dark:border-gray-700">
-      <Link href={`/discussion-forums/${topic.id}`}>
-        <CardContent className="p-6">
+        <CardContent
+          className="p-6 relative cursor-pointer"
+          onClick={() => window.location.href = `/discussion-forums/${topic.id}`}
+        >
+          {" "}
+          {/* Added relative positioning */}
+          {session?.user?.id === topic.userId && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  onClick={(e) => e.stopPropagation()} // Add this line
+                  onClick={(e) => e.stopPropagation()} // Add this line
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                  </svg>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-red-500"
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent default button behavior
+                    e.stopPropagation(); // Stop propagation to prevent CardContent navigation
+                    onDelete(topic.id);
+                  }}
+                >
+                  Delete
+                </Button>
+              </PopoverContent>
+            </Popover>
+          )}
           <div className="flex items-start space-x-4">
             <Avatar className="h-10 w-10 border border-gray-200 dark:border-gray-700">
               <AvatarImage src={topic.user.image} alt={topic.user.name} />
@@ -659,6 +767,7 @@ const TopicItem = ({
                 <button
                   onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation(); // Stop propagation for "Read more" button
                     setExpanded(!expanded);
                   }}
                   className="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-1"
@@ -675,8 +784,6 @@ const TopicItem = ({
             </div>
           </div>
         </CardContent>
-      </Link>
-
       <div className="px-6 pb-4 flex justify-between items-center">
         <FeedbackControls
           likes={topic.likes}
@@ -880,5 +987,3 @@ const PopularTopics = ({ topics }: { topics: ForumTopic[] }) => {
     </Card>
   );
 };
-
-export default DiscussionForumsPage;
