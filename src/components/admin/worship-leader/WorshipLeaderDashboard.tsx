@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Event, SongProposal, Announcement } from '@/generated/prisma';
 import { Button } from '@/components/ui/button';
-import { Input }m '@/components/ui/input';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarDays, Music, Megaphone, Plus } from 'lucide-react';

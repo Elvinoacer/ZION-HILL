@@ -186,12 +186,7 @@ export const Icons = {
       <path d="M8 14h.01" />
     </svg>
   ),
-  finance: (props) => (
-    <svg {...props} viewBox="0 0 24 24">
-      <path d="M12 2v20M2 12h20" />
-      <circle cx="12" cy="12" r="4" />
-    </svg>
-  ),
+  
   megaphone: (props) => (
     <svg {...props} viewBox="0 0 24 24">
       <path d="m3 11 18-5v12l-18-5v-2z" />

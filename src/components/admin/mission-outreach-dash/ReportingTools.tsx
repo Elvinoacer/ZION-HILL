@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { BarChart2 } from "lucide-react";
 
 export default function ReportingTools() {
@@ -34,13 +34,15 @@ export default function ReportingTools() {
         Generate Report
       </motion.button>
       <div className="space-y-6">
-        <BarChart width={600} height={300} data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="Value" fill="#2563eb" />
-        </BarChart>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="Value" fill="#2563eb" />
+          </BarChart>
+        </ResponsiveContainer>
         <div className="space-y-4">
           {metrics.map((metric: any, index: number) => (
             <motion.div

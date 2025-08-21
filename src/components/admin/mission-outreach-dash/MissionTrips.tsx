@@ -46,10 +46,10 @@ export default function MissionTrips({ itineraries }: MissionTripsProps) {
                   <div className="font-semibold text-gray-900">
                     {itinerary.title}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-600 text-wrap">
                     {itinerary.location} | {new Date(itinerary.date).toLocaleDateString()} - {new Date(itinerary.endDate || itinerary.date).toLocaleDateString()}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-600 text-wrap">
                     Tasks: {itinerary.description} {/* Assuming description can be used for tasks */}
                   </div>
                 </div>

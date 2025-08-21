@@ -1,23 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
-import Link from "next/link";
-import { useSession } from "next-auth/react";
-import {
-  Mail,
-  ArrowRight,
-  Calendar,
-  DollarSign,
-  Users,
-  MessageSquare,
-  Plus,
-  Edit,
-  Trash2,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import EventsOverview from "@/components/EventsOverview";
-import { Button } from "@/components/ui/button";
 import CreateEventModal from "@/components/CreateEventModal";
+import dynamic from "next/dynamic";
+const EventsOverview = dynamic(() => import("@/components/EventsOverview"), {
+  ssr: false,
+});
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,7 +16,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { useEventStore } from "@/store/eventStore";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  Calendar,
+  DollarSign,
+  Edit,
+  MessageSquare,
+  Plus,
+  Trash2,
+  Users,
+} from "lucide-react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface Event {
@@ -69,7 +71,7 @@ const EventsManagerDashboard = () => {
   const { deleteEvent, fetchEvents } = useEventStore();
   const [events, setEvents] = useState<Event[]>([]);
   const [financials, setFinancials] = useState<Financials[]>([]);
-  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
+  const [sponsors, setSponsors] = usxeState<Sponsor[]>([]);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,8 +93,6 @@ const EventsManagerDashboard = () => {
       toast.error(`Failed to delete event: ${err.message}`);
     }
   };
-
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -431,7 +431,10 @@ const EventsManagerDashboard = () => {
                               </p>
                             )}
                           <div className="flex justify-end space-x-2 mt-2">
-                            <Link href={`/events-manager/dashboard/${event.id}`} passHref>
+                            <Link
+                              href={`/events-manager/dashboard/${event.id}`}
+                              passHref
+                            >
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -465,8 +468,8 @@ const EventsManagerDashboard = () => {
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
                                     This action cannot be undone. This will
-                                    permanently delete your event and remove
-                                    its data from our servers.
+                                    permanently delete your event and remove its
+                                    data from our servers.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -485,10 +488,10 @@ const EventsManagerDashboard = () => {
                     </motion.div>
                   ))}
                 {events.filter((event) => {
-                    const eventDate = new Date(event.date);
-                    const now = new Date();
-                    return eventDate >= now;
-                  }).length > 5 && (
+                  const eventDate = new Date(event.date);
+                  const now = new Date();
+                  return eventDate >= now;
+                }).length > 5 && (
                   <div className="text-center mt-4">
                     <Link
                       href="/events-manager/events"

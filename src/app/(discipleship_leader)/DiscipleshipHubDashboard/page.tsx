@@ -8,7 +8,7 @@ import GroupFacilitation from "@/components/admin/discipleship/GroupFacilitation
 import MemberCare from "@/components/admin/discipleship/MemberCare";
 import ResourceDistribution from "@/components/admin/discipleship/ResourceDistribution";
 import CommunicationChannels from "@/components/admin/discipleship/CommunicationChannels";
-import ManageThemeOfTheWeekPage from "@/app/(authenticated)/discipleship/theme-of-the-week/manage/page";
+import ManageThemeOfTheWeekPage from "../courses/discipleship/theme-of-the-week/manage/page";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useDiscipleshipStore } from "@/store";

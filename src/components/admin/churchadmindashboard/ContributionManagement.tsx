@@ -2,14 +2,16 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { DollarSign, AlertTriangle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
-import { Transaction } from "@prisma/client";
+import { Transaction } from "@/generated/prisma";
 import { useDonationStore } from "@/store";
 
 interface ContributionManagementProps {
   donations: Transaction[];
 }
 
-export default function ContributionManagement({ donations }: ContributionManagementProps) {
+export default function ContributionManagement({
+  donations,
+}: ContributionManagementProps) {
   const { sendReceipt } = useDonationStore();
   const [filter, setFilter] = useState<
     "fundId" | "paymentMethod" | "demographic"
@@ -94,7 +96,8 @@ export default function ContributionManagement({ donations }: ContributionManage
                       KES {donation.amount} - {donation.fundId || "N/A"}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {donation.paymentMethod || "N/A"} | {donation.demographic || "N/A"} |{" "}
+                      {donation.paymentMethod || "N/A"} |{" "}
+                      {donation.demographic || "N/A"} |{" "}
                       {new Date(donation.createdAt).toLocaleDateString()}
                       {donation.anomaly && (
                         <span className="text-red-600 ml-2">
@@ -136,7 +139,10 @@ export default function ContributionManagement({ donations }: ContributionManage
                     </div>
                     <motion.button
                       onClick={() =>
-                        handleSendReceipt(donation.id, donation.fundId || "default")
+                        handleSendReceipt(
+                          donation.id,
+                          donation.fundId || "default"
+                        )
                       }
                       className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200"
                       whileHover={{ scale: 1.03 }}

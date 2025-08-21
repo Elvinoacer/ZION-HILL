@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { toast } 'sonner';
+import { toast } from 'sonner';
 import { Event, Partner, Transaction } from '@/generated/prisma';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

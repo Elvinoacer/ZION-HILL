@@ -1,81 +1,95 @@
 "use client";
 import { Icons } from "@/components/icons";
 import { AnimatePresence, motion } from "framer-motion";
-import { LayoutDashboardIcon } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { Award, LayoutDashboardIcon } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   FaBible,
-  FaChurch,
-  FaLandmark,
-  FaUsers,
-  FaUser,
-  FaCalendarAlt,
-  FaPray,
-  FaStar,
-  FaPrayingHands,
-  FaComment,
-  FaVideo,
   FaBookOpen,
-  FaChild,
-  FaSitemap,
-  FaHandshake,
+  FaBullhorn,
+  FaCalendarAlt,
   FaCheckCircle,
-  FaUserShield,
-  FaUsersCog,
-  FaDollarSign,
+  FaChild,
+  FaChurch,
+  FaComment,
+  FaFileInvoiceDollar,
   FaHandHoldingHeart,
-  FaNewspaper,
-  FaBuilding,
+  FaHandHoldingUsd,
+  FaHandshake,
+  FaLandmark,
   FaMusic,
   FaPhotoVideo,
-  FaFileInvoiceDollar,
-  FaBullhorn,
+  FaPray,
+  FaPrayingHands,
+  FaSitemap,
+  FaStar,
   FaTimes,
-  FaHandHoldingUsd,
+  FaUser,
+  FaUsers,
+  FaUsersCog,
+  FaUserShield,
+  FaVideo,
+  FaCross,
+  FaPoll,
+  FaQuoteRight,
 } from "react-icons/fa";
 
 const SidebarContent = ({ setSidebarOpen }) => {
   const pathname = usePathname();
   const { data: session } = useSession();
   const userRoles = session?.user?.roles || [];
+  const userId = session?.user?.id;
+
+  const [isWorshipMinistryMember, setIsWorshipMinistryMember] = useState(false);
+
+  useEffect(() => {
+    const checkWorshipMembership = async () => {
+      if (userId) {
+        try {
+          const res = await fetch(
+            `/api/ministries/check-membership?userId=${userId}&ministryName=Worship Ministry`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            setIsWorshipMinistryMember(data.isMember);
+          } else {
+            console.error(
+              "Failed to check worship ministry membership:",
+              res.statusText
+            );
+            setIsWorshipMinistryMember(false);
+          }
+        } catch (error) {
+          console.error("Error checking worship ministry membership:", error);
+          setIsWorshipMinistryMember(false);
+        }
+      } else {
+        setIsWorshipMinistryMember(false);
+      }
+    };
+
+    checkWorshipMembership();
+  }, [userId]);
 
   const hasRole = (roles: string[]) => {
     return roles.some((role) => userRoles.includes(role));
   };
-
-  const allLeadershipRoles = [
-    "ADMIN",
-    "WORSHIP_LEADER",
-    "MINISTRY_COORDINATOR",
-    "OUTREACH_DIRECTOR",
-    "DISCIPLESHIP_LEADER",
-    "EVENTS_MANAGER",
-    "COUNSELING_COORDINATOR",
-    "TECH_MEDIA_MANAGER",
-    "FINANCE_ADMINISTRATOR",
-    "VOLUNTEER_COORDINATOR",
-    "SMALL_GROUP_LEADER",
-    "CHILDREN_YOUTH_DIRECTOR",
-    "SECRETARY",
-    "COMMUNICATIONS_OFFICER",
-    "MISSION_PASTOR",
-    "SENIOR_PASTOR",
-  ];
 
   const memberNavItems = [
     {
       name: "Dashboard",
       icon: <LayoutDashboardIcon />,
       path: "/dashboard",
-      requiredRoles: ["MEMBER", ...allLeadershipRoles],
+      requiredRoles: ["MEMBER", "ADMIN"],
     },
     {
       name: "Profile",
       icon: <FaUser />,
       path: "/member-profile",
-      requiredRoles: ["MEMBER", ...allLeadershipRoles],
+      requiredRoles: ["MEMBER", "ADMIN"],
     },
     {
       name: "Family",
@@ -123,7 +137,7 @@ const SidebarContent = ({ setSidebarOpen }) => {
       name: "Financial Support",
       icon: <FaHandHoldingUsd />,
       path: "/member-financial-support",
-      requiredRoles: ["MEMBER", ...allLeadershipRoles],
+      requiredRoles: ["MEMBER", "ADMIN"],
     },
     {
       name: "Prayer Wall",
@@ -135,6 +149,12 @@ const SidebarContent = ({ setSidebarOpen }) => {
       name: "Discussion Forums",
       icon: <FaComment />,
       path: "/discussion-forums",
+      requiredRoles: ["MEMBER", "ADMIN"],
+    },
+    {
+      name: "Chat",
+      icon: <FaComment />,
+      path: "/chat",
       requiredRoles: ["MEMBER", "ADMIN"],
     },
     {
@@ -162,6 +182,12 @@ const SidebarContent = ({ setSidebarOpen }) => {
       requiredRoles: ["MEMBER", "ADMIN"],
     },
     {
+      name: "Announcements",
+      icon: <FaBullhorn />,
+      path: "/announcements",
+      requiredRoles: ["MEMBER", "ADMIN"],
+    },
+    {
       name: "Volunteering",
       icon: <FaHandshake />,
       path: "/volunteering",
@@ -173,119 +199,174 @@ const SidebarContent = ({ setSidebarOpen }) => {
       path: "/certificates",
       requiredRoles: ["MEMBER", "ADMIN"],
     },
-  ];
-
-  const adminNavItems = [
     {
-      name: "Admin Dashboard",
-      icon: <FaUserShield />,
-      path: "/admin/dashboard",
-      requiredRoles: ["ADMIN"],
-    },
-    {
-      name: "User Management",
-      icon: <FaUsersCog />,
-      path: "/admin/users",
-      requiredRoles: ["ADMIN"],
-    },
-    {
-      name: "Ministry Management",
-      icon: <FaChurch />,
-      path: "/admin/ministries",
-      requiredRoles: ["ADMIN"],
-    },
-    {
-      name: "Event Management",
-      icon: <FaCalendarAlt />,
-      path: "/admin/events",
-      requiredRoles: ["ADMIN"],
-    },
-    {
-      name: "Financial Management",
-      icon: <FaDollarSign />,
-      path: "/admin/financials",
-      requiredRoles: ["ADMIN"],
-    },
-    {
-      name: "Outreach Management",
-      icon: <FaHandshake />,
-      path: "/admin/outreach",
-      requiredRoles: ["ADMIN"],
-    },
-    {
-      name: "Pastoral Care",
-      icon: <FaHandHoldingHeart />,
-      path: "/admin/pastoral-care",
-      requiredRoles: ["ADMIN"],
-    },
-    {
-      name: "Newsletter Sender",
-      icon: <FaNewspaper />,
-      path: "/admin/newsletter",
-      requiredRoles: ["ADMIN", "COMMUNICATIONS_OFFICER"],
-    },
-    {
-      name: "Prayer Request Management",
-      icon: <FaPray />,
-      path: "/admin/prayer-requests",
-      requiredRoles: ["ADMIN", "PRAYER_MANAGER"],
-    },
-    {
-      name: "Project Management",
-      icon: <FaBuilding />,
-      path: "/admin/projects",
-      requiredRoles: ["ADMIN"],
-    },
-  ];
-
-  const leadershipNavItems = [
-    {
-      name: "Worship Leader",
+      name: "Worship Team",
       icon: <FaMusic />,
-      path: "/worship-leader",
-      requiredRoles: ["WORSHIP_LEADER", "ADMIN"],
+      path: "/worship-team",
+      requiredRoles: ["MEMBER", "WORSHIP_LEADER", "ADMIN"],
+      checkMinistryMembership: true,
     },
     {
-      name: "Ministry Coordinator",
-      icon: <FaUsersCog />,
-      path: "/ministry-coordinator",
-      requiredRoles: ["MINISTRY_COORDINATOR", "ADMIN"],
+      name: "Baptism Application",
+      icon: <FaCross />,
+      path: "/baptism-application",
+      requiredRoles: ["MEMBER", "ADMIN"],
     },
     {
-      name: "Discipleship Leader",
+      name: "Counseling Request",
+      icon: <FaHandHoldingHeart />,
+      path: "/counseling-request",
+      requiredRoles: ["MEMBER", "ADMIN"],
+    },
+    {
+      name: "Music Proposals",
+      icon: <FaMusic />,
+      path: "/music-proposals",
+      requiredRoles: ["MEMBER", "ADMIN"],
+    },
+    {
+      name: "My Certificates",
+      icon: <Award />,
+      path: "/my-certificates",
+      requiredRoles: ["MEMBER", "ADMIN"],
+    },
+    {
+      name: "Polls",
+      icon: <FaPoll />,
+      path: "/polls",
+      requiredRoles: ["MEMBER", "ADMIN"],
+    },
+    {
+      name: "Testimonies Wall",
+      icon: <FaQuoteRight />,
+      path: "/testimonies-wall",
+      requiredRoles: ["MEMBER", "ADMIN"],
+    },
+  ];
+
+  const rolesAndResponsibilitiesNavItems = [
+    {
+      name: "Admin Command Center",
+      icon: <FaUserShield />,
+      path: "/AdminCommandCenterDashboard",
+      requiredRoles: ["ADMIN"],
+    },
+    {
+      name: "Kids & Teens Resources",
+      icon: <FaChild />,
+      path: "/admin/kids-teens-resources",
+      requiredRoles: ["CHILDREN_YOUTH_DIRECTOR", "ADMIN"],
+    },
+    {
+      name: "Brand Engagement Hub",
+      icon: <FaBullhorn />,
+      path: "/BrandEngagementHubDashboard",
+      requiredRoles: ["COMMUNICATIONS_OFFICER", "ADMIN"],
+    },
+    {
+      name: "Counselor Dashboard",
+      icon: <FaHandHoldingHeart />,
+      path: "/counselor-dashboard",
+      requiredRoles: ["COUNSELOR", "ADMIN"],
+    },
+    {
+      name: "Discipleship Hub Dashboard",
       icon: <FaBookOpen />,
-      path: "/discipleship-leader",
+      path: "/DiscipleshipHubDashboard",
       requiredRoles: ["DISCIPLESHIP_LEADER", "ADMIN"],
     },
     {
-      name: "Tech & Media",
-      icon: <FaPhotoVideo />,
-      path: "/tech-media-manager",
-      requiredRoles: ["TECH_MEDIA_MANAGER", "ADMIN"],
+      name: "Event Manager Dashboard",
+      icon: <FaCalendarAlt />,
+      path: "/events-manager/eventdashboard",
+      requiredRoles: ["EVENTS_MANAGER", "ADMIN"],
     },
     {
-      name: "Finance Admin",
+      name: "Finance Administrator Dashboard",
       icon: <FaFileInvoiceDollar />,
       path: "/finance-administrator",
       requiredRoles: ["FINANCE_ADMINISTRATOR", "ADMIN"],
     },
     {
-      name: "Children/Youth",
-      icon: <FaChild />,
-      path: "/children-youth-director",
-      requiredRoles: ["CHILDREN_YOUTH_DIRECTOR", "ADMIN"],
+      name: "Leadership Dashboard",
+      icon: <FaUsersCog />,
+      path: "/role-management",
+      requiredRoles: [
+        "ADMIN",
+        "PRAYER_MANAGER",
+        "COUNSELOR",
+        "VOLUNTEER",
+        "EVENTS_MANAGER",
+        "SENIOR_PASTOR",
+        "FINANCE_ADMINISTRATOR",
+        "VOLUNTEER_COORDINATOR",
+        "WORSHIP_LEADER",
+        "OVERALL_MINISTRIES_COORDINATOR",
+        "MEN_MINISTRY_COORDINATOR",
+        "WOMEN_MINISTRY_COORDINATOR",
+        "YOUTH_MINISTRY_COORDINATOR",
+        "COUPLES_AND_FAMILY_MINISTRY_COORDINATOR",
+        "CHILDREN_MINISTRY_COORDINATOR",
+        "YOUNG_ADULTS_MINISTRY_COORDINATOR",
+        "ELDERS_MINISTRY_COORDINATOR",
+        "SINGLES_MINISTRY_COORDINATOR",
+        "OUTREACH_DIRECTOR",
+        "DISCIPLESHIP_LEADER",
+        "TECH_MEDIA_MANAGER",
+        "SMALL_GROUPS_LEADER",
+        "CHILDREN_YOUTH_DIRECTOR",
+        "SECRETARY",
+        "COMMUNICATIONS_OFFICER",
+        "MISSIONS_PASTOR",
+      ],
     },
     {
-      name: "Communications",
-      icon: <FaBullhorn />,
-      path: "/communications-officer",
-      requiredRoles: ["COMMUNICATIONS_OFFICER", "ADMIN"],
+      name: "Outreach Director Dashboard",
+      icon: <FaHandshake />,
+      path: "/outreach-director",
+      requiredRoles: ["OUTREACH_DIRECTOR", "ADMIN"],
     },
     {
-      name: "Senior Pastor",
+      name: "Ministry Coordinator Dashboard",
+      icon: <FaUsersCog />,
+      path: "/ministry-coordinator",
+      requiredRoles: ["MINISTRY_COORDINATOR", "ADMIN"],
+    },
+    {
+      name: "Secretary Dashboard",
+      icon: <FaFileInvoiceDollar />,
+      path: "/secretary",
+      requiredRoles: ["SECRETARY", "ADMIN"],
+    },
+    {
+      name: "Senior Pastor Dashboard",
       icon: <FaChurch />,
-      path: "/senior- pastor",
+      path: "/admin-dashboard",
       requiredRoles: ["SENIOR_PASTOR", "ADMIN"],
+    },
+    {
+      name: "Small Group Leader Dashboard",
+      icon: <FaUsers />,
+      path: "/small-group-leader",
+      requiredRoles: ["SMALL_GROUP_LEADER", "ADMIN"],
+    },
+    {
+      name: "Digital Hub Dashboard",
+      icon: <FaPhotoVideo />,
+      path: "/DigitalHubDashboard",
+      requiredRoles: ["TECH_MEDIA_MANAGER", "ADMIN"],
+    },
+    {
+      name: "Volunteer Hub Dashboard",
+      icon: <FaHandshake />,
+      path: "/VolunteerHubDashboard",
+      requiredRoles: ["VOLUNTEER_COORDINATOR", "ADMIN"],
+    },
+    {
+      name: "Worship Leader Dashboard",
+      icon: <FaMusic />,
+      path: "/worship-leader",
+      requiredRoles: ["WORSHIP_LEADER", "ADMIN"],
     },
   ];
 
@@ -313,9 +394,19 @@ const SidebarContent = ({ setSidebarOpen }) => {
       </h3>
       <ul className="space-y-1 mb-6">
         {items
-          .filter((item) => hasRole(item.requiredRoles))
+          .filter((item) => {
+            const roleCheck = hasRole(item.requiredRoles);
+            if (item.checkMinistryMembership) {
+              return roleCheck && isWorshipMinistryMember;
+            }
+            return roleCheck;
+          })
           .map((item) => (
-            <NavItem key={item.name} item={item} setSidebarOpen={setSidebarOpen} />
+            <NavItem
+              key={item.name}
+              item={item}
+              setSidebarOpen={setSidebarOpen}
+            />
           ))}
       </ul>
     </>
@@ -336,17 +427,20 @@ const SidebarContent = ({ setSidebarOpen }) => {
         </button>
       </div>
 
-      <nav className="p-4 overflow-y-auto flex-grow">
+      <nav className="p-4 overflow-y-auto flex-grow custom-scrollbar">
         {session?.user && (
           <>
-            <NavSection title="Member Area" items={memberNavItems} setSidebarOpen={setSidebarOpen} />
-
-            {hasRole(allLeadershipRoles) && (
-              <>
-                <NavSection title="Admin & Leadership" items={adminNavItems} setSidebarOpen={setSidebarOpen} />
-                <NavSection title="Ministry Tools" items={leadershipNavItems} setSidebarOpen={setSidebarOpen} />
-              </>
-            )}
+            <NavSection
+              title="Member Area"
+              items={memberNavItems}
+              setSidebarOpen={setSidebarOpen}
+            />
+            {/* New Roles & Responsibilities Section */}
+            <NavSection
+              title="Roles & Responsibilities"
+              items={rolesAndResponsibilitiesNavItems}
+              setSidebarOpen={setSidebarOpen}
+            />
           </>
         )}
       </nav>
@@ -368,10 +462,16 @@ const SidebarContent = ({ setSidebarOpen }) => {
             <div className="font-medium text-white">
               {session?.user?.name || "Guest"}
             </div>
-            <div className="text-xs text-gray-400">
+            <div className="text-xs text-gray-400 mb-2">
               {userRoles.map((role) => role.replace(/_/g, " ")).join(", ") ||
                 "Public User"}
             </div>
+            <button
+              onClick={() => signOut()}
+              className="w-full text-left text-sm text-red-400 hover:text-red-300 transition-colors"
+            >
+              Log Out
+            </button>
           </div>
         </div>
       </div>

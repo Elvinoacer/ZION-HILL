@@ -485,7 +485,7 @@ export default function VolunteerHubDashboard() {
                       </div>
                     </div>
 
-                    {Object.keys(opportunity.customFields).length > 0 && (
+                    {opportunity.customFields && Object.keys(opportunity.customFields).length > 0 && (
                       <div className="mt-4 pt-4 border-t">
                         <h4 className="text-sm font-medium mb-2 text-muted-foreground">
                           Custom Fields

@@ -43,7 +43,7 @@ export default function MissionarySupport({ missionaries, documents }: Missionar
                     <div className="font-semibold text-gray-900">
                       {missionary.name}
                     </div>
-                    <div className="text-sm text-gray-600">{missionary.bio || "N/A"}</div>
+                    <div className="text-sm text-gray-600 text-wrap">{missionary.bio || "N/A"}</div>
                     <a
                       href={missionary.supportLink || "#"}
                       className="text-sm text-blue-600 hover:underline"

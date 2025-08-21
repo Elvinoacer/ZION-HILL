@@ -1,28 +1,40 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { toast } from "sonner"; // Updated import
 import {
-  Search,
-  PlusCircle,
-  Edit,
-  Trash2,
-  Loader2,
-  Video,
-  Mic,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { motion } from "framer-motion";
+import {
   BookOpen,
-  Users,
+  Edit,
   Image as ImageIcon,
+  Loader2,
+  Mic,
+  PlusCircle,
+  Search,
+  Trash2,
+  Video,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useState } from "react";
+import { toast } from "sonner"; // Updated import
 
 const AdminKidsTeensResources = () => {
   const { data: session } = useSession();
@@ -45,8 +57,17 @@ const AdminKidsTeensResources = () => {
 
     const lowerCaseUrl = url.toLowerCase();
 
-    if (type === "IMAGE" || lowerCaseUrl.match(/\.(jpeg|jpg|png|gif|webp|svg)$/)) {
-      return <img src={url} alt="Preview" className="w-full h-48 object-contain rounded-md" />;
+    if (
+      type === "IMAGE" ||
+      lowerCaseUrl.match(/\.(jpeg|jpg|png|gif|webp|svg)$/)
+    ) {
+      return (
+        <img
+          src={url}
+          alt="Preview"
+          className="w-full h-48 object-contain rounded-md"
+        />
+      );
     } else if (
       type === "VIDEO" ||
       lowerCaseUrl.match(/\.(mp4|webm|ogg)$/) ||
@@ -172,13 +193,16 @@ const AdminKidsTeensResources = () => {
       let response;
       if (currentResource) {
         // Edit existing resource
-        response = await fetch(`/api/kids-teens-resources?id=${currentResource.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(resourceData),
-        });
+        response = await fetch(
+          `/api/kids-teens-resources?id=${currentResource.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(resourceData),
+          }
+        );
       } else {
         // Create new resource
         response = await fetch("/api/kids-teens-resources", {
@@ -192,18 +216,29 @@ const AdminKidsTeensResources = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.error || `HTTP error! status: ${response.status}`
+        );
       }
 
-      toast.success(`Resource ${currentResource ? "updated" : "created"} successfully.`); // Updated toast call
+      toast.success(
+        `Resource ${currentResource ? "updated" : "created"} successfully.`
+      ); // Updated toast call
       setIsDialogOpen(false);
       setFormState({ title: "", type: "", tags: "", url: "" });
       setCurrentResource(null);
       fetchResources(); // Refresh the list
     } catch (apiError) {
-      console.error(`Failed to ${currentResource ? "update" : "create"} resource:`, apiError);
+      console.error(
+        `Failed to ${currentResource ? "update" : "create"} resource:`,
+        apiError
+      );
       setError(apiError);
-      toast.error(`Failed to ${currentResource ? "update" : "create"} resource: ${apiError.message}`); // Updated toast call
+      toast.error(
+        `Failed to ${currentResource ? "update" : "create"} resource: ${
+          apiError.message
+        }`
+      ); // Updated toast call
     } finally {
       setLoading(false);
     }
@@ -235,7 +270,9 @@ const AdminKidsTeensResources = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.error || `HTTP error! status: ${response.status}`
+        );
       }
 
       toast.success("Resource deleted successfully."); // Updated toast call
@@ -277,7 +314,10 @@ const AdminKidsTeensResources = () => {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 text-red-600">
-        <p>Error: {error.message}. Failed to load resources. Please try again later.</p>
+        <p>
+          Error: {error.message}. Failed to load resources. Please try again
+          later.
+        </p>
       </div>
     );
   }
@@ -291,13 +331,21 @@ const AdminKidsTeensResources = () => {
     >
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Manage Kids & Teens Resources</h1>
+          <h1 className="text-3xl font-bold text-gray-800">
+            Manage Kids & Teens Resources
+          </h1>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button
                 onClick={() => {
                   setCurrentResource(null);
-                  setFormState({ title: "", type: "", tags: "", url: "", file: null });
+                  setFormState({
+                    title: "",
+                    type: "",
+                    tags: "",
+                    url: "",
+                    file: null,
+                  });
                 }}
               >
                 <PlusCircle className="mr-2 h-4 w-4" /> Add New Resource
@@ -305,7 +353,9 @@ const AdminKidsTeensResources = () => {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>{currentResource ? "Edit Resource" : "Add New Resource"}</DialogTitle>
+                <DialogTitle>
+                  {currentResource ? "Edit Resource" : "Add New Resource"}
+                </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleFormSubmit} className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -325,7 +375,12 @@ const AdminKidsTeensResources = () => {
                     Type
                   </Label>
                   <Select
-                    onValueChange={(value) => setFormState((prevState) => ({ ...prevState, type: value }))}
+                    onValueChange={(value) =>
+                      setFormState((prevState) => ({
+                        ...prevState,
+                        type: value,
+                      }))
+                    }
                     value={formState.type}
                   >
                     <SelectTrigger className="col-span-3">
@@ -371,7 +426,9 @@ const AdminKidsTeensResources = () => {
                 </div>
                 {previewUrl && formState.type && (
                   <div className="grid grid-cols-4 items-center gap-4">
-                    <div className="col-span-4">{getPreviewComponent(previewUrl, formState.type)}</div>
+                    <div className="col-span-4">
+                      {getPreviewComponent(previewUrl, formState.type)}
+                    </div>
                   </div>
                 )}
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -388,7 +445,9 @@ const AdminKidsTeensResources = () => {
                 </div>
                 <DialogFooter>
                   <Button type="submit" disabled={loading}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {loading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     {currentResource ? "Save Changes" : "Create Resource"}
                   </Button>
                 </DialogFooter>
@@ -415,29 +474,52 @@ const AdminKidsTeensResources = () => {
             </p>
           ) : (
             resources.map((resource) => (
-              <Card key={resource.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+              <Card
+                key={resource.id}
+                className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl"
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-lg font-semibold text-gray-800">{resource.title}</CardTitle>
+                  <CardTitle className="text-lg font-semibold text-gray-800">
+                    {resource.title}
+                  </CardTitle>
                   {getIconForType(resource.type)}
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-500 mb-4">Type: {resource.type}</p>
-                  <p className="text-sm text-gray-500 mb-4">Tags: {resource.tags.join(", ")}</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Type: {resource.type}
+                  </p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Tags: {resource.tags.join(", ")}
+                  </p>
                   {resource.url && (
                     <p className="text-sm text-blue-600 truncate mb-4">
-                      <a href={resource.url} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         View Resource
                       </a>
                     </p>
                   )}
                   {resource.url && resource.type && (
-                    <div className="mb-4">{getPreviewComponent(resource.url, resource.type)}</div>
+                    <div className="mb-4">
+                      {getPreviewComponent(resource.url, resource.type)}
+                    </div>
                   )}
                   <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditClick(resource)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditClick(resource)}
+                    >
                       <Edit className="mr-2 h-4 w-4" /> Edit
                     </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(resource.id)}>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteClick(resource.id)}
+                    >
                       <Trash2 className="mr-2 h-4 w-4" /> Delete
                     </Button>
                   </div>

@@ -6,7 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
   Search,
@@ -22,7 +29,13 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 interface MediaAsset {
@@ -44,7 +57,9 @@ const AdminMediaPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentResource, setCurrentResource] = useState<MediaAsset | null>(null);
+  const [currentResource, setCurrentResource] = useState<MediaAsset | null>(
+    null
+  );
   const [formState, setFormState] = useState({
     title: "",
     type: "",
@@ -59,8 +74,17 @@ const AdminMediaPage = () => {
   const getPreviewComponent = (url: string, type: string) => {
     if (!url) return null;
     const lowerCaseUrl = url.toLowerCase();
-    if (type === "IMAGE" || lowerCaseUrl.match(/\.(jpeg|jpg|png|gif|webp|svg)$/)) {
-      return <img src={url} alt="Preview" className="w-full h-48 object-contain rounded-md" />;
+    if (
+      type === "IMAGE" ||
+      lowerCaseUrl.match(/\.(jpeg|jpg|png|gif|webp|svg)$/)
+    ) {
+      return (
+        <img
+          src={url}
+          alt="Preview"
+          className="w-full h-40 sm:h-48 object-contain rounded-lg"
+        />
+      );
     }
     if (
       type === "VIDEO" ||
@@ -72,7 +96,7 @@ const AdminMediaPage = () => {
         const videoId = url.split("v=")[1]?.split("&")[0];
         return (
           <iframe
-            className="w-full h-48 rounded-md"
+            className="w-full h-40 sm:h-48 rounded-lg"
             src={`https://www.youtube.com/embed/${videoId}`}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -85,7 +109,7 @@ const AdminMediaPage = () => {
         const videoId = url.split("youtu.be/")[1]?.split("&")[0];
         return (
           <iframe
-            className="w-full h-48 rounded-md"
+            className="w-full h-40 sm:h-48 rounded-lg"
             src={`https://www.youtube.com/embed/${videoId}`}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -95,7 +119,10 @@ const AdminMediaPage = () => {
         );
       }
       return (
-        <video controls className="w-full h-48 object-contain rounded-md">
+        <video
+          controls
+          className="w-full h-40 sm:h-48 object-contain rounded-lg"
+        >
           <source src={url} type={`video/${lowerCaseUrl.split(".").pop()}`} />
         </video>
       );
@@ -104,7 +131,7 @@ const AdminMediaPage = () => {
       return (
         <iframe
           src={url}
-          className="w-full h-48 rounded-md"
+          className="w-full h-40 sm:h-48 rounded-lg"
           style={{ border: "none" }}
           title="Document Preview"
         ></iframe>
@@ -112,14 +139,14 @@ const AdminMediaPage = () => {
     }
     if (type === "AUDIO" || lowerCaseUrl.match(/\.(mp3|wav|ogg)$/)) {
       return (
-        <audio controls className="w-full rounded-md">
+        <audio controls className="w-full rounded-lg">
           <source src={url} type={`audio/${lowerCaseUrl.split(".").pop()}`} />
         </audio>
       );
     }
     return (
-      <div className="w-full h-48 flex items-center justify-center bg-gray-100 rounded-md text-gray-500">
-        No preview available for this type.
+      <div className="w-full h-40 sm:h-48 flex items-center justify-center bg-gray-100 rounded-lg text-gray-500 text-sm">
+        No preview available
       </div>
     );
   };
@@ -129,7 +156,8 @@ const AdminMediaPage = () => {
     setError(null);
     try {
       const response = await fetch("/api/media");
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       setMediaAssets(data);
     } catch (error: any) {
@@ -145,7 +173,9 @@ const AdminMediaPage = () => {
     fetchMediaAssets();
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { id, value } = e.target;
     setFormState((prevState) => ({ ...prevState, [id]: value }));
     if (id === "url") setPreviewUrl(value);
@@ -165,7 +195,10 @@ const AdminMediaPage = () => {
     const resourceData = {
       title: formState.title,
       type: formState.type,
-      tags: formState.tags.split(",").map((tag) => tag.trim()).filter((tag) => tag !== ""),
+      tags: formState.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag !== ""),
       url: formState.url,
       description: formState.description,
       uploaderId: session.user.id,
@@ -189,19 +222,30 @@ const AdminMediaPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.error || `HTTP error! status: ${response.status}`
+        );
       }
 
-      toast.success(`Media asset ${currentResource ? "updated" : "created"} successfully.`);
+      toast.success(
+        `Media asset ${currentResource ? "updated" : "created"} successfully.`
+      );
       setIsDialogOpen(false);
       setFormState({ title: "", type: "", tags: "", url: "", description: "" });
       setCurrentResource(null);
       setPreviewUrl(null);
       fetchMediaAssets();
     } catch (apiError: any) {
-      console.error(`Failed to ${currentResource ? "update" : "create"} media asset:`, apiError);
+      console.error(
+        `Failed to ${currentResource ? "update" : "create"} media asset:`,
+        apiError
+      );
       setError(apiError);
-      toast.error(`Failed to ${currentResource ? "update" : "create"} media asset: ${apiError.message}`);
+      toast.error(
+        `Failed to ${currentResource ? "update" : "create"} media asset: ${
+          apiError.message
+        }`
+      );
     } finally {
       setLoading(false);
     }
@@ -229,7 +273,9 @@ const AdminMediaPage = () => {
       const response = await fetch(`/api/media?id=${id}`, { method: "DELETE" });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.error || `HTTP error! status: ${response.status}`
+        );
       }
       toast.success("Media asset deleted successfully.");
       fetchMediaAssets();
@@ -244,21 +290,27 @@ const AdminMediaPage = () => {
 
   const getIconForType = (type: string) => {
     switch (type) {
-      case "VIDEO": return <Video className="h-5 w-5 text-blue-500" />;
-      case "DOCUMENT": return <BookOpen className="h-5 w-5 text-green-500" />;
-      case "AUDIO": return <Mic className="h-5 w-5 text-purple-500" />;
-      case "IMAGE": return <ImageIcon className="h-5 w-5 text-yellow-500" />;
-      default: return null;
+      case "VIDEO":
+        return <Video className="h-5 w-5 text-blue-500" />;
+      case "DOCUMENT":
+        return <BookOpen className="h-5 w-5 text-green-500" />;
+      case "AUDIO":
+        return <Mic className="h-5 w-5 text-purple-500" />;
+      case "IMAGE":
+        return <ImageIcon className="h-5 w-5 text-yellow-500" />;
+      default:
+        return null;
     }
   };
 
   const filteredAssets = useMemo(() => {
-    return mediaAssets.filter(asset => {
+    return mediaAssets.filter((asset) => {
       const query = searchQuery.toLowerCase();
       return (
         asset.title.toLowerCase().includes(query) ||
-        (asset.description && asset.description.toLowerCase().includes(query)) ||
-        asset.tags.some(tag => tag.toLowerCase().includes(query))
+        (asset.description &&
+          asset.description.toLowerCase().includes(query)) ||
+        asset.tags.some((tag) => tag.toLowerCase().includes(query))
       );
     });
   }, [mediaAssets, searchQuery]);
@@ -278,57 +330,111 @@ const AdminMediaPage = () => {
 
   if (loading && mediaAssets.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-        <p className="ml-4 text-lg text-gray-600">Loading media assets...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 p-4">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
+        <p className="ml-4 text-base sm:text-lg text-gray-600">
+          Loading media assets...
+        </p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-red-600">
-        <p>Error: {error.message}. Failed to load media assets. Please try again later.</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 p-4">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl max-w-md w-full text-center border border-gray-100"
+        >
+          <p className="text-base sm:text-lg text-red-500 mb-6 flex items-center justify-center gap-2">
+            <Loader2 className="h-5 w-5" /> Error: {error.message}
+          </p>
+          <Button
+            onClick={fetchMediaAssets}
+            className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 rounded-lg px-4 py-2"
+          >
+            Try Again
+          </Button>
+        </motion.div>
       </div>
     );
   }
 
   return (
     <motion.div
-      className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8"
+      className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 sm:p-6 md:p-8 font-sans"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Manage Media Assets</h1>
+      <div className="max-w-5xl mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            Manage Media Assets
+          </h1>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button
                 onClick={() => {
                   setCurrentResource(null);
-                  setFormState({ title: "", type: "", tags: "", url: "", description: "" });
+                  setFormState({
+                    title: "",
+                    type: "",
+                    tags: "",
+                    url: "",
+                    description: "",
+                  });
                   setPreviewUrl(null);
                   setIsDialogOpen(true);
                 }}
+                className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 rounded-lg"
               >
                 <PlusCircle className="mr-2 h-4 w-4" /> Add New Asset
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="max-w-[90vw] sm:max-w-lg rounded-2xl">
               <DialogHeader>
-                <DialogTitle>{currentResource ? "Edit Media Asset" : "Add New Media Asset"}</DialogTitle>
+                <DialogTitle className="text-lg sm:text-xl">
+                  {currentResource ? "Edit Media Asset" : "Add New Media Asset"}
+                </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleFormSubmit} className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="title" className="text-right">Title</Label>
-                  <Input id="title" value={formState.title} onChange={handleInputChange} className="col-span-3" required />
+                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+                  <Label
+                    htmlFor="title"
+                    className="text-right sm:col-span-1 text-sm sm:text-base"
+                  >
+                    Title
+                  </Label>
+                  <Input
+                    id="title"
+                    value={formState.title}
+                    onChange={handleInputChange}
+                    className="col-span-3 rounded-lg"
+                    required
+                  />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="type" className="text-right">Type</Label>
-                  <Select onValueChange={(value) => setFormState((prevState) => ({ ...prevState, type: value }))} value={formState.type}>
-                    <SelectTrigger className="col-span-3"><SelectValue placeholder="Select a type" /></SelectTrigger>
+                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+                  <Label
+                    htmlFor="type"
+                    className="text-right sm:col-span-1 text-sm sm:text-base"
+                  >
+                    Type
+                  </Label>
+                  <Select
+                    onValueChange={(value) =>
+                      setFormState((prevState) => ({
+                        ...prevState,
+                        type: value,
+                      }))
+                    }
+                    value={formState.type}
+                  >
+                    <SelectTrigger className="col-span-3 rounded-lg">
+                      <SelectValue placeholder="Select a type" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="VIDEO">Video</SelectItem>
                       <SelectItem value="AUDIO">Audio</SelectItem>
@@ -342,27 +448,74 @@ const AdminMediaPage = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="tags" className="text-right">Tags</Label>
-                  <Input id="tags" value={formState.tags} onChange={handleInputChange} className="col-span-3" placeholder="e.g., worship, sermon, event (comma-separated)" />
+                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+                  <Label
+                    htmlFor="tags"
+                    className="text-right sm:col-span-1 text-sm sm:text-base"
+                  >
+                    Tags
+                  </Label>
+                  <Input
+                    id="tags"
+                    value={formState.tags}
+                    onChange={handleInputChange}
+                    className="col-span-3 rounded-lg"
+                    placeholder="e.g., worship, sermon, event (comma-separated)"
+                  />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="url" className="text-right">URL</Label>
-                  <Input id="url" value={formState.url} onChange={handleInputChange} className="col-span-3" placeholder="Enter URL for the media asset" required />
+                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+                  <Label
+                    htmlFor="url"
+                    className="text-right sm:col-span-1 text-sm sm:text-base"
+                  >
+                    URL
+                  </Label>
+                  <Input
+                    id="url"
+                    value={formState.url}
+                    onChange={handleInputChange}
+                    className="col-span-3 rounded-lg"
+                    placeholder="Enter URL for the media asset"
+                    required
+                  />
                 </div>
                 {previewUrl && formState.type && (
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <div className="col-span-4">{getPreviewComponent(previewUrl, formState.type)}</div>
+                  <div className="col-span-4">
+                    {getPreviewComponent(previewUrl, formState.type)}
                   </div>
                 )}
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="description" className="text-right">Description</Label>
-                  <Textarea id="description" value={formState.description} onChange={handleInputChange} className="col-span-3" placeholder="Enter a brief description" />
+                <div className="grid grid-cols-1 sm:grid-cols-4 items-start gap-4">
+                  <Label
+                    htmlFor="description"
+                    className="text-right sm:col-span-1 text-sm sm:text-base"
+                  >
+                    Description
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={formState.description}
+                    onChange={handleInputChange}
+                    className="col-span-3 rounded-lg"
+                    placeholder="Enter a brief description"
+                  />
                 </div>
-                <DialogFooter>
-                  <Button type="submit" disabled={loading}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <DialogFooter className="flex flex-col sm:flex-row gap-2">
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 rounded-lg bg-blue-600 hover:bg-blue-700"
+                  >
+                    {loading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     {currentResource ? "Save Changes" : "Create Asset"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsDialogOpen(false)}
+                    className="flex-1 rounded-lg"
+                  >
+                    Cancel
                   </Button>
                 </DialogFooter>
               </form>
@@ -375,44 +528,73 @@ const AdminMediaPage = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <Input
               placeholder="Search by title, description, or tag..."
-              className="pl-10 w-full max-w-md"
+              className="pl-10 w-full sm:max-w-md rounded-lg"
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
-                setCurrentPage(1); // Reset to first page on new search
+                setCurrentPage(1);
               }}
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {paginatedAssets.length === 0 ? (
-            <p className="col-span-full text-center text-gray-500">
-              No media assets found. {searchQuery && "Try a different search term."}
+            <p className="col-span-full text-center text-gray-500 text-base sm:text-lg">
+              No media assets found.{" "}
+              {searchQuery && "Try a different search term."}
             </p>
           ) : (
             paginatedAssets.map((asset) => (
-              <Card key={asset.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+              <Card
+                key={asset.id}
+                className="shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl"
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-lg font-semibold text-gray-800">{asset.title}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg font-semibold text-gray-800 truncate">
+                    {asset.title}
+                  </CardTitle>
                   {getIconForType(asset.type)}
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-500 mb-4">Type: {asset.type}</p>
-                  <p className="text-sm text-gray-500 mb-4">Tags: {asset.tags.join(", ")}</p>
+                  <p className="text-sm text-gray-500 mb-2">
+                    Type: {asset.type}
+                  </p>
+                  <p className="text-sm text-gray-500 mb-4 truncate">
+                    Tags: {asset.tags.join(", ")}
+                  </p>
                   {asset.url && (
                     <p className="text-sm text-blue-600 truncate mb-4">
-                      <a href={asset.url} target="_blank" rel="noopener noreferrer">View Asset</a>
+                      <a
+                        href={asset.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        View Asset
+                      </a>
                     </p>
                   )}
                   {asset.url && asset.type && (
-                    <div className="mb-4">{getPreviewComponent(asset.url, asset.type)}</div>
+                    <div className="mb-4">
+                      {getPreviewComponent(asset.url, asset.type)}
+                    </div>
                   )}
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditClick(asset)}>
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditClick(asset)}
+                      className="flex-1 rounded-lg"
+                    >
                       <Edit className="mr-2 h-4 w-4" /> Edit
                     </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(asset.id)}>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteClick(asset.id)}
+                      className="flex-1 rounded-lg"
+                    >
                       <Trash2 className="mr-2 h-4 w-4" /> Delete
                     </Button>
                   </div>
@@ -423,15 +605,16 @@ const AdminMediaPage = () => {
         </div>
 
         {totalPages > 1 && (
-          <div className="flex justify-center items-center mt-8 space-x-2">
+          <div className="flex justify-center items-center mt-6 sm:mt-8 space-x-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
+              className="rounded-lg"
             >
               <ChevronLeft className="h-4 w-4" />
-              <span className="ml-2">Previous</span>
+              <span className="ml-2 hidden sm:inline">Previous</span>
             </Button>
             <span className="text-sm text-gray-600">
               Page {currentPage} of {totalPages}
@@ -441,8 +624,9 @@ const AdminMediaPage = () => {
               size="sm"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
+              className="rounded-lg"
             >
-              <span className="mr-2">Next</span>
+              <span className="mr-2 hidden sm:inline">Next</span>
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

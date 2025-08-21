@@ -1,18 +1,10 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  FiExternalLink,
-  FiPlus,
-  FiCalendar,
-  FiClock,
-  FiUpload,
-  FiCheck,
-  FiLoader,
-} from "react-icons/fi";
-import { FaChurch, FaBullhorn, FaBlog, FaHashtag } from "react-icons/fa";
+import { FaBlog, FaBullhorn, FaHashtag } from "react-icons/fa";
+import { FiExternalLink, FiPlus } from "react-icons/fi";
 
 interface Announcement {
   id: string;
@@ -94,8 +86,6 @@ const CommunicationsOfficerDashboard = () => {
       setError(err.message);
     }
   };
-
-  
 
   if (loading) {
     return (
@@ -419,7 +409,6 @@ const CommunicationsOfficerDashboard = () => {
         </div>
 
         {/* Unified Publishing Console */}
-        
       </div>
     </div>
   );

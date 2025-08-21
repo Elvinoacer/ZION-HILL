@@ -390,6 +390,7 @@ enum ResourceType {
   LINK
   EQUIPMENT
   VENUE
+  TEMPLATE
 }
 
 model Resource {

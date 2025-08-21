@@ -6,7 +6,7 @@ export async function GET(request: Request) {
     const pastorsDesk = await prisma.asset.findMany({ where: { type: 'DOCUMENT', tags: { has: 'pastors-desk' } } });
     return NextResponse.json(pastorsDesk);
   } catch (error) {
-    return NextResponse.json({ error: 'Error fetching pastor's desk content' }, { status: 500 });
+    return NextResponse.json({ error: "Error fetching pastor's desk content" }, { status: 500 });
   }
 }
 
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     const newPastorsDesk = await prisma.asset.create({ data: { ...body, type: 'DOCUMENT', tags: [...(body.tags || []), 'pastors-desk'] } });
     return NextResponse.json(newPastorsDesk, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Error creating pastor's desk content' }, { status: 500 });
+    return NextResponse.json({ error: "Error creating pastor's desk content" }, { status: 500 });
   }
 }
 
@@ -26,7 +26,7 @@ export async function PUT(request: Request) {
   const body = await request.json();
 
   if (!id) {
-    return NextResponse.json({ error: 'Pastor's Desk ID is required' }, { status: 400 });
+    return NextResponse.json({ error: "Pastor's Desk ID is required" }, { status: 400 });
   }
 
   try {
@@ -36,7 +36,7 @@ export async function PUT(request: Request) {
     });
     return NextResponse.json(updatedPastorsDesk);
   } catch (error) {
-    return NextResponse.json({ error: 'Error updating pastor's desk content' }, { status: 500 });
+    return NextResponse.json({ error: "Error updating pastor's desk content" }, { status: 500 });
   }
 }
 
@@ -45,13 +45,13 @@ export async function DELETE(request: Request) {
   const id = searchParams.get('id');
 
   if (!id) {
-    return NextResponse.json({ error: 'Pastor's Desk ID is required' }, { status: 400 });
+    return NextResponse.json({ error: "Pastor's Desk ID is required" }, { status: 400 });
   }
 
   try {
     await prisma.asset.delete({ where: { id } });
-    return NextResponse.json({ message: 'Pastor's desk content deleted successfully' });
+    return NextResponse.json({ message: "Pastor's desk content deleted successfully" });
   } catch (error) {
-    return NextResponse.json({ error: 'Error deleting pastor's desk content' }, { status: 500 });
+    return NextResponse.json({ error: "Error deleting pastor's desk content" }, { status: 500 });
   }
 }

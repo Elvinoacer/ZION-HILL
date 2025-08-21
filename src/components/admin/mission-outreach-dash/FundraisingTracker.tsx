@@ -1,7 +1,7 @@
 import { Fund } from "@/generated/prisma";
 import { motion } from "framer-motion";
 import { DollarSign } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
 interface FundraisingTrackerProps {
   fundraisers: Fund[];
@@ -37,14 +37,16 @@ export default function FundraisingTracker({
         Add New Fundraiser
       </motion.button>
       <div className="space-y-6">
-        <BarChart width={600} height={300} data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="title" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="Goal" fill="#2563eb" />
-          <Bar dataKey="Raised" fill="#16a34a" />
-        </BarChart>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="title" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="Goal" fill="#2563eb" />
+            <Bar dataKey="Raised" fill="#16a34a" />
+          </BarChart>
+        </ResponsiveContainer>
         <div className="space-y-4">
           {fundraisers.length === 0 ? (
             <div className="text-center py-12 text-gray-600">
