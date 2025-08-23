@@ -74,8 +74,8 @@ export default function DiscussionForumsPage() {
     isCreatingTopic: false,
   });
 
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // New state
-  const [topicToDeleteId, setTopicToDeleteId] = useState<string | null>(null); // New state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [topicToDeleteId, setTopicToDeleteId] = useState<string | null>(null);
 
   const {
     topics,
@@ -270,155 +270,176 @@ export default function DiscussionForumsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="mb-8"
-      >
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-2">
-          Community Discussions
-        </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300">
-          Connect, share knowledge, and grow together
-        </p>
-      </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-100 py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
+        >
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            Community Discussions
+          </h1>
+          <p className="text-base sm:text-lg text-gray-600 mt-2">
+            Connect, share knowledge, and grow together
+          </p>
+        </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <AnimatePresence>
-            {isCreatingTopic && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <AnimatePresence>
+              {isCreatingTopic && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <NewTopicCard
+                    session={session}
+                    state={{
+                      newTopicTitle,
+                      newTopicContent,
+                      newTopicImageUrl,
+                      newTopicVideoUrl,
+                      error,
+                    }}
+                    handlers={{
+                      setNewTopicTitle: (val) =>
+                        setState((prev) => ({ ...prev, newTopicTitle: val })),
+                      setNewTopicContent: (val) =>
+                        setState((prev) => ({ ...prev, newTopicContent: val })),
+                      setNewTopicImageUrl: (val) =>
+                        setState((prev) => ({
+                          ...prev,
+                          newTopicImageUrl: val,
+                        })),
+                      setNewTopicVideoUrl: (val) =>
+                        setState((prev) => ({
+                          ...prev,
+                          newTopicVideoUrl: val,
+                        })),
+                      cancel: () =>
+                        setState((prev) => ({
+                          ...prev,
+                          isCreatingTopic: false,
+                          newTopicTitle: "",
+                          newTopicContent: "",
+                          newTopicImageUrl: "",
+                          newTopicVideoUrl: "",
+                          error: null,
+                        })),
+                    }}
+                    onSubmit={handleSubmitTopic}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {!isCreatingTopic && (
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 }}
               >
-                <NewTopicCard
-                  session={session}
-                  state={{
-                    newTopicTitle,
-                    newTopicContent,
-                    newTopicImageUrl,
-                    newTopicVideoUrl,
-                    error,
-                  }}
-                  handlers={{
-                    setNewTopicTitle: (val) =>
-                      setState((prev) => ({ ...prev, newTopicTitle: val })),
-                    setNewTopicContent: (val) =>
-                      setState((prev) => ({ ...prev, newTopicContent: val })),
-                    setNewTopicImageUrl: (val) =>
-                      setState((prev) => ({ ...prev, newTopicImageUrl: val })),
-                    setNewTopicVideoUrl: (val) =>
-                      setState((prev) => ({ ...prev, newTopicVideoUrl: val })),
-                    cancel: () =>
-                      setState((prev) => ({
-                        ...prev,
-                        isCreatingTopic: false,
-                        newTopicTitle: "",
-                        newTopicContent: "",
-                        newTopicImageUrl: "",
-                        newTopicVideoUrl: "",
-                        error: null,
-                      })),
-                  }}
-                  onSubmit={handleSubmitTopic}
-                />
+                <Button
+                  onClick={() =>
+                    setState((prev) => ({ ...prev, isCreatingTopic: true }))
+                  }
+                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Discussion
+                </Button>
               </motion.div>
             )}
-          </AnimatePresence>
 
-          {!isCreatingTopic && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
-            >
-              <Button
-                onClick={() =>
-                  setState((prev) => ({ ...prev, isCreatingTopic: true }))
-                }
-                className="w-full sm:w-auto"
+            <TopicsList
+              topics={topics}
+              session={session}
+              handleFeedback={handleFeedback}
+              getYouTubeVideoId={getYouTubeVideoId}
+              onDeleteTopic={onDeleteTopic}
+            />
+          </div>
+
+          <div className="lg:col-span-1 space-y-6">
+            <CommunityGuidelines />
+            <PopularTopics topics={topics} />
+          </div>
+        </div>
+
+        <AlertDialog
+          open={showDeleteConfirm}
+          onOpenChange={setShowDeleteConfirm}
+        >
+          <AlertDialogContent className="rounded-2xl shadow-xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-lg font-bold text-gray-800">
+                Are you sure?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-sm text-gray-600">
+                This action cannot be undone. This will permanently delete this
+                discussion and all its associated comments and feedback.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="rounded-lg border-gray-200 hover:bg-gray-50">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmDeleteTopic}
+                className="bg-red-600 hover:bg-red-700 text-white rounded-lg"
               >
-                <Plus className="w-4 h-4 mr-2" />
-                New Discussion
-              </Button>
-            </motion.div>
-          )}
-
-          <TopicsList
-            topics={topics}
-            session={session}
-            handleFeedback={handleFeedback}
-            getYouTubeVideoId={getYouTubeVideoId}
-            onDeleteTopic={onDeleteTopic} // Pass the onDeleteTopic function
-          />
-        </div>
-
-        <div className="lg:col-span-1 space-y-6">
-          <CommunityGuidelines />
-          <PopularTopics topics={topics} />
-        </div>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
-
-      {/* AlertDialog for delete confirmation */}
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this
-              discussion and all its associated comments and feedback.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteTopic}>
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
 
 const LoadingState = () => (
-  <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-    <div className="space-y-8">
-      <div className="space-y-2">
-        <Skeleton className="h-10 w-64" />
-        <Skeleton className="h-6 w-80" />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <Skeleton className="h-12 w-full" />
-
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="space-y-4 p-6 border rounded-lg">
-              <div className="flex items-center space-x-3">
-                <Skeleton className="h-10 w-10 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-40" />
-                  <Skeleton className="h-3 w-32" />
-                </div>
-              </div>
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-3/4" />
-              <div className="flex justify-between">
-                <Skeleton className="h-8 w-24" />
-                <Skeleton className="h-8 w-24" />
-              </div>
-            </div>
-          ))}
+  <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-100 py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto">
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-6 w-80" />
         </div>
 
-        <div className="lg:col-span-1 space-y-6">
-          <Skeleton className="h-64 w-full rounded-lg" />
-          <Skeleton className="h-64 w-full rounded-lg" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <Skeleton className="h-12 w-full sm:w-48 rounded-lg" />
+
+            {[...Array(3)].map((_, i) => (
+              <Card key={i} className="shadow-lg rounded-2xl">
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-5 w-48" />
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                  </div>
+                  <div className="flex justify-between pt-4">
+                    <Skeleton className="h-8 w-24" />
+                    <Skeleton className="h-8 w-24" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="lg:col-span-1 space-y-6">
+            <Skeleton className="h-64 w-full rounded-2xl shadow-lg" />
+            <Skeleton className="h-64 w-full rounded-2xl shadow-lg" />
+          </div>
         </div>
       </div>
     </div>
@@ -426,39 +447,35 @@ const LoadingState = () => (
 );
 
 const ErrorState = ({ error }: { error: string }) => (
-  <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-    <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
-      <div className="flex">
-        <div className="flex-shrink-0">
-          <svg
-            className="h-5 w-5 text-red-500"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </div>
-        <div className="ml-3">
-          <h3 className="text-lg font-medium text-red-800">
-            Error loading discussions
-          </h3>
-          <div className="mt-2 text-sm text-red-700">
-            <p>{error}</p>
-          </div>
-          <div className="mt-4">
-            <button
-              onClick={() => window.location.reload()}
-              className="text-sm font-medium text-red-700 hover:text-red-600"
+  <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-2xl mx-auto">
+      <Card className="bg-white shadow-xl rounded-2xl">
+        <CardContent className="p-6 text-center space-y-4">
+          <div className="inline-flex items-center justify-center bg-red-100 p-4 rounded-full">
+            <svg
+              className="h-6 w-6 text-red-600"
+              viewBox="0 0 20 20"
+              fill="currentColor"
             >
-              Try again <span aria-hidden="true">&rarr;</span>
-            </button>
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
           </div>
-        </div>
-      </div>
+          <h3 className="text-lg font-bold text-gray-800">
+            Error Loading Discussions
+          </h3>
+          <p className="text-sm text-gray-600">{error}</p>
+          <Button
+            onClick={() => window.location.reload()}
+            className="bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
+          >
+            Try Again
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   </div>
 );
@@ -486,25 +503,27 @@ const NewTopicCard = ({
   };
   onSubmit: (e: React.FormEvent) => void;
 }) => (
-  <Card className="border border-blue-100 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10">
-    <CardHeader>
+  <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+    <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
       <div className="flex items-center justify-between">
-        <CardTitle className="text-xl">New Discussion</CardTitle>
+        <CardTitle className="text-lg sm:text-xl font-bold text-gray-800">
+          New Discussion
+        </CardTitle>
         <Button
           variant="ghost"
           size="sm"
           onClick={handlers.cancel}
-          className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          className="text-gray-500 hover:text-gray-700"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
           Cancel
         </Button>
       </div>
-      <CardDescription>
+      <CardDescription className="text-sm text-gray-600">
         Start a meaningful conversation with the community
       </CardDescription>
     </CardHeader>
-    <CardContent>
+    <CardContent className="p-6">
       <form onSubmit={onSubmit} className="space-y-4">
         <FormField
           label="Topic Title"
@@ -514,6 +533,7 @@ const NewTopicCard = ({
           required
           disabled={!session?.user?.id}
           placeholder="What's your discussion about?"
+          className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
 
         <FormField
@@ -526,6 +546,7 @@ const NewTopicCard = ({
           required
           disabled={!session?.user?.id}
           placeholder="Share your thoughts, questions, or ideas..."
+          className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -537,6 +558,7 @@ const NewTopicCard = ({
             onChange={handlers.setNewTopicImageUrl}
             placeholder="https://example.com/image.jpg"
             disabled={!session?.user?.id}
+            className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
 
           <FormField
@@ -547,31 +569,38 @@ const NewTopicCard = ({
             onChange={handlers.setNewTopicVideoUrl}
             placeholder="https://youtube.com/watch?v=..."
             disabled={!session?.user?.id}
+            className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
         </div>
 
         {state.error && (
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-300 rounded-md text-sm">
+          <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm shadow-sm">
             {state.error}
           </div>
         )}
 
         <div className="flex justify-end space-x-3 pt-2">
-          <Button variant="outline" type="button" onClick={handlers.cancel}>
+          <Button
+            variant="outline"
+            type="button"
+            onClick={handlers.cancel}
+            className="rounded-lg border-gray-200 hover:bg-gray-50"
+          >
             Cancel
           </Button>
-          <Button type="submit" disabled={!session?.user?.id}>
+          <Button
+            type="submit"
+            disabled={!session?.user?.id}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             Post Discussion
           </Button>
         </div>
 
         {!session?.user?.id && (
-          <div className="text-center text-sm text-gray-500 dark:text-gray-400 pt-2">
+          <div className="text-center text-sm text-gray-500 pt-2">
             You need to{" "}
-            <Link
-              href="/login"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
-            >
+            <Link href="/login" className="text-blue-600 hover:underline">
               sign in
             </Link>{" "}
             to create a discussion
@@ -600,7 +629,7 @@ const FormField = ({
   <div>
     <label
       htmlFor={id}
-      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+      className="block text-sm font-medium text-gray-700 mb-1.5"
     >
       {label}
     </label>
@@ -610,33 +639,32 @@ const FormField = ({
       onChange={(
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
       ) => onChange(e.target.value)}
-      className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
       {...props}
     />
   </div>
 );
 
-const TopicsList: React.FC<{
-  topics: ForumTopic;
-  session: any;
-  handleFeedback: (topicId: string, type: "LIKE" | "DISLIKE") => void;
-  getYouTubeVideoId: (url: string) => string | null;
-  onDeleteTopic: (topicId: string) => void;
-}> = ({
+const TopicsList = ({
   topics,
   session,
   handleFeedback,
   getYouTubeVideoId,
   onDeleteTopic,
+}: {
+  topics: ForumTopic[];
+  session: any;
+  handleFeedback: (topicId: string, type: "LIKE" | "DISLIKE") => void;
+  getYouTubeVideoId: (url: string) => string | null;
+  onDeleteTopic: (topicId: string) => void;
 }) => (
   <div className="space-y-4">
-    <h2 className="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
+    <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center">
       <MessageSquare className="w-5 h-5 mr-2 text-blue-600" />
       Recent Discussions
     </h2>
 
     {topics.length > 0 ? (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <AnimatePresence>
           {topics.map((topic) => (
             <motion.div
@@ -644,28 +672,26 @@ const TopicsList: React.FC<{
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.3 }}
             >
               <TopicItem
                 topic={topic}
                 session={session}
                 handleFeedback={handleFeedback}
                 getYouTubeVideoId={getYouTubeVideoId}
-                onDelete={onDeleteTopic} // Pass the onDeleteTopic function
+                onDelete={onDeleteTopic}
               />
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
     ) : (
-      <div className="text-center py-12">
-        <div className="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600">
-          <MessageSquare className="w-full h-full" />
-        </div>
-        <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
-          No discussions yet
+      <div className="text-center py-12 border rounded-2xl bg-white shadow-sm">
+        <MessageSquare className="mx-auto h-16 w-16 text-gray-300 mb-4" />
+        <h3 className="text-lg font-medium text-gray-800">
+          No Discussions Yet
         </h3>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-1 text-sm text-gray-500">
           Be the first to start a conversation!
         </p>
       </div>
@@ -684,106 +710,105 @@ const TopicItem = ({
   session: any;
   handleFeedback: (topicId: string, type: "LIKE" | "DISLIKE") => void;
   getYouTubeVideoId: (url: string) => string | null;
-  onDelete: (topicId: string) => void; // Added
+  onDelete: (topicId: string) => void;
 }) => {
   const videoId = topic.videoUrl ? getYouTubeVideoId(topic.videoUrl) : null;
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200 dark:bg-gray-800 dark:border-gray-700">
-        <CardContent
-          className="p-6 relative cursor-pointer"
-          onClick={() => window.location.href = `/discussion-forums/${topic.id}`}
-        >
-          {" "}
-          {/* Added relative positioning */}
-          {session?.user?.id === topic.userId && (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                  onClick={(e) => e.stopPropagation()} // Add this line
-                  onClick={(e) => e.stopPropagation()} // Add this line
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                  </svg>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-red-500"
-                  onClick={(e) => {
-                    e.preventDefault(); // Prevent default button behavior
-                    e.stopPropagation(); // Stop propagation to prevent CardContent navigation
-                    onDelete(topic.id);
-                  }}
-                >
-                  Delete
-                </Button>
-              </PopoverContent>
-            </Popover>
-          )}
-          <div className="flex items-start space-x-4">
-            <Avatar className="h-10 w-10 border border-gray-200 dark:border-gray-700">
-              <AvatarImage src={topic.user.image} alt={topic.user.name} />
-              <AvatarFallback>
-                {topic.user.name?.charAt(0) || "U"}
-              </AvatarFallback>
-            </Avatar>
-
-            <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                {topic.title}
-              </h3>
-
-              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
-                <span>Posted by {topic.user.name || "Anonymous"}</span>
-                <span className="mx-2">•</span>
-                <span>
-                  {formatDistanceToNow(new Date(topic.createdAt), {
-                    addSuffix: true,
-                  })}
-                </span>
-              </div>
-
-              <p
-                className={`mt-3 text-gray-600 dark:text-gray-300 ${
-                  expanded ? "" : "line-clamp-3"
-                }`}
+    <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+      <CardContent
+        className="p-6 relative cursor-pointer"
+        onClick={() =>
+          (window.location.href = `/discussion-forums/${topic.id}`)
+        }
+      >
+        {session?.user?.id === topic.userId && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                onClick={(e) => e.stopPropagation()}
               >
-                {topic.content}
-              </p>
-
-              {topic.content.length > 300 && (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation(); // Stop propagation for "Read more" button
-                    setExpanded(!expanded);
-                  }}
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-1"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
                 >
-                  {expanded ? "Show less" : "Read more"}
-                </button>
-              )}
+                  <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                </svg>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 rounded-lg shadow-lg">
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-red-500 hover:bg-red-50"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onDelete(topic.id);
+                }}
+              >
+                Delete
+              </Button>
+            </PopoverContent>
+          </Popover>
+        )}
+        <div className="flex items-start space-x-4">
+          <Avatar className="h-10 w-10 border border-gray-200">
+            <AvatarImage src={topic.user.image} alt={topic.user.name} />
+            <AvatarFallback className="bg-blue-100 text-blue-600">
+              {topic.user.name?.charAt(0) || "U"}
+            </AvatarFallback>
+          </Avatar>
 
-              <MediaContent
-                imageUrl={topic.imageUrl}
-                videoId={videoId}
-                alt="Topic visual content"
-              />
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors">
+              {topic.title}
+            </h3>
+
+            <div className="flex items-center text-xs sm:text-sm text-gray-500 mt-1 space-x-2">
+              <span>Posted by {topic.user.name || "Anonymous"}</span>
+              <span className="mx-1">•</span>
+              <span>
+                {formatDistanceToNow(new Date(topic.createdAt), {
+                  addSuffix: true,
+                })}
+              </span>
             </div>
+
+            <p
+              className={`mt-3 text-gray-600 text-sm sm:text-base ${
+                expanded ? "" : "line-clamp-3"
+              }`}
+            >
+              {topic.content}
+            </p>
+
+            {topic.content.length > 300 && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setExpanded(!expanded);
+                }}
+                className="text-sm text-blue-600 hover:underline mt-2"
+              >
+                {expanded ? "Show less" : "Read more"}
+              </button>
+            )}
+
+            <MediaContent
+              imageUrl={topic.imageUrl}
+              videoId={videoId}
+              alt="Topic visual content"
+            />
           </div>
-        </CardContent>
+        </div>
+      </CardContent>
       <div className="px-6 pb-4 flex justify-between items-center">
         <FeedbackControls
           likes={topic.likes}
@@ -794,7 +819,7 @@ const TopicItem = ({
           disabled={!session?.user?.id}
         />
 
-        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex items-center text-sm text-gray-500">
           <MessageSquare className="w-4 h-4 mr-1.5" />
           {topic._count.posts} {topic._count.posts === 1 ? "reply" : "replies"}
         </div>
@@ -815,19 +840,19 @@ const MediaContent = ({
   if (!imageUrl && !videoId) return null;
 
   return (
-    <div className="mt-4 rounded-lg overflow-hidden">
+    <div className="mt-4 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
       {imageUrl && (
-        <div className="relative aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg">
+        <div className="relative aspect-video bg-gray-100">
           <img
             src={imageUrl}
             alt={alt}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
         </div>
       )}
 
       {videoId && (
-        <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+        <div className="relative aspect-video bg-black">
           <iframe
             className="absolute inset-0 w-full h-full"
             src={`https://www.youtube.com/embed/${videoId}?modestbranding=1&rel=0`}
@@ -856,7 +881,7 @@ const FeedbackControls = ({
   onDislike: () => void;
   disabled: boolean;
 }) => (
-  <div className="flex items-center space-x-4">
+  <div className="flex items-center space-x-3">
     <FeedbackButton
       type="LIKE"
       count={likes}
@@ -891,11 +916,11 @@ const FeedbackButton = ({
   const colorClass =
     type === "LIKE"
       ? active
-        ? "text-blue-600 dark:text-blue-400"
-        : "text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+        ? "text-blue-600 bg-blue-50"
+        : "text-gray-500 hover:text-blue-600 hover:bg-blue-50"
       : active
-      ? "text-red-600 dark:text-red-400"
-      : "text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400";
+      ? "text-red-600 bg-red-50"
+      : "text-gray-500 hover:text-red-600 hover:bg-red-50";
 
   return (
     <button
@@ -904,11 +929,7 @@ const FeedbackButton = ({
         onClick();
       }}
       disabled={disabled}
-      className={`flex items-center text-sm font-medium ${colorClass} transition-colors rounded-full px-3 py-1.5 ${
-        active
-          ? "bg-blue-50 dark:bg-blue-900/30"
-          : "hover:bg-gray-100 dark:hover:bg-gray-700"
-      }`}
+      className={`flex items-center text-sm font-medium ${colorClass} rounded-full px-3 py-1.5 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
     >
       <Icon className="w-4 h-4 mr-1.5" />
       {count}
@@ -917,12 +938,14 @@ const FeedbackButton = ({
 };
 
 const CommunityGuidelines = () => (
-  <Card className="dark:bg-gray-800 dark:border-gray-700">
-    <CardHeader>
-      <CardTitle className="text-lg">Community Guidelines</CardTitle>
+  <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+    <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50">
+      <CardTitle className="text-lg sm:text-xl font-bold text-gray-800">
+        Community Guidelines
+      </CardTitle>
     </CardHeader>
-    <CardContent>
-      <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
+    <CardContent className="p-6">
+      <ul className="space-y-3 text-sm text-gray-600">
         <li className="flex items-start">
           <span className="flex-shrink-0 text-green-500 mr-2 mt-0.5">✓</span>
           <span>Be respectful and kind to others</span>
@@ -952,12 +975,16 @@ const PopularTopics = ({ topics }: { topics: ForumTopic[] }) => {
   if (popularTopics.length === 0) return null;
 
   return (
-    <Card className="dark:bg-gray-800 dark:border-gray-700">
-      <CardHeader>
-        <CardTitle className="text-lg">Popular Discussions</CardTitle>
-        <CardDescription>Most engaged topics this week</CardDescription>
+    <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
+        <CardTitle className="text-lg sm:text-xl font-bold text-gray-800">
+          Popular Discussions
+        </CardTitle>
+        <CardDescription className="text-sm text-gray-600">
+          Most engaged topics this week
+        </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         <div className="space-y-4">
           {popularTopics.map((topic) => (
             <Link
@@ -966,16 +993,16 @@ const PopularTopics = ({ topics }: { topics: ForumTopic[] }) => {
               className="block group"
             >
               <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg p-2">
+                <div className="flex-shrink-0 bg-blue-100 text-blue-600 rounded-lg p-2">
                   <MessageSquare className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <h3 className="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors">
                     {topic.title}
                   </h3>
-                  <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <div className="flex items-center text-xs text-gray-500 mt-1 space-x-2">
                     <span>{topic._count.posts} replies</span>
-                    <span className="mx-1.5">•</span>
+                    <span className="mx-1">•</span>
                     <span>{topic.likes} likes</span>
                   </div>
                 </div>
@@ -987,3 +1014,32 @@ const PopularTopics = ({ topics }: { topics: ForumTopic[] }) => {
     </Card>
   );
 };
+
+<style jsx>{`
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+  }
+`}</style>;

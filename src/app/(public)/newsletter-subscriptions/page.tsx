@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +33,7 @@ const NewsletterSubscriptionPage = () => {
         body: JSON.stringify({ email }),
       });
 
-      // @ts-expect-error i cannot believe it
+      // @ts-expect-error - response may contain message property
       setMessage(response?.message || "Subscription successful!");
       setEmail("");
     } catch (err: unknown) {
@@ -80,7 +79,9 @@ const NewsletterSubscriptionPage = () => {
         >
           <Card className="shadow-xl rounded-2xl overflow-hidden border border-gray-100">
             <CardHeader className="p-6 pb-0">
-              <CardTitle className="text-2xl font-bold text-gray-900">Subscribe Now</CardTitle>
+              <CardTitle className="text-2xl font-bold text-gray-900">
+                Subscribe Now
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-4">
               <form onSubmit={handleSubmit} className="space-y-6">

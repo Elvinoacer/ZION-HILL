@@ -198,7 +198,7 @@ const AboutPage = () => {
       transition={{ duration: 0.5 }}
       className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6"
     >
-      <div className="max-w-7xl mx-auto space-y-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Hero/Banner Section */}
         <motion.section
           initial={{ opacity: 0, scale: 0.98 }}
@@ -207,16 +207,16 @@ const AboutPage = () => {
           className="relative bg-cover bg-center rounded-2xl shadow-xl overflow-hidden"
           style={{
             backgroundImage: "url('/images/hero2.png')",
-            minHeight: "480px",
+            minHeight: "400px", // Adjusted for better mobile view
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-purple-900/70 flex flex-col items-center justify-center text-center p-8">
-            <div className="max-w-4xl space-y-6">
-              <Church className="h-12 w-12 text-white mx-auto opacity-90" />
-              <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 leading-tight">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-purple-900/70 flex flex-col items-center justify-center text-center p-6 sm:p-8">
+            <div className="max-w-4xl space-y-4 sm:space-y-6">
+              <Church className="h-10 w-10 sm:h-12 sm:w-12 text-white mx-auto opacity-90" />
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-2 sm:mb-4 leading-tight">
                 Welcome to Our Church Family
               </h1>
-              <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl text-blue-100 mb-4 sm:mb-8 max-w-2xl mx-auto">
                 Where faith grows, hope shines, and love connects.
               </p>
               {weeklyTheme && (
@@ -224,17 +224,17 @@ const AboutPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20"
+                  className="bg-white/10 backdrop-blur-md p-4 sm:p-6 rounded-xl border border-white/20"
                 >
-                  <p className="text-lg font-semibold text-white italic mb-2">
+                  <p className="text-base sm:text-lg font-semibold text-white italic mb-2">
                     "{weeklyTheme.verse}"
                   </p>
-                  <div className="flex flex-wrap justify-center items-center gap-4 mt-4">
-                    <span className="inline-flex items-center text-blue-100 bg-blue-800/30 px-3 py-1 rounded-full text-sm">
-                      <Target className="h-4 w-4 mr-1" />
+                  <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-4 mt-2 sm:mt-4">
+                    <span className="inline-flex items-center text-blue-100 bg-blue-800/30 px-2 py-1 rounded-full text-xs sm:text-sm">
+                      <Target className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                       {weeklyTheme.title}
                     </span>
-                    <span className="text-sm text-blue-100">
+                    <span className="text-xs sm:text-sm text-blue-100">
                       {weeklyTheme.reference}
                     </span>
                   </div>
@@ -251,33 +251,33 @@ const AboutPage = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="grid md:grid-cols-2 gap-8"
         >
-          <Card className="p-8 border-blue-100 shadow-md hover:shadow-lg transition-all duration-300">
-            <CardHeader className="items-center p-0 mb-6">
-              <div className="bg-blue-100 p-3 rounded-full mb-4">
-                <Target className="h-8 w-8 text-blue-600" />
+          <Card className="p-6 sm:p-8 border-blue-100 shadow-md hover:shadow-lg transition-all duration-300">
+            <CardHeader className="items-center p-0 mb-4 sm:mb-6">
+              <div className="bg-blue-100 p-2 sm:p-3 rounded-full mb-2 sm:mb-4">
+                <Target className="h-7 w-7 sm:h-8 sm:w-8 text-blue-600" />
               </div>
-              <CardTitle className="text-2xl font-bold text-blue-700">
+              <CardTitle className="text-xl sm:text-2xl font-bold text-blue-700">
                 Our Mission
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <p className="text-slate-700 leading-relaxed text-center">
+              <p className="text-sm sm:text-base text-slate-700 leading-relaxed text-center">
                 {missionStatement}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="p-8 border-purple-100 shadow-md hover:shadow-lg transition-all duration-300">
-            <CardHeader className="items-center p-0 mb-6">
-              <div className="bg-purple-100 p-3 rounded-full mb-4">
-                <Eye className="h-8 w-8 text-purple-600" />
+          <Card className="p-6 sm:p-8 border-purple-100 shadow-md hover:shadow-lg transition-all duration-300">
+            <CardHeader className="items-center p-0 mb-4 sm:mb-6">
+              <div className="bg-purple-100 p-2 sm:p-3 rounded-full mb-2 sm:mb-4">
+                <Eye className="h-7 w-7 sm:h-8 sm:w-8 text-purple-600" />
               </div>
-              <CardTitle className="text-2xl font-bold text-purple-700">
+              <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">
                 Our Vision
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <p className="text-slate-700 leading-relaxed text-center">
+              <p className="text-sm sm:text-base text-slate-700 leading-relaxed text-center">
                 {visionStatement}
               </p>
             </CardContent>
@@ -290,16 +290,16 @@ const AboutPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-2 sm:mb-4">
               Our Core Values
             </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
               These principles guide everything we do as a church community
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {values.map((value, index) => (
               <motion.div
                 key={index}
@@ -307,17 +307,17 @@ const AboutPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.7 + index * 0.1 }}
               >
-                <Card className="h-full text-center p-6 border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 hover:border-blue-200 group">
-                  <CardHeader className="flex flex-col items-center p-0 mb-4">
-                    <div className="bg-blue-50 p-3 rounded-full mb-4 group-hover:bg-blue-100 transition-colors">
+                <Card className="h-full text-center p-4 sm:p-6 border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 hover:border-blue-200 group">
+                  <CardHeader className="flex flex-col items-center p-0 mb-2 sm:mb-4">
+                    <div className="bg-blue-50 p-2 sm:p-3 rounded-full mb-2 sm:mb-4 group-hover:bg-blue-100 transition-colors">
                       <div className="text-blue-600">{value.icon}</div>
                     </div>
-                    <CardTitle className="text-xl font-semibold text-slate-800">
+                    <CardTitle className="text-lg sm:text-xl font-semibold text-slate-800">
                       {value.title}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-0">
-                    <p className="text-slate-600 text-sm">
+                    <p className="text-xs sm:text-sm text-slate-600">
                       {value.description}
                     </p>
                   </CardContent>
@@ -332,43 +332,43 @@ const AboutPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.8 }}
-          className="bg-white p-10 rounded-2xl shadow-md border border-slate-100"
+          className="bg-white p-6 sm:p-10 rounded-2xl shadow-md border border-slate-100"
         >
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">
+          <div className="text-center mb-8 sm:mb-10">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-2 sm:mb-4">
               Our Journey & Accomplishments
             </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
               Celebrating God's faithfulness through the years
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-2">
+          <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
+            <div className="space-y-2 sm:space-y-3">
               {accomplishments.slice(0, 2).map((item, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.9 + index * 0.1 }}
-                  className="flex items-start p-4 bg-slate-50 rounded-lg"
+                  className="flex items-start p-3 sm:p-4 bg-slate-50 rounded-lg"
                 >
-                  <Award className="h-5 w-5 text-green-500 mr-3 flex-shrink-0 mt-1" />
-                  <span className="text-slate-700">{item}</span>
+                  <Award className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 mr-2 sm:mr-3 flex-shrink-0 mt-1" />
+                  <span className="text-sm sm:text-base text-slate-700">{item}</span>
                 </motion.div>
               ))}
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 sm:space-y-3">
               {accomplishments.slice(2, 4).map((item, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 1.1 + index * 0.1 }}
-                  className="flex items-start p-4 bg-slate-50 rounded-lg"
+                  className="flex items-start p-3 sm:p-4 bg-slate-50 rounded-lg"
                 >
-                  <Award className="h-5 w-5 text-green-500 mr-3 flex-shrink-0 mt-1" />
-                  <span className="text-slate-700">{item}</span>
+                  <Award className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 mr-2 sm:mr-3 flex-shrink-0 mt-1" />
+                  <span className="text-sm sm:text-base text-slate-700">{item}</span>
                 </motion.div>
               ))}
             </div>
@@ -381,17 +381,17 @@ const AboutPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.0 }}
         >
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">
+          <div className="text-center mb-8 sm:mb-10">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-2 sm:mb-4">
               Featured Services & Programs
             </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
               Join us for worship, fellowship, and spiritual growth
             </p>
           </div>
 
           {featuredServices.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {featuredServices.map((service, index) => (
                 <motion.div
                   key={service.id}
@@ -399,28 +399,28 @@ const AboutPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.1 + index * 0.1 }}
                 >
-                  <Card className="h-full p-6 border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group overflow-hidden">
-                    <CardHeader className="flex flex-row items-start space-x-4 p-0 mb-4">
-                      <div className="bg-purple-100 p-2 rounded-md group-hover:bg-purple-200 transition-colors">
-                        <Calendar className="h-5 w-5 text-purple-600" />
+                  <Card className="h-full p-4 sm:p-6 border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group overflow-hidden">
+                    <CardHeader className="flex flex-row items-start space-x-3 sm:space-x-4 p-0 mb-3 sm:mb-4">
+                      <div className="bg-purple-100 p-1.5 sm:p-2 rounded-md group-hover:bg-purple-200 transition-colors">
+                        <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
                       </div>
-                      <CardTitle className="text-xl font-semibold text-slate-800">
+                      <CardTitle className="text-lg sm:text-xl font-semibold text-slate-800">
                         {service.title}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
-                      <p className="text-slate-600 mb-4 text-sm">
+                      <p className="text-xs sm:text-sm text-slate-600 mb-3 sm:mb-4">
                         {service.description || "No description available."}
                       </p>
-                      <div className="flex items-center text-sm text-slate-500 gap-2">
-                        <Calendar size={16} />
+                      <div className="flex items-center text-xs sm:text-sm text-slate-500 gap-1.5 sm:gap-2">
+                        <Calendar size={14} />
                         <span>
                           {new Date(service.date).toLocaleDateString()}
                         </span>
                         {service.location && (
                           <>
                             <span className="text-slate-300">•</span>
-                            <MapPin size={16} />
+                            <MapPin size={14} />
                             <span>{service.location}</span>
                           </>
                         )}
@@ -431,7 +431,7 @@ const AboutPage = () => {
               ))}
             </div>
           ) : (
-            <p className="text-center text-slate-500 py-10 bg-slate-50 rounded-xl">
+            <p className="text-center text-slate-500 py-8 sm:py-10 bg-slate-50 rounded-xl">
               No featured services available at the moment.
             </p>
           )}
@@ -442,38 +442,38 @@ const AboutPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.2 }}
-          className="bg-white p-10 rounded-2xl shadow-md border border-slate-100"
+          className="bg-white p-6 sm:p-10 rounded-2xl shadow-md border border-slate-100"
         >
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">
+          <div className="text-center mb-8 sm:mb-10">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-2 sm:mb-4">
               Upcoming Events
             </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
               Mark your calendar and join us for these special gatherings
             </p>
           </div>
 
           {upcomingEvents.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {upcomingEvents.map((event, index) => (
                 <motion.div
                   key={event.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.3 + index * 0.1 }}
-                  className="flex items-start p-6 rounded-xl bg-slate-50 border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 group"
+                  className="flex items-start p-4 sm:p-6 rounded-xl bg-slate-50 border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 group"
                 >
-                  <div className="bg-blue-100 p-2 rounded-md group-hover:bg-blue-200 transition-colors mr-4 flex-shrink-0">
-                    <Calendar className="h-5 w-5 text-blue-600" />
+                  <div className="bg-blue-100 p-1.5 sm:p-2 rounded-md group-hover:bg-blue-200 transition-colors mr-3 sm:mr-4 flex-shrink-0">
+                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                   </div>
                   <div className="flex-grow">
-                    <h3 className="text-lg font-semibold text-slate-800 mb-1">
+                    <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-1">
                       {event.title}
                     </h3>
-                    <p className="text-slate-600 text-sm mb-2">
+                    <p className="text-xs sm:text-sm text-slate-600 mb-1.5 sm:mb-2">
                       {event.description}
                     </p>
-                    <div className="flex items-center text-sm text-slate-500 gap-2 flex-wrap">
+                    <div className="flex items-center text-xs sm:text-sm text-slate-500 gap-1.5 sm:gap-2 flex-wrap">
                       <span className="font-medium">
                         {new Date(event.date).toLocaleDateString()}
                       </span>
@@ -481,7 +481,7 @@ const AboutPage = () => {
                         <>
                           <span className="text-slate-300">•</span>
                           <span className="flex items-center gap-1">
-                            <MapPin size={14} />
+                            <MapPin size={12} />
                             {event.location}
                           </span>
                         </>
@@ -499,7 +499,7 @@ const AboutPage = () => {
               ))}
             </div>
           ) : (
-            <p className="text-center text-slate-500 py-10 bg-slate-100 rounded-lg">
+            <p className="text-center text-slate-500 py-8 sm:py-10 bg-slate-100 rounded-lg">
               No upcoming events scheduled at the moment.
             </p>
           )}
@@ -511,17 +511,17 @@ const AboutPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.4 }}
         >
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">
+          <div className="text-center mb-8 sm:mb-10">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-2 sm:mb-4">
               Our Leadership
             </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
               Dedicated servants guiding our church community
             </p>
           </div>
 
           {leadership.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {leadership.map((person, index) => (
                 <motion.div
                   key={person.id}
@@ -529,19 +529,19 @@ const AboutPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.5 + index * 0.1 }}
                 >
-                  <Card className="h-full text-center p-6 border-slate-100 shadow-sm hover:shadow-md transition-all duration-300">
-                    <CardHeader className="flex flex-col items-center p-0 mb-4">
-                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-blue-800 text-2xl font-bold mb-4 ring-4 ring-white shadow-inner">
+                  <Card className="h-full text-center p-4 sm:p-6 border-slate-100 shadow-sm hover:shadow-md transition-all duration-300">
+                    <CardHeader className="flex flex-col items-center p-0 mb-3 sm:mb-4">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-blue-800 text-xl sm:text-2xl font-bold mb-3 sm:mb-4 ring-3 sm:ring-4 ring-white shadow-inner">
                         {person.name?.charAt(0) ||
                           person.email?.charAt(0) ||
                           "?"}
                       </div>
-                      <CardTitle className="text-xl font-semibold text-slate-800">
+                      <CardTitle className="text-lg sm:text-xl font-semibold text-slate-800">
                         {person.name || person.email}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
-                      <p className="text-blue-600 font-medium">
+                      <p className="text-sm sm:text-base text-blue-600 font-medium">
                         {person.role || "Church Leader"}
                       </p>
                     </CardContent>
@@ -550,7 +550,7 @@ const AboutPage = () => {
               ))}
             </div>
           ) : (
-            <p className="text-center text-slate-500 py-10 bg-slate-50 rounded-xl">
+            <p className="text-center text-slate-500 py-8 sm:py-10 bg-slate-50 rounded-xl">
               Leadership information not available at the moment.
             </p>
           )}
@@ -561,27 +561,27 @@ const AboutPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.6 }}
-          className="bg-gradient-to-r from-blue-700 to-indigo-700 text-white p-12 rounded-2xl shadow-xl text-center"
+          className="bg-gradient-to-r from-blue-700 to-indigo-700 text-white p-8 sm:p-12 rounded-2xl shadow-xl text-center"
         >
           <div className="max-w-3xl mx-auto">
-            <Star className="h-12 w-12 text-yellow-300 mx-auto mb-6" />
-            <h2 className="text-4xl font-bold mb-6">Join Our Church Family!</h2>
-            <p className="text-lg mb-8 opacity-90">
+            <Star className="h-10 w-10 sm:h-12 sm:w-12 text-yellow-300 mx-auto mb-4 sm:mb-6" />
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6">Join Our Church Family!</h2>
+            <p className="text-base sm:text-lg mb-6 sm:mb-8 opacity-90">
               Whether you're looking for a spiritual home, seeking support, or
               want to contribute to our community, we welcome you with open
               arms.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
               <Button
                 size="lg"
-                className="bg-white text-blue-700 hover:bg-gray-100 text-lg px-8 py-6 rounded-full shadow-md font-semibold transition-all hover:scale-105"
+                className="bg-white text-blue-700 hover:bg-gray-100 text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 rounded-full shadow-md font-semibold transition-all hover:scale-105"
               >
                 Become a Member
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-white hover:text-indigo-700 text-lg px-8 py-6 rounded-full shadow-md font-semibold transition-all hover:scale-105"
+                className="border-white text-white hover:bg-white hover:text-indigo-700 text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 rounded-full shadow-md font-semibold transition-all hover:scale-105"
               >
                 Support Our Ministry
               </Button>
@@ -594,19 +594,19 @@ const AboutPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.8 }}
-          className="bg-white p-10 rounded-2xl shadow-md border border-slate-100 text-center"
+          className="bg-white p-8 sm:p-10 rounded-2xl shadow-md border border-slate-100 text-center"
         >
-          <h2 className="text-3xl font-bold text-slate-800 mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-3 sm:mb-4">
             Get In Touch
           </h2>
-          <p className="text-slate-700 mb-8 text-lg">
+          <p className="text-base sm:text-lg text-slate-700 mb-6 sm:mb-8">
             Have questions or need support? We're here to help.
           </p>
-          <div className="inline-flex items-center gap-3 text-blue-600 bg-blue-50 px-6 py-4 rounded-xl">
-            <Mail size={24} />
-            <p className="text-lg font-medium">info@ourchurch.org</p>
+          <div className="inline-flex items-center gap-2 sm:gap-3 text-blue-600 bg-blue-50 px-4 sm:px-6 py-3 sm:py-4 rounded-xl">
+            <Mail size={20} />
+            <p className="text-base sm:text-lg font-medium">info@ourchurch.org</p>
           </div>
-          <p className="text-slate-400 text-sm mt-6">
+          <p className="text-slate-400 text-xs sm:text-sm mt-4 sm:mt-6">
             We typically respond within 24 hours
           </p>
         </motion.section>

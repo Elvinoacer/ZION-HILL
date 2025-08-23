@@ -223,47 +223,47 @@ const BaptismCandidatesList: React.FC = () => {
 
   if (error)
     return (
-      <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-sm mb-6">
-        <p className="font-semibold">Error loading candidates</p>
-        <p className="text-sm">{String(error)}</p>
+      <div className="bg-red-900/30 border-l-4 border-red-500 text-red-300 p-4 rounded-lg shadow-lg mb-6">
+        <p className="font-semibold text-red-200">Error loading candidates</p>
+        <p className="text-sm text-red-400">{String(error)}</p>
       </div>
     );
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-6 py-5 flex justify-between items-center">
+      <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700/50">
+        <div className="px-4 py-4 sm:px-6 sm:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800">
+            <h1 className="text-xl sm:text-2xl font-semibold text-white">
               Baptism Candidates
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="text-sm sm:text-base text-gray-400 mt-1">
               Manage all baptism applications
             </p>
           </div>
-          <div className="flex space-x-3 relative">
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto relative">
             <input
               type="text"
               placeholder="Search candidates..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-900 text-gray-200 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder-gray-500 w-full"
             />
             <div className="relative">
               <button
                 ref={exportButtonRef}
-                className="px-4 py-2.5 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium"
+                className="px-4 py-2.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-200 hover:bg-gray-700 transition-colors text-sm font-medium w-full"
                 onClick={() => setShowExportDropdown((s) => !s)}
               >
                 Export
               </button>
               {showExportDropdown && (
-                <div className="absolute right-0 mt-1 w-44 bg-white rounded-lg shadow-md border z-50">
+                <div className="absolute right-0 mt-1 w-44 bg-gray-800/50 rounded-lg shadow-lg border border-gray-700 backdrop-blur-md z-50">
                   {["xlsx", "csv", "html", "pdf", "docx"].map((fmt) => (
                     <button
                       key={fmt}
-                      className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50"
+                      className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-700"
                       onClick={() => {
                         setShowExportDropdown(false);
                         handleExport(fmt as any);
@@ -280,45 +280,45 @@ const BaptismCandidatesList: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+      <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700/50">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-700/30">
               <tr>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase">
+                <th className="px-3 py-2 text-left text-xs font-semibold text-gray-300 uppercase">
                   Candidate
                 </th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase">
+                <th className="px-3 py-2 text-left text-xs font-semibold text-gray-300 uppercase">
                   Status
                 </th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase">
+                <th className="px-3 py-2 text-left text-xs font-semibold text-gray-300 uppercase">
                   Class Completed
                 </th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase">
+                <th className="px-3 py-2 text-left text-xs font-semibold text-gray-300 uppercase">
                   Baptism Date
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-gray-800 divide-y divide-gray-700">
               {(searchTerm ? filteredCandidates : candidates).map(
                 (candidate) => (
-                  <tr key={candidate.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
-                        <span className="text-blue-600 font-medium">
+                  <tr key={candidate.id} className="hover:bg-gray-700">
+                    <td className="px-3 py-2 whitespace-nowrap flex items-center">
+                      <div className="h-10 w-10 rounded-full bg-blue-900/30 flex items-center justify-center">
+                        <span className="text-blue-400 font-medium">
                           {candidate.name?.charAt(0)?.toUpperCase() ?? "?"}
                         </span>
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium">
+                        <div className="text-xs sm:text-sm font-medium text-white">
                           {candidate.name}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-400">
                           ID: {candidate.id?.slice(0, 8)}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 py-2 whitespace-nowrap">
                       <select
                         value={candidate.baptismApplicationStatus ?? ""}
                         onChange={(e) =>
@@ -327,7 +327,7 @@ const BaptismCandidatesList: React.FC = () => {
                             e.target.value as BaptismStatus
                           )
                         }
-                        className="block w-full rounded-lg border-gray-200 shadow-sm text-sm py-1.5 px-3"
+                        className="block w-full rounded-lg border-gray-700 bg-gray-900 text-gray-200 shadow-sm text-xs py-1 px-2"
                       >
                         {Object.values(BaptismStatus).map((status) => (
                           <option key={status} value={status}>
@@ -336,7 +336,7 @@ const BaptismCandidatesList: React.FC = () => {
                         ))}
                       </select>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 py-2 whitespace-nowrap">
                       <label className="inline-flex items-center">
                         <input
                           type="checkbox"
@@ -347,16 +347,16 @@ const BaptismCandidatesList: React.FC = () => {
                               e.target.checked
                             )
                           }
-                          className="h-4 w-4 text-blue-600 rounded border-gray-300"
+                          className="h-4 w-4 text-blue-400 rounded border-gray-600 bg-gray-900"
                         />
-                        <span className="ml-2 text-sm">
+                        <span className="ml-2 text-xs sm:text-sm text-gray-200">
                           {candidate.baptismClassCompleted
                             ? "Completed"
                             : "Pending"}
                         </span>
                       </label>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 py-2 whitespace-nowrap">
                       <input
                         type="date"
                         value={
@@ -370,7 +370,7 @@ const BaptismCandidatesList: React.FC = () => {
                         onChange={(e) =>
                           handleDateChange(candidate.id, e.target.value)
                         }
-                        className="block w-full rounded-lg border-gray-200 shadow-sm text-sm py-1.5 px-3"
+                        className="block w-full rounded-lg border-gray-700 bg-gray-900 text-gray-200 shadow-sm text-xs py-1 px-2"
                       />
                     </td>
                   </tr>
@@ -379,15 +379,15 @@ const BaptismCandidatesList: React.FC = () => {
             </tbody>
           </table>
         </div>
-        <div className="px-6 py-3.5 border-t border-gray-200 bg-gray-50 flex justify-between">
-          <p className="text-sm text-gray-500">
+        <div className="px-3 py-2 border-t border-gray-700 bg-gray-700/30 flex justify-between">
+          <p className="text-xs sm:text-sm text-gray-300">
             Showing{" "}
-            <span className="font-medium">
+            <span className="font-medium text-white">
               {(searchTerm ? filteredCandidates : candidates).length}
             </span>{" "}
             candidates
           </p>
-          <div className="text-xs text-gray-400">
+          <div className="text-xs text-gray-500">
             Last updated: {formatDate(new Date(), "MMM dd, yyyy h:mm a")}
           </div>
         </div>

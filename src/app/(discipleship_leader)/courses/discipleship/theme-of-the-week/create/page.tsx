@@ -14,8 +14,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { safeFetch } from "@/lib/api";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeft, Sparkles, BookOpen, Hash } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CreateThemeOfTheWeekPage = () => {
   const router = useRouter();
@@ -25,15 +26,53 @@ const CreateThemeOfTheWeekPage = () => {
     reference: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.title.trim()) {
+      newErrors.title = "Title is required";
+    } else if (formData.title.length < 3) {
+      newErrors.title = "Title must be at least 3 characters";
+    }
+
+    if (!formData.verse.trim()) {
+      newErrors.verse = "Verse is required";
+    } else if (formData.verse.length < 5) {
+      newErrors.verse = "Verse must be at least 5 characters";
+    }
+
+    if (!formData.reference.trim()) {
+      newErrors.reference = "Reference is required";
+    } else if (!/^[a-zA-Z0-9\s:]+$/.test(formData.reference)) {
+      newErrors.reference = "Please enter a valid Bible reference";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await safeFetch("/api/theme-of-the-week", {
@@ -42,7 +81,9 @@ const CreateThemeOfTheWeekPage = () => {
         body: JSON.stringify(formData),
       });
       toast.success("Theme of the Week created successfully!");
-      router.push("/discipleship"); // Redirect to discipleship dashboard or themes list
+      setTimeout(() => {
+        router.push("/discipleship");
+      }, 1500);
     } catch (err: any) {
       toast.error(`Failed to create theme: ${err.message}`);
     } finally {
@@ -51,72 +92,246 @@ const CreateThemeOfTheWeekPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-      <Card className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
-          <div className="flex items-center space-x-4">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.733 8.733 0 0 0 5.217 7.98c-.483.07-.95.148-1.404.246Zm-.002 3.118l-.354 1.185A.75.75 0 0 0 3 12.395m16.862-3.407c.483-.07.95-.148 1.404-.246a8.733 8.733 0 0 1 1.03 2.022m-.002 3.118l.354 1.185A.75.75 0 0 1 21 12.395m0 0c-.115.026-.229.053-.344.08H9.32c-.114-.027-.23-.054-.344-.08m5.018 0h-5.018m0 0a8.648 8.648 0 0 1-1.293-1.056m5.018 0a8.648 8.648 0 0 0 1.293-1.056m-7.497 6.383a.75.75 0 0 0 1.06-.057l1.972-2.185a.75.75 0 0 0 .174-.434v-4.395a.75.75 0 0 0-.32-.62L6.55 5.45m7.497 6.383a.75.75 0 0 1-1.06-.057l-1.972-2.185a.75.75 0 0 1-.174-.434v-4.395a.75.75 0 0 1 .32-.62L17.45 5.45m-4.997 6.383v4.395a.75.75 0 0 0 .32.62l2.65 1.766c.47.313.53.905.144 1.249-.176.153-.395.24-.624.24h-3.996a.75.75 0 0 1-.624-.24c-.386-.344-.326-.936.144-1.249l2.65-1.766a.75.75 0 0 0 .32-.62v-4.395Z" />
-            </svg>
-            <div>
-              <CardTitle className="text-3xl font-extrabold">Create New Theme of the Week</CardTitle>
-              <CardDescription className="text-blue-100 mt-1">Craft a powerful message to inspire your community.</CardDescription>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-950 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-2xl mx-auto"
+      >
+        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700/60 overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={() => router.back()}
+                className="flex items-center text-blue-100 hover:text-white transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Back
+              </button>
+              <div className="flex items-center space-x-2">
+                <Sparkles className="w-6 h-6" />
+                <span className="text-sm font-medium bg-blue-500/20 px-2 py-1 rounded-full">
+                  New Theme
+                </span>
+              </div>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-6">
-          <form onSubmit={handleSubmit} className="grid gap-6">
-            <div>
-              <Label htmlFor="title" className="text-lg font-semibold text-gray-700 mb-2 block">Title</Label>
-              <Input
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                placeholder="e.g., Theme of Hope"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
-              />
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <BookOpen className="w-8 h-8" />
+              </div>
+              <div>
+                <CardTitle className="text-3xl font-extrabold">
+                  Create New Theme of the Week
+                </CardTitle>
+                <CardDescription className="text-blue-100/90 mt-1">
+                  Craft a powerful message to inspire your community
+                </CardDescription>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="verse" className="text-lg font-semibold text-gray-700 mb-2 block">Verse</Label>
-              <Textarea
-                id="verse"
-                name="verse"
-                value={formData.verse}
-                onChange={handleChange}
-                required
-                rows={4}
-                placeholder="e.g., 'For God so loved the world...'"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
-              />
-            </div>
-            <div>
-              <Label htmlFor="reference" className="text-lg font-semibold text-gray-700 mb-2 block">Reference</Label>
-              <Input
-                id="reference"
-                name="reference"
-                value={formData.reference}
-                onChange={handleChange}
-                required
-                placeholder="e.g., John 3:16"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
-              />
-            </div>
-            <div className="flex justify-end gap-4 mt-6">
-              <Button type="button" variant="outline" onClick={() => router.back()} className="px-6 py-3 text-lg font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-all duration-200">
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting} className="px-6 py-3 text-lg font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 shadow-md hover:shadow-lg">
-                {isSubmitting && (
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                )}
-                Create Theme
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+          </CardHeader>
+
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="grid gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <Label
+                  htmlFor="title"
+                  className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2 block flex items-center"
+                >
+                  <Sparkles className="w-4 h-4 mr-2 text-blue-500" />
+                  Theme Title
+                </Label>
+                <Input
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g., Theme of Hope"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+                    errors.title
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
+                />
+                <AnimatePresence>
+                  {errors.title && (
+                    <motion.p
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="text-red-500 text-sm mt-1"
+                    >
+                      {errors.title}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Label
+                  htmlFor="verse"
+                  className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2 block flex items-center"
+                >
+                  <BookOpen className="w-4 h-4 mr-2 text-blue-500" />
+                  Bible Verse
+                </Label>
+                <Textarea
+                  id="verse"
+                  name="verse"
+                  value={formData.verse}
+                  onChange={handleChange}
+                  required
+                  rows={4}
+                  placeholder="e.g., 'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.'"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+                    errors.verse
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
+                />
+                <AnimatePresence>
+                  {errors.verse && (
+                    <motion.p
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="text-red-500 text-sm mt-1"
+                    >
+                      {errors.verse}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  Enter the full Bible verse text
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <Label
+                  htmlFor="reference"
+                  className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2 block flex items-center"
+                >
+                  <Hash className="w-4 h-4 mr-2 text-blue-500" />
+                  Bible Reference
+                </Label>
+                <Input
+                  id="reference"
+                  name="reference"
+                  value={formData.reference}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g., John 3:16"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+                    errors.reference
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
+                />
+                <AnimatePresence>
+                  {errors.reference && (
+                    <motion.p
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="text-red-500 text-sm mt-1"
+                    >
+                      {errors.reference}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  Format: Book Chapter:Verse (e.g., John 3:16)
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="flex flex-col sm:flex-row justify-end gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700"
+              >
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.back()}
+                  className="px-6 py-3 text-base font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 flex-1 sm:flex-none"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-6 py-3 text-base font-medium rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white transition-all duration-200 shadow-md hover:shadow-lg flex-1 sm:flex-none"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-5 w-5" />
+                      Create Theme
+                    </>
+                  )}
+                </Button>
+              </motion.div>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Help Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6 bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border border-blue-200 dark:border-blue-800/50"
+        >
+          <h3 className="font-medium text-blue-800 dark:text-blue-300 mb-3 flex items-center">
+            <Sparkles className="mr-2" />
+            Tips for Creating Effective Themes
+          </h3>
+          <ul className="space-y-2 text-sm text-blue-700 dark:text-blue-400">
+            <li className="flex items-start">
+              <div className="bg-blue-200 dark:bg-blue-700/50 rounded-full p-1 mr-2 mt-0.5">
+                <Hash className="h-3 w-3 text-blue-700 dark:text-blue-300" />
+              </div>
+              <span>
+                Choose a clear, inspiring title that reflects the theme's
+                message
+              </span>
+            </li>
+            <li className="flex items-start">
+              <div className="bg-blue-200 dark:bg-blue-700/50 rounded-full p-1 mr-2 mt-0.5">
+                <BookOpen className="h-3 w-3 text-blue-700 dark:text-blue-300" />
+              </div>
+              <span>
+                Select verses that directly support and illustrate your theme
+              </span>
+            </li>
+            <li className="flex items-start">
+              <div className="bg-blue-200 dark:bg-blue-700/50 rounded-full p-1 mr-2 mt-0.5">
+                <Sparkles className="h-3 w-3 text-blue-700 dark:text-blue-300" />
+              </div>
+              <span>
+                Keep references accurate and properly formatted for easy lookup
+              </span>
+            </li>
+          </ul>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };

@@ -1,7 +1,15 @@
 import { Fund } from "@/generated/prisma";
 import { motion } from "framer-motion";
 import { DollarSign } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Tooltip,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+} from "recharts";
 
 interface FundraisingTrackerProps {
   fundraisers: Fund[];

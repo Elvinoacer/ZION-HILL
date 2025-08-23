@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import React, { useEffect, useState, useMemo } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -9,8 +9,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+} from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,20 +20,20 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import CreateEventModal from "@/components/CreateEventModal";
-import { PlusCircle } from "lucide-react";
-import { toast } from "sonner";
+} from '@/components/ui/alert-dialog';
+import CreateEventModal from '@/components/CreateEventModal';
+import { PlusCircle, Trash2, Edit, MapPin, Calendar, Info, Search, X } from 'lucide-react';
+import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// This interface should be compatible with the Event model for the modal
 interface OutreachProgram {
   id: string;
   title: string;
   description?: string | null;
   date?: string;
   location?: string | null;
-  // Fields needed for CreateEventModal's eventToEdit prop
-  type: any; // Ideally, this would be the EventType enum
+  type: any;
   imageUrl?: string | null;
   time?: string | null;
   ministryId?: string | null;
@@ -42,35 +42,79 @@ interface OutreachProgram {
   longitude?: number | null;
 }
 
+const EmptyState = ({ onAddNew }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="text-center py-16 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200"
+  >
+    <MapPin className="mx-auto h-16 w-16 text-gray-400" />
+    <h3 className="mt-4 text-2xl font-semibold text-gray-800">No Outreach Programs Yet</h3>
+    <p className="mt-2 text-md text-gray-500">Get started by creating a new outreach initiative.</p>
+    <div className="mt-6">
+      <Button onClick={onAddNew} className="bg-blue-600 hover:bg-blue-700 shadow-lg">
+        <PlusCircle className="mr-2 h-5 w-5" />
+        Create First Program
+      </Button>
+    </div>
+  </motion.div>
+);
+
+const ProgramCard = ({ program, onEdit, onDelete }) => (
+  <motion.div
+    layout
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    exit={{ opacity: 0, scale: 0.9 }}
+    transition={{ duration: 0.3 }}
+    className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-100 overflow-hidden"
+  >
+    <div className="p-5">
+      <h3 className="font-bold text-lg text-gray-800 truncate">{program.title}</h3>
+      <p className="text-sm text-gray-500 h-10 overflow-hidden text-ellipsis">{program.description || 'No description'}</p>
+      <div className="mt-4 space-y-2 text-sm">
+        <div className="flex items-center text-gray-600">
+          <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
+          <span>{program.date ? new Date(program.date).toLocaleDateString() : 'Date TBD'}</span>
+        </div>
+        <div className="flex items-center text-gray-600">
+          <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+          <span className="truncate">{program.location || 'Location TBD'}</span>
+        </div>
+      </div>
+    </div>
+    <div className="bg-gray-50 px-5 py-3 flex justify-end gap-2">
+      <Button variant="outline" size="sm" onClick={() => onEdit(program)}>
+        <Edit className="h-4 w-4 mr-1" /> Edit
+      </Button>
+      <Button variant="destructive" size="sm" onClick={() => onDelete(program.id)}>
+        <Trash2 className="h-4 w-4 mr-1" /> Delete
+      </Button>
+    </div>
+  </motion.div>
+);
+
 const AdminOutreachPage = () => {
-  const [outreachPrograms, setOutreachPrograms] = useState<OutreachProgram[]>(
-    []
-  );
+  const [outreachPrograms, setOutreachPrograms] = useState<OutreachProgram[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const [editingProgram, setEditingProgram] = useState<OutreachProgram | null>(
-    null
-  );
+  const [editingProgram, setEditingProgram] = useState<OutreachProgram | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
-  const [programToDeleteId, setProgramToDeleteId] = useState<string | null>(
-    null
-  );
+  const [programToDeleteId, setProgramToDeleteId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchOutreachPrograms = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Assuming outreach programs are events of type 'TRIP' or 'EVENT'
-      // You might need to adjust the query parameter based on your EventType enum
-      const res = await fetch("/api/events?type=TRIP");
-      if (!res.ok) throw new Error("Failed to fetch outreach programs");
+      const res = await fetch('/api/events?type=TRIP');
+      if (!res.ok) throw new Error('Failed to fetch outreach programs');
       const data = await res.json();
       setOutreachPrograms(data);
     } catch (err: any) {
       setError(err.message);
-      toast.error("Failed to load outreach programs.");
+      toast.error('Failed to load outreach programs.');
     } finally {
       setLoading(false);
     }
@@ -79,6 +123,13 @@ const AdminOutreachPage = () => {
   useEffect(() => {
     fetchOutreachPrograms();
   }, []);
+
+  const filteredPrograms = useMemo(() =>
+    outreachPrograms.filter(p =>
+      p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.location?.toLowerCase().includes(searchTerm.toLowerCase())
+    ), [outreachPrograms, searchTerm]);
 
   const handleOpenModalForEdit = (program: OutreachProgram) => {
     setEditingProgram(program);
@@ -96,23 +147,16 @@ const AdminOutreachPage = () => {
   };
 
   const confirmDeleteProgram = async () => {
-    setError(null);
     if (!programToDeleteId) return;
-
-    const toastId = toast.loading("Deleting program...");
+    const toastId = toast.loading('Deleting program...');
     try {
-      // Use the events API endpoint for deletion
-      const res = await fetch(`/api/events/${programToDeleteId}`, {
-        method: "DELETE",
-      });
-
+      const res = await fetch(`/api/events/${programToDeleteId}`, { method: 'DELETE' });
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to delete outreach program");
+        throw new Error(errorData.error || 'Failed to delete outreach program');
       }
-
-      toast.success("Outreach program deleted successfully.", { id: toastId });
-      fetchOutreachPrograms(); // Refresh list
+      toast.success('Outreach program deleted successfully.', { id: toastId });
+      fetchOutreachPrograms();
     } catch (err: any) {
       setError(err.message);
       toast.error(`Error: ${err.message}`, { id: toastId });
@@ -124,138 +168,141 @@ const AdminOutreachPage = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">
-          Outreach Programs Management
-        </h1>
-        <p className="text-lg text-gray-600">Loading outreach programs...</p>
+      <div className="p-4 md:p-8">
+        <div className="animate-pulse space-y-6">
+          <div className="flex justify-between items-center">
+            <div className="h-10 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-10 bg-gray-200 rounded w-36"></div>
+          </div>
+          <div className="h-12 bg-gray-200 rounded w-1/2"></div>
+          <div className="rounded-lg bg-gray-200 h-96 w-full"></div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto py-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">
-          Outreach Programs Management
-        </h1>
-        <p className="text-lg text-red-500">Error: {error}</p>
+      <div className="container mx-auto py-10 px-4 text-center">
+        <h1 className="text-2xl font-bold text-red-600 mb-4">An Error Occurred</h1>
+        <p className="text-red-500 mb-6">{error}</p>
+        <Button onClick={fetchOutreachPrograms}>Try Again</Button>
       </div>
     );
   }
 
   return (
-    <>
-      <header className="flex justify-between items-center mb-10">
-        <div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            Outreach Programs Management
-          </h1>
-          <p className="text-lg text-gray-600">
-            Manage community outreach initiatives and mission trips.
-          </p>
-        </div>
-        <Button onClick={handleOpenModalForCreate}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add New Program
-        </Button>
-      </header>
+    <div className="min-h-screen bg-gray-50/50 p-4 sm:p-6 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+          <div className="mb-4 sm:mb-0">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 tracking-tight">Outreach Programs</h1>
+            <p className="text-lg text-gray-600 mt-1">Manage community initiatives and mission trips.</p>
+          </div>
+          <Button onClick={handleOpenModalForCreate} className="shadow-lg bg-blue-600 hover:bg-blue-700">
+            <PlusCircle className="mr-2 h-5 w-5" />
+            New Program
+          </Button>
+        </header>
 
-      {/* Table */}
-      <Card className="shadow-lg border border-gray-100">
-        <CardHeader className="bg-gray-50 border-b">
-          <CardTitle className="text-lg font-semibold text-gray-800">
-            Existing Outreach Programs
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {outreachPrograms.length > 0 ? (
-            <div>
-              <Table className="min-w-full">
-                <TableHeader>
-                  <TableRow className="bg-gray-100">
-                    <TableHead>Title</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead className="text-center">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {outreachPrograms.map((program) => (
-                    <TableRow
-                      key={program.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <TableCell className="font-medium text-gray-800">
-                        {program.title}
-                      </TableCell>
-                      <TableCell className="text-gray-600 text-wrap">
-                        {program.description || "N/A"}
-                      </TableCell>
-                      <TableCell>
-                        {program.date
-                          ? new Date(program.date).toLocaleDateString()
-                          : "N/A"}
-                      </TableCell>
-                      <TableCell className="text-wrap">{program.location || "N/A"}</TableCell>
-                      <TableCell className="flex justify-center gap-2 whitespace-nowrap">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleOpenModalForEdit(program)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteProgram(program.id)}
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+        <Card className="shadow-xl border-gray-200/80 rounded-2xl overflow-hidden bg-white/80 backdrop-blur-sm">
+          <CardHeader className="p-5 border-b border-gray-200/80">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <CardTitle className="text-xl font-bold text-gray-800">Program List</CardTitle>
+              <div className="relative w-full md:w-72">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Input
+                  placeholder="Search programs..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 h-11 bg-gray-50 border-gray-200 focus:bg-white focus:border-blue-500 transition"
+                />
+                {searchTerm && (
+                  <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" onClick={() => setSearchTerm('')}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
-          ) : (
-            <p className="text-gray-500 text-center py-6">
-              No outreach programs found.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent className="p-0">
+            {filteredPrograms.length > 0 ? (
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gray-50/50">
+                        <TableHead className="w-[25%]">Title</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead className="w-[120px]">Date</TableHead>
+                        <TableHead className="w-[180px]">Location</TableHead>
+                        <TableHead className="text-center w-[150px]">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <AnimatePresence>
+                        {filteredPrograms.map((program) => (
+                          <motion.tr
+                            layout
+                            key={program.id}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="hover:bg-gray-50/70 transition-colors"
+                          >
+                            <TableCell className="font-semibold text-gray-800">{program.title}</TableCell>
+                            <TableCell className="text-gray-600 text-sm">{program.description || 'N/A'}</TableCell>
+                            <TableCell>{program.date ? new Date(program.date).toLocaleDateString() : 'N/A'}</TableCell>
+                            <TableCell>{program.location || 'N/A'}</TableCell>
+                            <TableCell className="flex justify-center gap-2">
+                              <Button variant="outline" size="sm" onClick={() => handleOpenModalForEdit(program)}><Edit className="h-4 w-4 mr-1"/>Edit</Button>
+                              <Button variant="destructive" size="sm" onClick={() => handleDeleteProgram(program.id)}><Trash2 className="h-4 w-4 mr-1"/>Delete</Button>
+                            </TableCell>
+                          </motion.tr>
+                        ))}
+                      </AnimatePresence>
+                    </TableBody>
+                  </Table>
+                </div>
+                {/* Mobile Card View */}
+                <div className="md:hidden p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <AnimatePresence>
+                    {filteredPrograms.map((program) => (
+                      <ProgramCard key={program.id} program={program} onEdit={handleOpenModalForEdit} onDelete={handleDeleteProgram} />
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </>
+            ) : (
+              <EmptyState onAddNew={handleOpenModalForCreate} />
+            )}
+          </CardContent>
+        </Card>
 
-      <CreateEventModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onEventCreated={fetchOutreachPrograms}
-        eventToEdit={editingProgram || undefined}
-      />
+        <CreateEventModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onEventCreated={fetchOutreachPrograms}
+          eventToEdit={editingProgram || undefined}
+        />
 
-      <AlertDialog
-        open={showConfirmDeleteDialog}
-        onOpenChange={setShowConfirmDeleteDialog}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              outreach program.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteProgram}>
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+        <AlertDialog open={showConfirmDeleteDialog} onOpenChange={setShowConfirmDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the outreach program and all associated data.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDeleteProgram} className="bg-red-600 hover:bg-red-700">Continue</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </div>
   );
 };
 

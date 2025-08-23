@@ -1,18 +1,20 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Loader2, Edit, User, Calendar as CalendarIcon, Users, PlusCircle } from "lucide-react";
-import Image from "next/image";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import CreateEventModal from "@/components/CreateEventModal";
-import Link from "next/link";
-import AddMemberModal from "@/components/AddMemberModal";
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Loader2, Edit, User, Calendar as CalendarIcon, Users, PlusCircle, ArrowLeft } from 'lucide-react';
+import Image from 'next/image';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import CreateEventModal from '@/components/CreateEventModal';
+import Link from 'next/link';
+import AddMemberModal from '@/components/AddMemberModal';
+import { motion } from 'framer-motion';
 
-interface User {
+// Interfaces
+interface UserProfile {
   id: string;
   name: string | null;
   image: string | null;
@@ -20,7 +22,7 @@ interface User {
 }
 
 interface MinistryMember {
-  user: User;
+  user: UserProfile;
 }
 
 interface Event {
@@ -34,12 +36,13 @@ interface Ministry {
   id: string;
   name: string;
   description?: string;
-  leader: User;
+  leader: UserProfile;
   photo?: string;
   members: MinistryMember[];
   events: Event[];
 }
 
+// Main Component
 const MinistryDetailPage = () => {
   const params = useParams();
   const id = params.id as string;
@@ -56,9 +59,7 @@ const MinistryDetailPage = () => {
     try {
       setLoading(true);
       const res = await fetch(`/api/ministry?id=${id}`);
-      if (!res.ok) {
-        throw new Error("Failed to fetch ministry details");
-      }
+      if (!res.ok) throw new Error("Failed to fetch ministry details");
       const data = await res.json();
       setMinistry(data);
     } catch (err: any) {
@@ -69,27 +70,15 @@ const MinistryDetailPage = () => {
   };
 
   useEffect(() => {
-    if (id) {
-      fetchMinistryDetails();
-    }
+    if (id) fetchMinistryDetails();
   }, [id]);
 
-  const existingEventDates = ministry?.events.map((event) => new Date(event.date)) || [];
-
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-16 w-16 animate-spin text-gray-500" />
-      </div>
-    );
+    return <div className="flex items-center justify-center h-screen"><Loader2 className="h-16 w-16 animate-spin text-blue-600" /></div>;
   }
 
-  if (error) {
-    return <p className="text-red-500">Error: {error}</p>;
-  }
-
-  if (!ministry) {
-    return <p>Ministry not found.</p>;
+  if (error || !ministry) {
+    return <div className="text-center py-10 text-red-500">Error: {error || 'Ministry not found.'}</div>;
   }
 
   const handleEditEventClick = (event: Event) => {
@@ -97,176 +86,66 @@ const MinistryDetailPage = () => {
     setIsCreateEventModalOpen(true);
   };
 
-  const handleCloseCreateEventModal = () => {
-    setIsCreateEventModalOpen(false);
-    setEventToEdit(undefined); // Clear eventToEdit when modal closes
-  };
-
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-start mb-8">
-        <div>
-          <h1 className="text-4xl font-bold text-gray-800">{ministry.name}</h1>
-          <p className="text-lg text-gray-600 mt-2">{ministry.description}</p>
-        </div>
-        <Button variant="outline">
-          <Edit className="mr-2 h-4 w-4" />
-          Edit Ministry
-        </Button>
-      </div>
+    <div className="min-h-screen bg-gray-50/50 p-4 sm:p-6 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+          <Button variant="outline" onClick={() => router.back()} className="mb-6">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Ministries
+          </Button>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Ministry Details</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {ministry.photo && (
-                <div className="mb-4">
-                  <Image
-                    src={ministry.photo}
-                    alt={ministry.name}
-                    width={400}
-                    height={200}
-                    className="rounded-md object-cover"
-                  />
-                </div>
-              )}
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <User className="h-5 w-5 mr-2 text-gray-500" />
-                  <span>Leader: {ministry.leader.name}</span>
-                </div>
-                <div className="flex items-center">
-                  <Users className="h-5 w-5 mr-2 text-gray-500" />
-                  <span>Members: {ministry.members.length}</span>
-                </div>
-                <div className="flex items-center">
-                  <CalendarIcon className="h-5 w-5 mr-2 text-gray-500" />
-                  <span>Events: {ministry.events.length}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="md:col-span-2">
-          <Tabs defaultValue="members">
-            <TabsList>
-              <TabsTrigger value="members">Members</TabsTrigger>
-              <TabsTrigger value="events">Events</TabsTrigger>
-            </TabsList>
-            <TabsContent value="members">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Members</CardTitle>
-                  <Button size="sm" onClick={() => setIsAddMemberModalOpen(true)}>
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Add Member
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {ministry.members.map((member) => (
-                        <TableRow key={member.user.id}>
-                          <TableCell className="font-medium flex items-center">
-                            <Image
-                              src={member.user.image || "/images/default-avatar.png"}
-                              alt={member.user.name || "user"}
-                              width={32}
-                              height={32}
-                              className="rounded-full mr-3"
-                            />
-                            {member.user.name}
-                          </TableCell>
-                          <TableCell>{member.user.email}</TableCell>
-                          <TableCell className="text-right">
-                            <Link href={`/members/${member.user.id}`}>
-                              <Button variant="outline" size="sm">
-                                View
-                              </Button>
-                            </Link>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="events">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Events</CardTitle>
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      setEventToEdit(undefined); // Ensure no event is pre-filled for new creation
-                      setIsCreateEventModalOpen(true);
-                    }}
-                  >
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Create Event
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Location</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {ministry.events.map((event) => (
-                        <TableRow key={event.id}>
-                          <TableCell className="font-medium">{event.title}</TableCell>
-                          <TableCell>{new Date(event.date).toLocaleDateString()}</TableCell>
-                          <TableCell>{event.location}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end space-x-2">
-                              <Button
-                                onClick={() =>
-                                  router.push(`/events/${event.id}`)
-                                }
-                                variant="outline"
-                                size="sm"
-                              >
-                                View
-                              </Button>
-                              <Button
-                                onClick={() => handleEditEventClick(event)}
-                                variant="outline"
-                                size="sm"
-                              >
-                                Edit
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+          <header className="relative rounded-2xl overflow-hidden mb-8 border border-gray-200/80 shadow-lg">
+            <Image
+              src={ministry.photo || '/images/hero.png'}
+              alt={ministry.name}
+              width={1200}
+              height={400}
+              className="w-full h-48 md:h-64 object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/10" />
+            <div className="absolute bottom-0 left-0 p-6">
+              <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">{ministry.name}</h1>
+              <p className="text-lg text-gray-200 mt-2 max-w-3xl">{ministry.description}</p>
+            </div>
+          </header>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <motion.div className="lg:col-span-1 space-y-8" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
+            <InfoCard ministry={ministry} />
+          </motion.div>
+
+          <motion.div className="lg:col-span-2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}>
+            <Tabs defaultValue="members" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 bg-gray-100/80 rounded-lg">
+                <TabsTrigger value="members">Members</TabsTrigger>
+                <TabsTrigger value="events">Events</TabsTrigger>
+              </TabsList>
+              <TabsContent value="members">
+                <MembersSection 
+                  members={ministry.members} 
+                  onAddMember={() => setIsAddMemberModalOpen(true)} 
+                />
+              </TabsContent>
+              <TabsContent value="events">
+                <EventsSection 
+                  events={ministry.events} 
+                  onCreateEvent={() => {
+                    setEventToEdit(undefined);
+                    setIsCreateEventModalOpen(true);
+                  }}
+                  onEditEvent={handleEditEventClick}
+                />
+              </TabsContent>
+            </Tabs>
+          </motion.div>
         </div>
       </div>
 
       <CreateEventModal
         isOpen={isCreateEventModalOpen}
-        onClose={handleCloseCreateEventModal}
+        onClose={() => setIsCreateEventModalOpen(false)}
         ministryId={ministry?.id}
         onEventCreated={fetchMinistryDetails}
         eventToEdit={eventToEdit}
@@ -281,5 +160,138 @@ const MinistryDetailPage = () => {
     </div>
   );
 };
+
+// InfoCard Component
+const InfoCard = ({ ministry }: { ministry: Ministry }) => (
+  <Card className="shadow-xl border-gray-200/80 rounded-2xl">
+    <CardHeader><CardTitle>Ministry Details</CardTitle></CardHeader>
+    <CardContent className="space-y-4">
+      <InfoRow icon={User} label="Leader" value={ministry.leader.name} />
+      <InfoRow icon={Users} label="Members" value={`${ministry.members.length} members`} />
+      <InfoRow icon={CalendarIcon} label="Events" value={`${ministry.events.length} upcoming`} />
+      <Button variant="outline" className="w-full mt-4"><Edit className="mr-2 h-4 w-4" /> Edit Details</Button>
+    </CardContent>
+  </Card>
+);
+
+const InfoRow = ({ icon: Icon, label, value }) => (
+  <div className="flex items-center text-md">
+    <Icon className="h-5 w-5 mr-3 text-gray-500" />
+    <span className="font-semibold text-gray-700">{label}:</span>
+    <span className="ml-2 text-gray-900">{value}</span>
+  </div>
+);
+
+// MembersSection Component
+const MembersSection = ({ members, onAddMember }) => (
+  <Card className="shadow-xl border-gray-200/80 rounded-2xl">
+    <CardHeader className="flex flex-row items-center justify-between">
+      <CardTitle>Ministry Members</CardTitle>
+      <Button size="sm" onClick={onAddMember}><PlusCircle className="mr-2 h-4 w-4" /> Add Member</Button>
+    </CardHeader>
+    <CardContent>
+      {/* Responsive Layout */}
+      <div className="md:hidden space-y-4">
+        {members.map(member => <MemberCard key={member.user.id} member={member} />)}
+      </div>
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {members.map(member => <MemberRow key={member.user.id} member={member} />)}
+          </TableBody>
+        </Table>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const MemberCard = ({ member }) => (
+    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center gap-3">
+            <Image src={member.user.image || '/images/default-avatar.png'} alt={member.user.name || 'user'} width={40} height={40} className="rounded-full" />
+            <div>
+                <p className="font-semibold">{member.user.name}</p>
+                <p className="text-sm text-gray-600">{member.user.email}</p>
+            </div>
+        </div>
+        <Link href={`/members/${member.user.id}`}><Button variant="outline" size="sm">View</Button></Link>
+    </div>
+);
+
+const MemberRow = ({ member }) => (
+    <TableRow>
+        <TableCell className="font-medium flex items-center">
+            <Image src={member.user.image || '/images/default-avatar.png'} alt={member.user.name || 'user'} width={32} height={32} className="rounded-full mr-3" />
+            {member.user.name}
+        </TableCell>
+        <TableCell>{member.user.email}</TableCell>
+        <TableCell className="text-right">
+            <Link href={`/members/${member.user.id}`}><Button variant="outline" size="sm">View</Button></Link>
+        </TableCell>
+    </TableRow>
+);
+
+// EventsSection Component
+const EventsSection = ({ events, onCreateEvent, onEditEvent }) => {
+  const router = useRouter();
+  return (
+    <Card className="shadow-xl border-gray-200/80 rounded-2xl">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Upcoming Events</CardTitle>
+        <Button size="sm" onClick={onCreateEvent}><PlusCircle className="mr-2 h-4 w-4" /> Create Event</Button>
+      </CardHeader>
+      <CardContent>
+        <div className="md:hidden space-y-4">
+            {events.map(event => <EventCard key={event.id} event={event} onEdit={onEditEvent} onView={() => router.push(`/events/${event.id}`)} />)}
+        </div>
+        <div className="hidden md:block">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Location</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {events.map(event => <EventRow key={event.id} event={event} onEdit={onEditEvent} onView={() => router.push(`/events/${event.id}`)} />)}
+                </TableBody>
+            </Table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const EventCard = ({ event, onEdit, onView }) => (
+    <div className="p-4 bg-gray-50 rounded-lg">
+        <h3 className="font-semibold">{event.title}</h3>
+        <p className="text-sm text-gray-600">{new Date(event.date).toLocaleDateString()} - {event.location}</p>
+        <div className="mt-3 flex justify-end gap-2">
+            <Button variant="outline" size="sm" onClick={onView}>View</Button>
+            <Button variant="outline" size="sm" onClick={() => onEdit(event)}>Edit</Button>
+        </div>
+    </div>
+);
+
+const EventRow = ({ event, onEdit, onView }) => (
+    <TableRow>
+        <TableCell className="font-medium">{event.title}</TableCell>
+        <TableCell>{new Date(event.date).toLocaleDateString()}</TableCell>
+        <TableCell>{event.location}</TableCell>
+        <TableCell className="text-right space-x-2">
+            <Button variant="outline" size="sm" onClick={onView}>View</Button>
+            <Button variant="outline" size="sm" onClick={() => onEdit(event)}>Edit</Button>
+        </TableCell>
+    </TableRow>
+);
 
 export default MinistryDetailPage;

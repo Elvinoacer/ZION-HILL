@@ -1,10 +1,22 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { safeFetch } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
+import {
+  Calendar,
+  User,
+  Tag,
+  ArrowLeft,
+  Share2,
+  Twitter,
+  Facebook,
+  Linkedin,
+} from "lucide-react";
+import Image from "next/image";
 
 interface BlogPost {
   id: string;
@@ -17,8 +29,22 @@ interface BlogPost {
   coverImage?: string;
 }
 
+interface InfoItemProps {
+  icon: React.ComponentType<{ className?: string; size?: number }>;
+  text: string;
+}
+
+interface SocialShareIconProps {
+  icon: React.ComponentType<{ className?: string; size?: number }>;
+}
+
+interface ErrorStateProps {
+  message: string;
+}
+
 const BlogPostPage = () => {
   const { id } = useParams();
+  const router = useRouter();
   const [blogPost, setBlogPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,217 +65,146 @@ const BlogPostPage = () => {
     }
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="space-y-6">
-          <Skeleton className="h-12 w-3/4 rounded-lg" />
-          <Skeleton className="h-6 w-1/2 rounded-lg" />
-          <div className="flex gap-2">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-8 w-20 rounded-full" />
-            ))}
-          </div>
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-4 w-full rounded-lg" />
-            ))}
-            <Skeleton className="h-4 w-3/4 rounded-lg" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-red-500"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-lg font-medium text-red-800">
-                Error loading post
-              </h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{error}</p>
-              </div>
-              <div className="mt-4">
-                <button
-                  onClick={() => window.location.reload()}
-                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                >
-                  Try again
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!blogPost) {
-    return (
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="text-center">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <h3 className="mt-2 text-lg font-medium text-gray-900">
-            Post not found
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            The blog post you're looking for doesn't exist or may have been
-            removed.
-          </p>
-          <div className="mt-6">
-            <a
-              href="/blog"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Browse all posts
-            </a>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingState />;
+  if (error) return <ErrorState message={error} />;
+  if (!blogPost) return <NotFoundState />;
 
   return (
-    <div className="bg-gradient-to-b from-gray-50 to-white">
-      <article className="container mx-auto px-4 py-16 max-w-4xl">
-        {/* Post Header */}
-        <header className="mb-12 text-center">
-          {blogPost.tags && blogPost.tags.length > 0 && (
-            <div className="flex justify-center flex-wrap gap-2 mb-4">
-              {blogPost.tags.map((tag) => (
-                <Badge key={tag}>
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          )}
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-            {blogPost.title}
-          </h1>
-          {(blogPost.publishedDate || blogPost.author) && (
-            <div className="flex items-center justify-center space-x-4 text-gray-500">
-              {blogPost.author && (
-                <span className="flex items-center">
-                  <svg
-                    className="h-5 w-5 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
-                  {blogPost.author}
-                </span>
-              )}
-              {blogPost.publishedDate && (
-                <span className="flex items-center">
-                  <svg
-                    className="h-5 w-5 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  {new Date(blogPost.publishedDate).toLocaleDateString(
-                    "en-US",
-                    {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    }
-                  )}
-                </span>
-              )}
-            </div>
-          )}
-        </header>
-
-        {/* Cover Image */}
+    <div className="bg-white text-gray-800 min-h-screen">
+      <motion.article
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
         {blogPost.coverImage && (
-          <div className="mb-12 rounded-xl overflow-hidden shadow-lg">
-            <img
+          <header className="relative h-56 sm:h-64 md:h-80 lg:h-96">
+            <Image
               src={blogPost.coverImage}
               alt={blogPost.title}
-              className="w-full h-auto object-cover"
+              fill
+              className="z-0 object-cover"
             />
-          </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20" />
+            <div className="absolute bottom-0 left-0 p-4 sm:p-6 md:p-8 lg:p-12 z-10 w-full">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                {blogPost.title}
+              </h1>
+            </div>
+          </header>
         )}
 
-        {/* Post Content */}
-        <div className="prose prose-lg md:prose-xl max-w-none text-gray-700">
-          <div dangerouslySetInnerHTML={{ __html: blogPost.content }} />
-        </div>
+        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-4xl">
+          {!blogPost.coverImage && (
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 sm:mb-8 text-center">
+              {blogPost.title}
+            </h1>
+          )}
 
-        {/* Post Footer */}
-        <footer className="mt-16 pt-8 border-t border-gray-200">
-          <div className="flex justify-center">
-            <a
-              href="/blog"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-            >
-              <svg
-                className="-ml-1 mr-3 h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Back to all posts
-            </a>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-x-6 sm:gap-y-4 mb-6 sm:mb-8 text-gray-500 border-y py-3 sm:py-4">
+            {blogPost.author && <InfoItem icon={User} text={blogPost.author} />}
+            {blogPost.publishedDate && (
+              <InfoItem
+                icon={Calendar}
+                text={new Date(blogPost.publishedDate).toLocaleDateString(
+                  "en-US",
+                  { year: "numeric", month: "long", day: "numeric" }
+                )}
+              />
+            )}
+            {blogPost.tags?.length > 0 && (
+              <InfoItem icon={Tag} text={blogPost.tags.join(", ")} />
+            )}
           </div>
-        </footer>
-      </article>
+
+          <div className="prose prose-base sm:prose-lg md:prose-xl max-w-none mx-auto text-gray-700 leading-relaxed">
+            <div dangerouslySetInnerHTML={{ __html: blogPost.content }} />
+          </div>
+
+          <footer className="mt-12 sm:mt-16 pt-6 sm:pt-8 border-t-2 border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+            <button
+              onClick={() => router.push("/blog")}
+              className="flex items-center gap-1.5 sm:gap-2 text-blue-600 font-semibold hover:underline text-sm sm:text-base"
+            >
+              <ArrowLeft size={18} /> Back to Blog
+            </button>
+            <div className="flex items-center gap-3 sm:gap-4">
+              <span className="font-semibold text-sm sm:text-base">Share:</span>
+              <div className="flex gap-1.5 sm:gap-2">
+                <SocialShareIcon icon={Twitter} />
+                <SocialShareIcon icon={Facebook} />
+                <SocialShareIcon icon={Linkedin} />
+              </div>
+            </div>
+          </footer>
+        </div>
+      </motion.article>
     </div>
   );
 };
+
+// Helper Components
+const InfoItem = ({ icon: Icon, text }: InfoItemProps) => (
+  <div className="flex items-center gap-1.5">
+    <Icon className="h-4 w-4 text-gray-400" />
+    <span className="text-sm">{text}</span>
+  </div>
+);
+
+const SocialShareIcon = ({ icon: Icon }: SocialShareIconProps) => (
+  <button className="p-1.5 sm:p-2 rounded-full bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 transition-colors">
+    <Icon size={18} />
+  </button>
+);
+
+// State Components
+const LoadingState = () => (
+  <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-4xl animate-pulse">
+    <Skeleton className="h-64 sm:h-80 md:h-96 w-full rounded-lg mb-8 sm:mb-12" />
+    <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+      <Skeleton className="h-8 w-3/4" />
+      <Skeleton className="h-5 w-1/2" />
+    </div>
+    <div className="space-y-2 sm:space-y-3">
+      {[...Array(8)].map((_, i) => (
+        <Skeleton
+          key={i}
+          className={`h-4 ${i % 3 === 0 ? "w-5/6" : "w-full"}`}
+        />
+      ))}
+    </div>
+  </div>
+);
+
+const ErrorState = ({ message }: ErrorStateProps) => (
+  <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
+    <h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-3 sm:mb-4">
+      Failed to Load Post
+    </h2>
+    <p className="text-red-500 mb-4 sm:mb-6 text-sm sm:text-base">{message}</p>
+    <button
+      onClick={() => window.location.reload()}
+      className="px-5 py-2 sm:px-6 sm:py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm sm:text-base"
+    >
+      Try Again
+    </button>
+  </div>
+);
+
+const NotFoundState = () => (
+  <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
+    <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">
+      Post Not Found
+    </h2>
+    <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
+      The post you are looking for does not exist or has been moved.
+    </p>
+    <button
+      onClick={() => (window.location.href = "/blog")}
+      className="px-5 py-2 sm:px-6 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base"
+    >
+      Back to Blog
+    </button>
+  </div>
+);
 
 export default BlogPostPage;

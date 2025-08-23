@@ -1,7 +1,6 @@
 "use client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Icons } from "@/components/icons";
-
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useBudgetStore } from "@/store/budgetStore";
 import {
@@ -19,8 +18,31 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
+import {
+  DollarSign,
+  TrendingUp,
+  PieChart as PieChartIcon,
+  BarChart3,
+  Calendar,
+  Download,
+  Filter,
+  Search,
+  ChevronDown,
+  Eye,
+  Edit3,
+  Save,
+  X,
+  AlertCircle,
+  CheckCircle2,
+  Wallet,
+  Target,
+  CreditCard,
+  Building,
+  Users,
+  Sparkles,
+} from "lucide-react";
 
 type BudgetItem = {
   id: string;
@@ -38,25 +60,31 @@ export const formatCurrency = (n: number) =>
   }).format(n ?? 0);
 
 const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#8884d8",
-  "#82ca9d",
+  "#3B82F6", // Blue-500
+  "#10B981", // Emerald-500
+  "#F59E0B", // Amber-500
+  "#EF4444", // Red-500
+  "#8B5CF6", // Violet-500
+  "#EC4899", // Pink-500
+  "#06B6D4", // Cyan-500
+  "#84CC16", // Lime-500
 ];
 
-const ChartCard: React.FC<{ title: string; children: React.ReactNode }> = ({
-  title,
-  children,
-}) => (
+const ChartCard: React.FC<{
+  title: string;
+  children: React.ReactNode;
+  icon: React.ReactNode;
+}> = ({ title, children, icon }) => (
   <motion.div
-    className="bg-white shadow-md rounded-lg p-6"
+    className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
   >
-    <h3 className="text-xl font-semibold text-gray-700 mb-4">{title}</h3>
+    <div className="flex items-center gap-3 mb-6">
+      <div className="p-2 bg-blue-100 rounded-lg text-blue-600">{icon}</div>
+      <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
+    </div>
     {children}
   </motion.div>
 );
@@ -79,13 +107,15 @@ export default function BudgetsContent(): JSX.Element {
     annualBudgetLimit ?? 0
   );
   const [editingAnnual, setEditingAnnual] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");
   const editingValuesRef = useRef<Record<string, number>>({});
   const editingTimersRef = useRef<
     Record<string, ReturnType<typeof setTimeout>>
   >({});
   const editingSetRef = useRef<Set<string>>(new Set());
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
-
   const limitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const getCurrentFiscalYear = useCallback(() => new Date().getFullYear(), []);
@@ -146,6 +176,24 @@ export default function BudgetsContent(): JSX.Element {
       return changed ? merged : prev;
     });
   }, [ministryBudgets]);
+
+  // Filter budgets based on search and filters
+  const filteredBudgets = displayBudgets.filter((budget) => {
+    const matchesSearch =
+      searchQuery === "" ||
+      budget.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      (statusFilter === "under" &&
+        budget.spent / budget.allocatedBudget < 0.8) ||
+      (statusFilter === "over" &&
+        budget.spent / budget.allocatedBudget >= 0.8) ||
+      (statusFilter === "critical" &&
+        budget.spent / budget.allocatedBudget >= 1);
+
+    return matchesSearch && matchesStatus;
+  });
 
   // Poll for spent updates
   useEffect(() => {
@@ -308,7 +356,7 @@ export default function BudgetsContent(): JSX.Element {
     0
   );
 
-  const budgetVsActualData = displayBudgets.map((m) => ({
+  const budgetVsActualData = filteredBudgets.map((m) => ({
     name: m.name,
     allocated: m.allocatedBudget,
     spent: m.spent,
@@ -328,14 +376,27 @@ export default function BudgetsContent(): JSX.Element {
       totalSpent: monthlySpending[monthYear],
     }));
 
-  const budgetAllocationData = displayBudgets.map((m) => ({
+  const budgetAllocationData = filteredBudgets.map((m) => ({
     name: m.name,
     value: m.allocatedBudget,
   }));
 
+  const getUtilizationColor = (utilization: number) => {
+    if (utilization >= 1) return "text-red-600 bg-red-100";
+    if (utilization >= 0.8) return "text-amber-600 bg-amber-100";
+    if (utilization >= 0.6) return "text-blue-600 bg-blue-100";
+    return "text-green-600 bg-green-100";
+  };
+
+  const getUtilizationIcon = (utilization: number) => {
+    if (utilization >= 1) return <AlertCircle className="h-4 w-4" />;
+    if (utilization >= 0.8) return <AlertCircle className="h-4 w-4" />;
+    return <CheckCircle2 className="h-4 w-4" />;
+  };
+
   if (loading && displayBudgets.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center space-y-8">
             <motion.div
@@ -344,7 +405,9 @@ export default function BudgetsContent(): JSX.Element {
               transition={{ duration: 0.6 }}
               className="flex justify-center"
             >
-              <Icons.finance className="h-16 w-16 text-blue-600" />
+              <div className="h-16 w-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <Wallet className="h-8 w-8 text-white" />
+              </div>
             </motion.div>
             <motion.h1
               initial={{ opacity: 0 }}
@@ -378,13 +441,13 @@ export default function BudgetsContent(): JSX.Element {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="min-h-screen bg-gradient-to-br from-gray-50 to-red-50 py-12 px-4 sm:px-6 lg:px-8"
+        className="min-h-screen bg-gradient-to-br from-slate-50 to-red-50/30 py-12 px-4 sm:px-6 lg:px-8"
       >
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div className="bg-red-600 p-4">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Icons.warning className="h-6 w-6" />
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-red-200">
+            <div className="bg-red-500 p-6">
+              <h2 className="text-xl font-bold text-white flex items-center gap-3">
+                <AlertCircle className="h-6 w-6" />
                 Financial Data Error
               </h2>
             </div>
@@ -394,8 +457,9 @@ export default function BudgetsContent(): JSX.Element {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => window.location.reload()}
-                className="px-6 py-3 bg-red-600 text-white font-medium rounded-lg shadow-md hover:bg-red-700 transition-colors"
+                className="px-6 py-3 bg-red-500 text-white font-medium rounded-lg shadow-md hover:bg-red-600 transition-colors flex items-center mx-auto"
               >
+                <RefreshCw className="h-4 w-4 mr-2" />
                 Retry Loading Data
               </motion.button>
             </div>
@@ -409,9 +473,9 @@ export default function BudgetsContent(): JSX.Element {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 py-8 px-4 sm:px-6 lg:px-8"
     >
-      <div className="max-w-7xl mx-auto space-y-12">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Section */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
@@ -419,12 +483,17 @@ export default function BudgetsContent(): JSX.Element {
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-700">
+          <div className="inline-flex items-center justify-center p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4">
+            <Wallet className="h-6 w-6 text-white" />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
             Ministry Financial Oversight
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Comprehensive budget management and spending analytics for{" "}
-            {getCurrentFiscalYear()}
+            <span className="font-semibold text-blue-600">
+              {getCurrentFiscalYear()}
+            </span>
           </p>
         </motion.div>
 
@@ -433,13 +502,13 @@ export default function BudgetsContent(): JSX.Element {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100"
+          className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
         >
-          <div className="p-6 md:p-8">
+          <div className="p-6 md:p-8 bg-gradient-to-r from-blue-50 to-indigo-50">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                  <Icons.budget className="h-8 w-8 text-blue-600" />
+                  <Target className="h-8 w-8 text-blue-600" />
                   Annual Church Budget Limit
                 </h2>
                 <p className="text-gray-600 mt-2">
@@ -468,23 +537,146 @@ export default function BudgetsContent(): JSX.Element {
           </div>
         </motion.div>
 
+        {/* Summary Cards */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        >
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Allocated
+                </p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {formatCurrency(totalAllocated)}
+                </p>
+              </div>
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <CreditCard className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Spent</p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {formatCurrency(totalSpent)}
+                </p>
+              </div>
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <DollarSign className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Remaining
+                </p>
+                <p
+                  className={`text-2xl font-bold ${
+                    totalRemaining >= 0 ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {formatCurrency(Math.abs(totalRemaining))}
+                </p>
+              </div>
+              <div
+                className={`p-3 rounded-lg ${
+                  totalRemaining >= 0 ? "bg-green-100" : "bg-red-100"
+                }`}
+              >
+                {totalRemaining >= 0 ? (
+                  <CheckCircle2 className="h-6 w-6 text-green-600" />
+                ) : (
+                  <AlertCircle className="h-6 w-6 text-red-600" />
+                )}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Ministry Budget Table */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100"
+          className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
         >
           <div className="p-6 md:p-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                <Icons.ministry className="h-8 w-8 text-indigo-600" />
-                Ministry Budget Allocations
-              </h2>
-              <div className="bg-blue-50 text-blue-800 px-4 py-2 rounded-lg font-medium">
-                Fiscal Year: {getCurrentFiscalYear()}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                  <Building className="h-8 w-8 text-indigo-600" />
+                  Ministry Budget Allocations
+                </h2>
+                <p className="text-gray-600 mt-2">
+                  Manage and track budget allocations across all ministries
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <input
+                    type="text"
+                    placeholder="Search ministries..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filters
+                  <ChevronDown
+                    className={`h-4 w-4 ml-2 transition-transform ${
+                      showFilters ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
               </div>
             </div>
+
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Status
+                      </label>
+                      <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="all">All Status</option>
+                        <option value="under">Under Budget</option>
+                        <option value="over">Approaching Limit</option>
+                        <option value="critical">Over Budget</option>
+                      </select>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -505,10 +697,13 @@ export default function BudgetsContent(): JSX.Element {
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Utilization
                     </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {displayBudgets.map((ministry) => {
+                  {filteredBudgets.map((ministry) => {
                     const remaining =
                       (ministry.allocatedBudget || 0) - (ministry.spent || 0);
                     const utilization = ministry.allocatedBudget
@@ -519,14 +714,14 @@ export default function BudgetsContent(): JSX.Element {
                       <motion.tr
                         key={ministry.id}
                         whileHover={{
-                          backgroundColor: "rgba(59, 130, 246, 0.05)",
+                          backgroundColor: "rgba(59, 130, 246, 0.03)",
                         }}
                         className="transition-colors"
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                              <Icons.ministry className="h-5 w-5 text-indigo-600" />
+                              <Users className="h-5 w-5 text-indigo-600" />
                             </div>
                             <div className="ml-4">
                               <div className="text-lg font-medium text-gray-900">
@@ -585,9 +780,24 @@ export default function BudgetsContent(): JSX.Element {
                                 }}
                               ></div>
                             </div>
-                            <span className="text-sm font-medium text-gray-700">
+                            <span
+                              className={`text-sm font-medium px-2 py-1 rounded-full ${getUtilizationColor(
+                                utilization
+                              )} flex items-center gap-1`}
+                            >
+                              {getUtilizationIcon(utilization)}
                               {(utilization * 100).toFixed(1)}%
                             </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <button className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                              <Edit3 className="h-4 w-4" />
+                            </button>
                           </div>
                         </td>
                       </motion.tr>
@@ -597,54 +807,26 @@ export default function BudgetsContent(): JSX.Element {
               </table>
             </div>
 
-            {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              <motion.div
-                whileHover={{ y: -5 }}
-                className="bg-blue-50 p-6 rounded-xl border border-blue-100"
-              >
-                <h3 className="text-lg font-medium text-blue-800 mb-2">
-                  Total Allocated
-                </h3>
-                <p className="text-3xl font-bold text-blue-600">
-                  {formatCurrency(totalAllocated)}
-                </p>
-              </motion.div>
-              <motion.div
-                whileHover={{ y: -5 }}
-                className="bg-purple-50 p-6 rounded-xl border border-purple-100"
-              >
-                <h3 className="text-lg font-medium text-purple-800 mb-2">
-                  Total Spent
-                </h3>
-                <p className="text-3xl font-bold text-purple-600">
-                  {formatCurrency(totalSpent)}
-                </p>
-              </motion.div>
-              <motion.div
-                whileHover={{ y: -5 }}
-                className={`p-6 rounded-xl border ${
-                  totalRemaining >= 0
-                    ? "bg-green-50 border-green-100"
-                    : "bg-red-50 border-red-100"
-                }`}
-              >
-                <h3
-                  className={`text-lg font-medium ${
-                    totalRemaining >= 0 ? "text-green-800" : "text-red-800"
-                  } mb-2`}
+            <AnimatePresence>
+              {filteredBudgets.length === 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-center py-12"
                 >
-                  {totalRemaining >= 0 ? "Total Remaining" : "Over Budget"}
-                </h3>
-                <p
-                  className={`text-3xl font-bold ${
-                    totalRemaining >= 0 ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {formatCurrency(Math.abs(totalRemaining))}
-                </p>
-              </motion.div>
-            </div>
+                  <div className="bg-gray-50 rounded-2xl p-8 border-2 border-dashed border-gray-300">
+                    <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-700 mb-2">
+                      No ministries match your criteria
+                    </h3>
+                    <p className="text-gray-500">
+                      Try adjusting your search or filters
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </motion.div>
 
@@ -656,11 +838,10 @@ export default function BudgetsContent(): JSX.Element {
           className="grid grid-cols-1 lg:grid-cols-2 gap-8"
         >
           {/* Budget vs Actual Chart */}
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Icons.chartBar className="h-6 w-6 text-blue-600" />
-              Budget vs. Actual Spending
-            </h3>
+          <ChartCard
+            title="Budget vs. Actual Spending"
+            icon={<BarChart3 className="h-5 w-5" />}
+          >
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={budgetVsActualData}>
@@ -684,31 +865,24 @@ export default function BudgetsContent(): JSX.Element {
                     dataKey="allocated"
                     name="Allocated Budget"
                     radius={[4, 4, 0, 0]}
-                  >
-                    {budgetVsActualData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill="#6366f1" />
-                    ))}
-                  </Bar>
+                    fill="#6366f1"
+                  />
                   <Bar
                     dataKey="spent"
                     name="Actual Spent"
                     radius={[4, 4, 0, 0]}
-                  >
-                    {budgetVsActualData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill="#10b981" />
-                    ))}
-                  </Bar>
+                    fill="#10b981"
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </div>
+          </ChartCard>
 
           {/* Spending Trend Chart */}
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Icons.chartLine className="h-6 w-6 text-purple-600" />
-              Monthly Spending Trend
-            </h3>
+          <ChartCard
+            title="Monthly Spending Trend"
+            icon={<TrendingUp className="h-5 w-5" />}
+          >
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={spendingTrendData}>
@@ -740,14 +914,13 @@ export default function BudgetsContent(): JSX.Element {
                 </LineChart>
               </ResponsiveContainer>
             </div>
-          </div>
+          </ChartCard>
 
           {/* Budget Allocation Chart */}
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Icons.chartPie className="h-6 w-6 text-green-600" />
-              Budget Allocation Overview
-            </h3>
+          <ChartCard
+            title="Budget Allocation Overview"
+            icon={<PieChartIcon className="h-5 w-5" />}
+          >
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -787,9 +960,26 @@ export default function BudgetsContent(): JSX.Element {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-          </div>
+          </ChartCard>
         </motion.div>
       </div>
     </motion.div>
   );
 }
+
+// Add missing icon component
+const RefreshCw = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+    />
+  </svg>
+);

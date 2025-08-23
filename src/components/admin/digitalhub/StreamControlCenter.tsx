@@ -49,13 +49,13 @@ export default function StreamControlCenter() {
   };
 
   return (
-    <div>
-      <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+    <div className="p-4 sm:p-6 lg:p-8"> {/* Added responsive padding */}
+      <h2 className="text-2xl font-semibold text-white mb-6">
         Stream Control Center
       </h2>
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-white">
             Multi-Platform Broadcasting
           </h3>
           <div className="mt-4 space-y-2">
@@ -65,14 +65,14 @@ export default function StreamControlCenter() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="p-4 bg-white rounded-lg shadow-sm flex items-center"
+                className="p-4 bg-gray-700/50 rounded-lg shadow-sm flex items-center border border-gray-600" /* Dark theme background and border */
               >
-                <Video className="h-5 w-5 text-blue-600 mr-2" />
+                <Video className="h-5 w-5 text-blue-400 mr-2" /> {/* Dark theme icon color */}
                 <div>
-                  <div className="font-semibold text-gray-900">
+                  <div className="font-semibold text-white"> {/* Dark theme text */}
                     {stream.platform}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-300"> {/* Dark theme text */}
                     Status: {stream.status} | Bitrate: {stream.bitrate} kbps
                   </div>
                 </div>
@@ -80,30 +80,32 @@ export default function StreamControlCenter() {
             ))}
           </div>
           <div className="mt-4">
-            <h4 className="text-md font-semibold text-gray-900">
+            <h4 className="text-md font-semibold text-white">
               Bitrate Monitoring
             </h4>
-            <LineChart
-              width={600}
-              height={300}
-              data={bitrateData}
-              className="mt-2"
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="YouTube" stroke="#2563eb" />
-              <Line type="monotone" dataKey="Facebook" stroke="#16a34a" />
-            </LineChart>
+            <div className="w-full overflow-x-auto"> {/* Added for responsiveness */}
+              <LineChart
+                width={600} /* Keep fixed width for chart content */
+                height={300}
+                data={bitrateData}
+                className="mt-2"
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#4b5563" /> {/* Darker grid lines */}
+                <XAxis dataKey="time" stroke="#d1d5db" /> {/* Light text for axis */}
+                <YAxis stroke="#d1d5db" /> {/* Light text for axis */}
+                <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#4b5563', color: '#d1d5db' }} /> {/* Darker tooltip */}
+                <Line type="monotone" dataKey="YouTube" stroke="#60a5fa" /> {/* Lighter blue */}
+                <Line type="monotone" dataKey="Facebook" stroke="#4ade80" /> {/* Lighter green */}
+              </LineChart>
+            </div>
           </div>
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-white">
             Equipment Automation
           </h3>
-          <div className="mt-4 p-4 bg-white rounded-lg shadow-sm">
-            <div className="text-sm text-gray-600">
+          <div className="mt-4 p-4 bg-gray-700/50 rounded-lg shadow-sm border border-gray-600"> {/* Dark theme background and border */}
+            <div className="text-sm text-gray-300"> {/* Dark theme text */}
               Camera Preset: {cameraPreset}
             </div>
             <div className="mt-2 space-x-2">
@@ -113,8 +115,8 @@ export default function StreamControlCenter() {
                   onClick={() => handleCameraSwitch(preset)}
                   className={`px-4 py-2 rounded-lg ${
                     cameraPreset === preset
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 hover:bg-gray-300"
+                      ? "bg-blue-700 text-white" /* Dark theme primary button */
+                      : "bg-gray-600 hover:bg-gray-500 text-gray-200" /* Dark theme secondary button */
                   }`}
                   whileHover={{ scale: 1.03 }}
                   aria-label={`Switch to ${preset} camera preset`}
@@ -123,7 +125,7 @@ export default function StreamControlCenter() {
                 </motion.button>
               ))}
             </div>
-            <div className="mt-4 text-sm text-gray-600">
+            <div className="mt-4 text-sm text-gray-300"> {/* Dark theme text */}
               Lighting Scene: {lightingScene}
             </div>
             <div className="mt-2 space-x-2">
@@ -133,8 +135,8 @@ export default function StreamControlCenter() {
                   onClick={() => handleLightingRecall(scene)}
                   className={`px-4 py-2 rounded-lg ${
                     lightingScene === scene
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 hover:bg-gray-300"
+                      ? "bg-blue-700 text-white" /* Dark theme primary button */
+                      : "bg-gray-600 hover:bg-gray-500 text-gray-200" /* Dark theme secondary button */
                   }`}
                   whileHover={{ scale: 1.03 }}
                   aria-label={`Recall ${scene} lighting scene`}

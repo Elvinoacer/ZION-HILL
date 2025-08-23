@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +10,15 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { safeFetch } from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -19,12 +29,16 @@ import {
   Disc,
   Play,
   Pause,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface SongProposal {
   id: string;
@@ -66,6 +80,8 @@ const MusicProposalsPage = () => {
   const [activeTab, setActiveTab] = useState<
     "proposals" | "guidelines" | "top"
   >("proposals");
+  const [formProgress, setFormProgress] = useState(0);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const fetchProposals = async () => {
     try {
@@ -74,6 +90,9 @@ const MusicProposalsPage = () => {
       setProposals(data);
     } catch (err: any) {
       setError(err.message);
+      toast.error(err.message, {
+        icon: <AlertCircle className="h-5 w-5 text-red-600" />,
+      });
     } finally {
       setLoadingProposals(false);
     }
@@ -95,6 +114,9 @@ const MusicProposalsPage = () => {
         } catch (err: any) {
           setError(err.message);
           setSearchResults([]);
+          toast.error(err.message, {
+            icon: <AlertCircle className="h-5 w-5 text-red-600" />,
+          });
         } finally {
           setLoadingSearch(false);
         }
@@ -118,14 +140,29 @@ const MusicProposalsPage = () => {
     }
   }, [playingPreviewUrl]);
 
+  useEffect(() => {
+    const fields = ["title", "artist", "youtubeUrl", "spotifyUrl"];
+    const filledFields = fields.filter(
+      (field) => newProposal[field as keyof typeof newProposal]
+    ).length;
+    const progress = Math.round((filledFields / fields.length) * 100);
+    setFormProgress(progress);
+  }, [newProposal]);
+
   const handleProposalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session?.user?.id) {
       setError("You must be logged in to submit a proposal.");
+      toast.error("Please log in to submit a proposal.", {
+        icon: <AlertCircle className="h-5 w-5 text-red-600" />,
+      });
       return;
     }
     if (!newProposal.title || !newProposal.artist) {
       setError("Song title and artist are required.");
+      toast.error("Song title and artist are required.", {
+        icon: <AlertCircle className="h-5 w-5 text-red-600" />,
+      });
       return;
     }
 
@@ -143,9 +180,16 @@ const MusicProposalsPage = () => {
       });
       setNewProposal({ title: "", artist: "", youtubeUrl: "", spotifyUrl: "" });
       setSearchResults([]);
+      setShowConfirmationModal(true);
       fetchProposals();
+      toast.success("Proposal submitted successfully!", {
+        icon: <CheckCircle2 className="h-5 w-5 text-green-600" />,
+      });
     } catch (err: any) {
       setError(err.message);
+      toast.error(err.message, {
+        icon: <AlertCircle className="h-5 w-5 text-red-600" />,
+      });
     } finally {
       setSubmittingProposal(false);
     }
@@ -170,49 +214,50 @@ const MusicProposalsPage = () => {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="container mx-auto py-8 px-4 sm:px-6 lg:px-8"
-    >
-      <div className="mb-8">
-        <motion.h1
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-2"
-        >
-          Music Proposals
-        </motion.h1>
-        <motion.p
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-lg text-gray-600 dark:text-gray-300"
-        >
-          Suggest songs for our worship services or church events!
-        </motion.p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 px-4 sm:px-6 lg:px-8 py-12">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-7xl mx-auto"
+      >
+        <div className="mb-8">
+          <motion.h1
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2"
+          >
+            Music Proposals
+          </motion.h1>
+          <motion.p
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-base sm:text-lg text-gray-600"
+          >
+            Suggest songs for our worship services or church events!
+          </motion.p>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           <motion.div
+            className="lg:col-span-2 space-y-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <Music className="w-5 h-5 text-blue-500" />
+            <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-t-2xl">
+                <CardTitle className="text-lg sm:text-xl flex items-center gap-2 text-indigo-700">
+                  <Music className="w-5 h-5" />
                   Submit a New Proposal
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm text-gray-600">
                   Search for a song or manually enter details.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <form onSubmit={handleProposalSubmit} className="space-y-4">
                   <div className="relative">
                     <Input
@@ -220,7 +265,7 @@ const MusicProposalsPage = () => {
                       placeholder="Search for a song (e.g., 'Amazing Grace Chris Tomlin')"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pr-10"
+                      className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200 pr-10"
                     />
                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   </div>
@@ -231,7 +276,7 @@ const MusicProposalsPage = () => {
                       animate={{ opacity: 1 }}
                       className="flex justify-center items-center py-4"
                     >
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                      <Loader2 className="h-8 w-8 text-indigo-600 animate-spin" />
                     </motion.div>
                   )}
 
@@ -241,7 +286,7 @@ const MusicProposalsPage = () => {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="border rounded-md overflow-hidden"
+                        className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm"
                       >
                         {searchResults.map((result, index) => (
                           <motion.div
@@ -249,7 +294,7 @@ const MusicProposalsPage = () => {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.05 }}
-                            className="flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b last:border-b-0"
+                            className="flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
                           >
                             <div
                               className="flex items-center flex-grow gap-3"
@@ -272,10 +317,10 @@ const MusicProposalsPage = () => {
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium truncate">
+                                <p className="font-medium text-sm sm:text-base truncate">
                                   {result.trackName}
                                 </p>
-                                <p className="text-sm text-gray-500 truncate">
+                                <p className="text-xs text-gray-500 truncate">
                                   {result.artistName}
                                 </p>
                               </div>
@@ -284,7 +329,7 @@ const MusicProposalsPage = () => {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="ml-2"
+                                className="ml-2 border-gray-200 text-gray-600 hover:bg-gray-50"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   if (playingPreviewUrl === result.previewUrl) {
@@ -307,9 +352,24 @@ const MusicProposalsPage = () => {
                     )}
                   </AnimatePresence>
 
+                  <div className="mb-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-600">
+                        Form Completion
+                      </span>
+                      <span className="text-sm font-medium text-indigo-600">
+                        {formProgress}%
+                      </span>
+                    </div>
+                    <Progress
+                      value={formProgress}
+                      className="h-1.5 bg-gray-100"
+                    />
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Song Title
                       </label>
                       <Input
@@ -323,10 +383,11 @@ const MusicProposalsPage = () => {
                           })
                         }
                         required
+                        className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Artist
                       </label>
                       <Input
@@ -340,12 +401,13 @@ const MusicProposalsPage = () => {
                           })
                         }
                         required
+                        className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       YouTube Link (Optional)
                     </label>
                     <Input
@@ -358,11 +420,12 @@ const MusicProposalsPage = () => {
                           youtubeUrl: e.target.value,
                         })
                       }
+                      className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       Spotify Link (Optional)
                     </label>
                     <Input
@@ -375,6 +438,7 @@ const MusicProposalsPage = () => {
                           spotifyUrl: e.target.value,
                         })
                       }
+                      className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                     />
                   </div>
 
@@ -384,31 +448,12 @@ const MusicProposalsPage = () => {
                   >
                     <Button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                      className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={submittingProposal || !session?.user?.id}
                     >
                       {submittingProposal ? (
                         <>
-                          <svg
-                            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Submitting...
                         </>
                       ) : (
@@ -421,7 +466,7 @@ const MusicProposalsPage = () => {
                     <p className="text-center text-sm text-gray-500">
                       <Link
                         href="/login"
-                        className="text-blue-600 hover:underline font-medium"
+                        className="text-indigo-600 hover:underline font-medium"
                       >
                         Log in
                       </Link>{" "}
@@ -431,30 +476,26 @@ const MusicProposalsPage = () => {
                 </form>
               </CardContent>
             </Card>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <ListMusic className="w-5 h-5 text-blue-500" />
+            <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 mt-6">
+              <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-t-2xl">
+                <CardTitle className="text-lg sm:text-xl flex items-center gap-2 text-indigo-700">
+                  <ListMusic className="w-5 h-5" />
                   Submitted Proposals
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 {proposals.length === 0 ? (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="text-center py-8"
                   >
-                    <Disc className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                    <p className="text-gray-500">No proposals submitted yet.</p>
-                    <p className="text-gray-400 text-sm mt-1">
+                    <Disc className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                    <p className="text-gray-500 text-sm sm:text-base">
+                      No proposals submitted yet.
+                    </p>
+                    <p className="text-gray-400 text-xs sm:text-sm mt-1">
                       Be the first to suggest a song!
                     </p>
                   </motion.div>
@@ -472,7 +513,7 @@ const MusicProposalsPage = () => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, x: -20 }}
                             transition={{ duration: 0.2 }}
-                            className="p-4 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:shadow-md transition-shadow"
+                            className="p-4 rounded-lg border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-all duration-200"
                           >
                             <div className="flex items-start gap-3">
                               {proposal.user.image ? (
@@ -482,13 +523,13 @@ const MusicProposalsPage = () => {
                                   className="w-10 h-10 rounded-full object-cover"
                                 />
                               ) : (
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold">
                                   {proposal.user.name.charAt(0)}
                                 </div>
                               )}
                               <div className="flex-1">
                                 <div className="flex items-center justify-between">
-                                  <h3 className="font-semibold text-lg">
+                                  <h3 className="font-semibold text-sm sm:text-base">
                                     {proposal.title}
                                   </h3>
                                   <span className="text-xs text-gray-500">
@@ -498,7 +539,7 @@ const MusicProposalsPage = () => {
                                     )}
                                   </span>
                                 </div>
-                                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                                <p className="text-gray-600 text-xs sm:text-sm">
                                   by {proposal.artist}
                                 </p>
                                 <p className="text-xs text-gray-500 mt-1">
@@ -513,7 +554,7 @@ const MusicProposalsPage = () => {
                                         href={proposal.youtubeUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1 text-sm bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-3 py-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                                        className="inline-flex items-center gap-1 text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full hover:bg-red-100 transition-colors"
                                       >
                                         <svg
                                           xmlns="http://www.w3.org/2000/svg"
@@ -531,7 +572,7 @@ const MusicProposalsPage = () => {
                                         href={proposal.spotifyUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1 text-sm bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-3 py-1 rounded-full hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+                                        className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-600 px-3 py-1 rounded-full hover:bg-green-100 transition-colors"
                                       >
                                         <svg
                                           xmlns="http://www.w3.org/2000/svg"
@@ -569,165 +610,173 @@ const MusicProposalsPage = () => {
               </CardContent>
             </Card>
           </motion.div>
-        </div>
 
-        <div className="lg:col-span-1 space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-lg">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Mic2 className="w-5 h-5 text-blue-500" />
-                  <CardTitle className="text-lg">Proposal Guidelines</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <motion.li
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.6 }}
-                    className="flex items-start gap-2"
-                  >
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-                        <span className="text-blue-600 dark:text-blue-400 text-xs font-bold">
-                          1
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      Suggest songs that align with our church's values and
-                      worship style.
-                    </span>
-                  </motion.li>
-                  <motion.li
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.65 }}
-                    className="flex items-start gap-2"
-                  >
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-                        <span className="text-blue-600 dark:text-blue-400 text-xs font-bold">
-                          2
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      Ensure the song is appropriate for public worship or
-                      events.
-                    </span>
-                  </motion.li>
-                  <motion.li
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.7 }}
-                    className="flex items-start gap-2"
-                  >
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-                        <span className="text-blue-600 dark:text-blue-400 text-xs font-bold">
-                          3
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      Provide accurate title and artist information.
-                    </span>
-                  </motion.li>
-                  <motion.li
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.75 }}
-                    className="flex items-start gap-2"
-                  >
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-                        <span className="text-blue-600 dark:text-blue-400 text-xs font-bold">
-                          4
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      Optional: Include YouTube or Spotify links for reference.
-                    </span>
-                  </motion.li>
-                  <motion.li
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8 }}
-                    className="flex items-start gap-2"
-                  >
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-                        <span className="text-blue-600 dark:text-blue-400 text-xs font-bold">
-                          5
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      Proposals will be reviewed by the worship team.
-                    </span>
-                  </motion.li>
-                </ul>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.85 }}
-          >
-            <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-lg">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Disc className="w-5 h-5 text-blue-500" />
-                  <CardTitle className="text-lg">Top Requested Songs</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-center py-8">
-                  <div className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
-                      <Music className="w-8 h-8 text-blue-500" />
-                    </div>
-                    <p className="text-gray-500">Coming soon!</p>
-                    <p className="text-gray-400 text-sm mt-1">
-                      We'll show the most popular song requests here.
-                    </p>
+          <div className="lg:col-span-1 space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-t-2xl">
+                  <div className="flex items-center gap-2">
+                    <Mic2 className="w-5 h-5 text-indigo-600" />
+                    <CardTitle className="text-lg sm:text-xl text-indigo-700">
+                      Proposal Guidelines
+                    </CardTitle>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <ul className="space-y-3">
+                    {[
+                      "Suggest songs that align with our church's values and worship style.",
+                      "Ensure the song is appropriate for public worship or events.",
+                      "Provide accurate title and artist information.",
+                      "Optional: Include YouTube or Spotify links for reference.",
+                      "Proposals will be reviewed by the worship team.",
+                    ].map((guideline, index) => (
+                      <motion.li
+                        key={index}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.6 + index * 0.05 }}
+                        className="flex items-start gap-2"
+                      >
+                        <div className="flex-shrink-0 mt-1">
+                          <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <span className="text-indigo-600 text-xs font-bold">
+                              {index + 1}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="text-sm text-gray-600">
+                          {guideline}
+                        </span>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-      <audio id="audio-preview" src={playingPreviewUrl || ""} preload="auto" />
-    </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.85 }}
+            >
+              <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-t-2xl">
+                  <div className="flex items-center gap-2">
+                    <Disc className="w-5 h-5 text-indigo-600" />
+                    <CardTitle className="text-lg sm:text-xl text-indigo-700">
+                      Top Requested Songs
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-center">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <Music className="w-8 h-8 text-indigo-600" />
+                      </div>
+                      <p className="text-gray-500 text-sm sm:text-base">
+                        Coming soon!
+                      </p>
+                      <p className="text-gray-400 text-xs sm:text-sm mt-1">
+                        We'll show the most popular song requests here.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {showConfirmationModal && (
+            <Dialog
+              open={showConfirmationModal}
+              onOpenChange={setShowConfirmationModal}
+            >
+              <DialogContent className="sm:max-w-md rounded-2xl bg-white shadow-xl">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center space-x-2 text-lg sm:text-xl font-bold text-gray-800">
+                    <CheckCircle2 className="h-6 w-6 text-green-600" />
+                    <span>Proposal Submitted</span>
+                  </DialogTitle>
+                  <DialogDescription className="text-sm sm:text-base text-gray-600">
+                    Your song proposal has been successfully submitted and will
+                    be reviewed by the worship team.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    onClick={() => setShowConfirmationModal(false)}
+                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
+                  >
+                    Close
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+        </AnimatePresence>
+
+        <audio
+          id="audio-preview"
+          src={playingPreviewUrl || ""}
+          preload="auto"
+        />
+      </motion.div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.6s ease-out;
+        }
+        .animate-slide-up {
+          animation: slideUp 0.6s ease-out;
+        }
+      `}</style>
+    </div>
   );
 };
 
 const LoadingState = () => (
-  <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-    <div className="space-y-8">
+  <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto space-y-8">
       <div className="space-y-2">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-6 w-80" />
+        <Skeleton className="h-8 w-64 rounded-lg bg-gray-200" />
+        <Skeleton className="h-6 w-80 rounded-lg bg-gray-200" />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <Skeleton className="h-96 w-full rounded-xl" />
-          <Skeleton className="h-[500px] w-full rounded-xl" />
+          <Skeleton className="h-96 w-full rounded-2xl bg-gray-200" />
+          <Skeleton className="h-[500px] w-full rounded-2xl bg-gray-200" />
         </div>
         <div className="lg:col-span-1 space-y-6">
-          <Skeleton className="h-64 w-full rounded-xl" />
-          <Skeleton className="h-48 w-full rounded-xl" />
+          <Skeleton className="h-64 w-full rounded-2xl bg-gray-200" />
+          <Skeleton className="h-48 w-full rounded-2xl bg-gray-200" />
         </div>
       </div>
     </div>
@@ -738,55 +787,25 @@ const ErrorState = ({ error }: { error: string }) => (
   <motion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
-    className="container mx-auto py-8 px-4 sm:px-6 lg:px-8"
+    transition={{ duration: 0.5 }}
+    className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 px-4 sm:px-6 lg:px-8 py-12 flex items-center justify-center"
   >
-    <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-500 p-4 rounded-lg shadow">
-      <div className="flex">
-        <div className="flex-shrink-0">
-          <svg
-            className="h-5 w-5 text-red-500"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </div>
-        <div className="ml-3">
-          <h3 className="text-lg font-medium text-red-800 dark:text-red-500">
-            Error loading page
-          </h3>
-          <div className="mt-2 text-sm text-red-700 dark:text-red-400">
-            <p>{error}</p>
-          </div>
-          <div className="mt-4">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => window.location.reload()}
-              className="inline-flex items-center text-sm font-medium text-red-700 dark:text-red-500 hover:text-red-600 dark:hover:text-red-400"
-            >
-              Try again
-              <svg
-                className="ml-1 w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-            </motion.button>
-          </div>
-        </div>
+    <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
+      <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-red-100 rounded-full">
+        <AlertCircle className="w-8 h-8 text-red-600" />
       </div>
+      <h3 className="text-xl sm:text-2xl font-semibold text-red-800 mb-4">
+        Error Loading Page
+      </h3>
+      <p className="text-sm text-red-600 mb-6">{error}</p>
+      <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => window.location.reload()}
+        className="bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md px-4 py-2 transition-transform transform"
+      >
+        Try Again
+      </motion.button>
     </div>
   </motion.div>
 );

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useSecretaryStore } from "@/store/secretaryStore";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { LayoutDashboard, Calendar, Inbox } from "lucide-react";
 
 const navItems = [
@@ -15,13 +15,17 @@ const navItems = [
 
 export default function SecretarySidebar() {
   const pathname = usePathname();
-  const { sidebarCollapsed, mobileMenuOpen, closeMobileMenu } = useSecretaryStore();
+  const { sidebarCollapsed, mobileMenuOpen, closeMobileMenu } =
+    useSecretaryStore();
 
   return (
     <>
       {/* Mobile Sidebar (Sheet) */}
       <Sheet open={mobileMenuOpen} onOpenChange={closeMobileMenu}>
         <SheetContent side="left" className="w-64 p-0 pt-16 bg-gray-800">
+          <SheetTitle id="secretary-sidebar-title" className="sr-only">
+            Secretary Navigation
+          </SheetTitle>
           <nav className="flex flex-col p-4 space-y-1">
             {navItems.map((item) => (
               <Link
@@ -51,7 +55,12 @@ export default function SecretarySidebar() {
         )}
       >
         <div className="mb-4">
-          <h2 className={cn("text-lg font-semibold text-white", sidebarCollapsed ? "hidden" : "block")}>
+          <h2
+            className={cn(
+              "text-lg font-semibold text-white",
+              sidebarCollapsed ? "hidden" : "block"
+            )}
+          >
             Secretary
           </h2>
         </div>
@@ -68,7 +77,9 @@ export default function SecretarySidebar() {
                 sidebarCollapsed ? "justify-center" : ""
               )}
             >
-              <item.icon className={cn("h-6 w-6", sidebarCollapsed ? "" : "mr-3")} />
+              <item.icon
+                className={cn("h-6 w-6", sidebarCollapsed ? "" : "mr-3")}
+              />
               <span className={cn(sidebarCollapsed ? "hidden" : "block")}>
                 {item.label}
               </span>

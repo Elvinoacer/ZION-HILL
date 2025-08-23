@@ -38,23 +38,23 @@ const MinistriesPageContent = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
-        <p className="ml-3 text-lg text-gray-700">Loading ministries...</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex items-center justify-center animate-fade-in">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-400" />
+        <p className="ml-3 text-lg text-gray-300">Loading ministries...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 sm:p-6 flex items-center justify-center animate-fade-in">
+        <Card className="w-full max-w-md bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 shadow-lg">
           <CardHeader>
-            <CardTitle>Error</CardTitle>
+            <CardTitle className="text-white">Error</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-red-500">Failed to load ministries: {error}</p>
-            <Button onClick={() => window.location.reload()} className="mt-4">
+            <p className="text-red-400 mb-4">Failed to load ministries: {error}</p>
+            <Button onClick={() => window.location.reload()} className="mt-4 w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300">
               Retry
             </Button>
           </CardContent>
@@ -64,20 +64,20 @@ const MinistriesPageContent = () => {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-4xl font-extrabold text-center text-gray-900 mb-12">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 sm:p-6 animate-fade-in">
+      <h1 className="text-3xl sm:text-4xl font-extrabold text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600 mb-8 sm:mb-12">
         Our Ministries
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {ministries.length > 0 ? (
           ministries.map((ministry) => (
             <Card
               key={ministry.id}
-              className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+              className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 rounded-lg"
             >
               {ministry.photo && (
-                <div className="relative h-48 w-full">
+                <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
                   <Image
                     src={ministry.photo}
                     alt={ministry.name}
@@ -88,25 +88,25 @@ const MinistriesPageContent = () => {
                 </div>
               )}
               <CardHeader>
-                <CardTitle className="text-2xl font-bold text-gray-800">
+                <CardTitle className="text-xl font-bold text-white">
                   {ministry.name}
                 </CardTitle>
                 {ministry.leader && (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-400">
                     Led by: {ministry.leader.name}
                   </p>
                 )}
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-gray-700 line-clamp-3">
+                <p className="text-gray-300 line-clamp-3">
                   {ministry.description}
                 </p>
-                <div className="flex items-center text-gray-500 text-sm">
-                  <Users className="h-4 w-4 mr-2" />
+                <div className="flex items-center text-gray-400 text-sm">
+                  <Users className="h-4 w-4 mr-2 text-blue-400" />
                   <span>{ministry._count?.members || 0} Members</span>
                 </div>
                 <Link href={`/ministries/${ministry.id}`} passHref>
-                  <Button className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700">
+                  <Button className="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg">
                     Learn More <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -114,9 +114,11 @@ const MinistriesPageContent = () => {
             </Card>
           ))
         ) : (
-          <div className="col-span-full text-center text-gray-600 text-lg">
-            No ministries found.
-          </div>
+          <div className="col-span-full text-center py-12 bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/30 shadow-lg">
+              <p className="text-xl text-gray-400">
+                No ministries found at the moment. Please check back later!
+              </p>
+            </div>
         )}
       </div>
     </div>
@@ -126,9 +128,9 @@ const MinistriesPageContent = () => {
 const MinistriesPage = () => (
   <Suspense
     fallback={
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
-        <p className="ml-3 text-lg text-gray-700">Loading page...</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-400" />
+        <p className="ml-3 text-lg text-gray-300">Loading page...</p>
       </div>
     }
   >

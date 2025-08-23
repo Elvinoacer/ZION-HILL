@@ -45,7 +45,7 @@ export default function EnrollButton({ courseId }: { courseId: string }) {
       <button
         onClick={handleEnroll}
         disabled={isLoading || isSuccess}
-        className={`inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm transition-all duration-200 ${
+        className={`w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm transition-all duration-200 ${
           isSuccess
             ? "bg-green-600 text-white cursor-default"
             : isLoading

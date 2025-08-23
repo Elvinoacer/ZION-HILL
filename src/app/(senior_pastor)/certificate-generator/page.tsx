@@ -413,7 +413,7 @@ export default function CertificateGenerator() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black p-4 sm:p-6 md:p-8">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -421,40 +421,40 @@ export default function CertificateGenerator() {
           transition={{ duration: 0.5 }}
           className="text-center mb-10"
         >
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">
             Church Certificate Generator
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-base sm:text-lg text-gray-300">
             Create beautiful, professional certificates for your church members
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
-              <h2 className="text-2xl font-bold text-white">
+          <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700/50">
+            <div className="bg-gradient-to-r from-blue-800 to-indigo-900 p-4 sm:p-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-white">
                 Certificate Details
               </h2>
-              <p className="text-blue-100">
+              <p className="text-blue-300">
                 Fill out the form to generate your certificate
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               {isUploading && (
-                <div className="text-center text-blue-600 font-medium">
+                <div className="text-center text-blue-400 font-medium">
                   Uploading certificate... Please wait.
                 </div>
               )}
               {uploadError && (
-                <div className="text-center text-red-600 font-medium">
+                <div className="text-center text-red-400 font-medium">
                   Error uploading: {uploadError}
                 </div>
               )}
               <div>
                 <label
                   htmlFor="certificateType"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-300 mb-1"
                 >
                   Certificate Type <span className="text-red-500">*</span>
                 </label>
@@ -464,7 +464,7 @@ export default function CertificateGenerator() {
                   value={formData.certificateType}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="w-full px-4 py-2 border border-gray-700 bg-gray-900 text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-gray-500"
                 >
                   <option value="">Select Type</option>
                   <option value="Baptism Certificate">
@@ -486,7 +486,7 @@ export default function CertificateGenerator() {
               <div>
                 <label
                   htmlFor="recipientName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-300 mb-1"
                 >
                   Recipient's Full Name <span className="text-red-500">*</span>
                 </label>
@@ -498,7 +498,7 @@ export default function CertificateGenerator() {
                   onChange={handleChange}
                   placeholder="e.g., John Doe"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="w-full px-4 py-2 border border-gray-700 bg-gray-900 text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-gray-500"
                 />
               </div>
 
@@ -506,7 +506,7 @@ export default function CertificateGenerator() {
                 <div>
                   <label
                     htmlFor="dateOfEvent"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-300 mb-1"
                   >
                     Date of Event <span className="text-red-500">*</span>
                   </label>
@@ -517,7 +517,7 @@ export default function CertificateGenerator() {
                     value={formData.dateOfEvent}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                    className="w-full px-4 py-2 border border-gray-700 bg-gray-900 text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-gray-500"
                   />
                 </div>
 
@@ -526,7 +526,7 @@ export default function CertificateGenerator() {
                   <div>
                     <label
                       htmlFor="eventName"
-                      className="block text-sm font-medium text-gray-700 mb-1"
+                      className="block text-sm font-medium text-gray-300 mb-1"
                     >
                       Course/Event Name
                     </label>
@@ -537,7 +537,7 @@ export default function CertificateGenerator() {
                       value={formData.eventName}
                       onChange={handleChange}
                       placeholder="e.g., Foundations of Faith"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                      className="w-full px-4 py-2 border border-gray-700 bg-gray-900 text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-gray-500"
                     />
                   </div>
                 )}
@@ -547,7 +547,7 @@ export default function CertificateGenerator() {
                 <div>
                   <label
                     htmlFor="pastorName"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-300 mb-1"
                   >
                     Pastor's Name <span className="text-red-500">*</span>
                   </label>
@@ -559,14 +559,14 @@ export default function CertificateGenerator() {
                     onChange={handleChange}
                     placeholder="e.g., Pastor Jane Smith"
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                    className="w-full px-4 py-2 border border-gray-700 bg-gray-900 text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-gray-500"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="churchName"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-300 mb-1"
                   >
                     Church Name <span className="text-red-500">*</span>
                   </label>
@@ -577,7 +577,7 @@ export default function CertificateGenerator() {
                     value={formData.churchName}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                    className="w-full px-4 py-2 border border-gray-700 bg-gray-900 text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-gray-500"
                   />
                 </div>
               </div>
@@ -585,7 +585,7 @@ export default function CertificateGenerator() {
               <div>
                 <label
                   htmlFor="churchLocation"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-300 mb-1"
                 >
                   Church Location <span className="text-red-500">*</span>
                 </label>
@@ -597,19 +597,19 @@ export default function CertificateGenerator() {
                   onChange={handleChange}
                   placeholder="e.g., City, State, Country"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="w-full px-4 py-2 border border-gray-700 bg-gray-900 text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-gray-500"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="churchLogo"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-300 mb-1"
                 >
                   Church Logo (Optional)
                 </label>
                 <div className="flex items-center space-x-4">
-                  <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg transition duration-200">
+                  <label className="cursor-pointer bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition duration-200 text-white">
                     <span>Choose File</span>
                     <input
                       type="file"
@@ -620,7 +620,7 @@ export default function CertificateGenerator() {
                       className="hidden"
                     />
                   </label>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-400">
                     {formData.churchLogo ? "Logo selected" : "No file chosen"}
                   </span>
                 </div>
@@ -629,7 +629,7 @@ export default function CertificateGenerator() {
               <div>
                 <label
                   htmlFor="certificateId"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-300 mb-1"
                 >
                   Certificate ID (Optional)
                 </label>
@@ -640,14 +640,14 @@ export default function CertificateGenerator() {
                   value={formData.certificateId}
                   onChange={handleChange}
                   placeholder="Auto-generated if blank"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="w-full px-4 py-2 border border-gray-700 bg-gray-900 text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-gray-500"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="briefDescription"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-300 mb-1"
                 >
                   Personalized Message (Optional)
                 </label>
@@ -658,13 +658,13 @@ export default function CertificateGenerator() {
                   onChange={handleChange}
                   placeholder="Add a scripture verse or special message"
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="w-full px-4 py-2 border border-gray-700 bg-gray-900 text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-gray-500"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 shadow-md"
+                className="w-full bg-gradient-to-r from-blue-700 to-indigo-800 text-white font-bold py-2.5 px-5 rounded-lg hover:from-blue-800 hover:to-indigo-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 shadow-lg text-base"
               >
                 Generate Certificate
               </button>
@@ -672,12 +672,12 @@ export default function CertificateGenerator() {
           </div>
 
           {generatedPdfUrl && (
-            <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
-              <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-6">
-                <h2 className="text-2xl font-bold text-white">
+            <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700/50">
+              <div className="bg-gradient-to-r from-green-800 to-emerald-900 p-4 sm:p-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-white">
                   Certificate Preview
                 </h2>
-                <p className="text-green-100">
+                <p className="text-green-300">
                   Your beautiful certificate is ready!
                 </p>
               </div>
@@ -689,14 +689,14 @@ export default function CertificateGenerator() {
                     /\s/g,
                     "_"
                   )}_${formData.certificateType.replace(/\s/g, "_")}.pdf`}
-                  className="block mt-6 w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-3 px-6 rounded-lg hover:from-green-700 hover:to-emerald-700 text-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 shadow-md"
+                  className="block mt-6 w-full bg-gradient-to-r from-green-700 to-emerald-800 text-white font-bold py-2.5 px-5 rounded-lg hover:from-green-800 hover:to-emerald-900 text-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 shadow-lg text-base"
                 >
                   Download Certificate
                 </a>
 
                 <Button
                   onClick={() => setIsAssignUserModalOpen(true)}
-                  className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md"
+                  className="mt-4 w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2.5 px-5 rounded-lg shadow-lg text-base"
                 >
                   Assign Certificate to User
                 </Button>
@@ -705,18 +705,18 @@ export default function CertificateGenerator() {
                   open={isAssignUserModalOpen}
                   onOpenChange={setIsAssignUserModalOpen}
                 >
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Assign Certificate to User</DialogTitle>
+                  <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white border-gray-700/50 shadow-lg">
+                    <DialogHeader className="bg-gray-700/30 p-4">
+                      <DialogTitle className="text-xl font-bold text-blue-400">Assign Certificate to User</DialogTitle>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <Input
                         placeholder="Search users..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="mb-4"
+                        className="mb-4 border-gray-700 bg-gray-900 text-gray-200 placeholder-gray-500"
                       />
-                      <div className="max-h-60 overflow-y-auto border rounded-md">
+                      <div className="max-h-60 overflow-y-auto border border-gray-700 rounded-md">
                         {users
                           .filter((user) =>
                             user.name
@@ -726,16 +726,16 @@ export default function CertificateGenerator() {
                           .map((user) => (
                             <div
                               key={user.id}
-                              className="flex items-center justify-between p-2 hover:bg-gray-100 cursor-pointer"
+                              className="flex items-center justify-between p-2 hover:bg-gray-700 cursor-pointer"
                               onClick={() => {
                                 handleAssignCertificate(user);
                               }}
                             >
-                              <span>{user.name}</span>
+                              <span className="text-gray-200">{user.name}</span>
                               {selectedUser?.id === user.id && (
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5 text-green-500"
+                                  className="h-5 w-5 text-green-400"
                                   viewBox="0 0 20 20"
                                   fill="currentColor"
                                 >

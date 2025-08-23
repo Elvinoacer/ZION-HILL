@@ -11,20 +11,20 @@ export default function TechMediaManagerLayout({
   const { sidebarCollapsed, toggleSidebar, mobileMenuOpen, toggleMobileMenu } = useTechMediaManagerStore();
 
   return (
-    <div className="relative flex min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
+    <div className="relative flex min-h-screen bg-gray-900 text-gray-200"> {/* Dark theme background */}
       <TechMediaManagerSidebar />
       
       {/* Toggle button for sidebar */}
       <div className="fixed top-4 right-4 z-50 md:hidden">
         <button
           onClick={toggleMobileMenu}
-          className="p-2 rounded-lg bg-white shadow-md focus:outline-none focus:ring-4 focus:ring-indigo-200"
+          className="p-2 rounded-lg bg-gray-800 shadow-md focus:outline-none focus:ring-4 focus:ring-blue-400 border border-gray-700/50" /* Dark theme styling */
           aria-label="Toggle sidebar"
         >
           {mobileMenuOpen || !sidebarCollapsed ? (
-            <X className="h-6 w-6 text-indigo-600" />
+            <X className="h-6 w-6 text-blue-400" /> /* Dark theme icon color */
           ) : (
-            <Menu className="h-6 w-6 text-indigo-600" />
+            <Menu className="h-6 w-6 text-blue-400" /> /* Dark theme icon color */
           )}
         </button>
       </div>

@@ -5,7 +5,7 @@ CREATE TYPE "public"."CertificateFrequency" AS ENUM ('QUARTERLY', 'ANNUALLY', 'B
 CREATE TYPE "public"."BaptismStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'SCHEDULED', 'COMPLETED');
 
 -- CreateEnum
-CREATE TYPE "public"."ResourceType" AS ENUM ('PDF', 'VIDEO', 'ARTICLE', 'IMAGE', 'LINK');
+CREATE TYPE "public"."ResourceType" AS ENUM ('PDF', 'VIDEO', 'ARTICLE', 'IMAGE', 'LINK', 'EQUIPMENT', 'VENUE', 'TEMPLATE');
 
 -- CreateEnum
 CREATE TYPE "public"."ReconciliationStatus" AS ENUM ('PENDING', 'APPROVED', 'FLAGGED');
@@ -14,7 +14,7 @@ CREATE TYPE "public"."ReconciliationStatus" AS ENUM ('PENDING', 'APPROVED', 'FLA
 CREATE TYPE "public"."DonationPlanType" AS ENUM ('PROJECT', 'MINISTRY', 'USER_REQUEST', 'GENERAL');
 
 -- CreateEnum
-CREATE TYPE "public"."MessageType" AS ENUM ('GENERAL', 'EVENT_QUERY', 'SUPPORT', 'FEEDBACK', 'MINISTRY_INQUIRY');
+CREATE TYPE "public"."MessageType" AS ENUM ('GENERAL', 'EVENT_QUERY', 'SUPPORT', 'FEEDBACK', 'MINISTRY_INQUIRY', 'WORSHIP_TEAM', 'PASTORAL_CARE');
 
 -- CreateEnum
 CREATE TYPE "public"."RoleName" AS ENUM ('ADMIN', 'MEMBER', 'GUEST', 'PRAYER_MANAGER', 'COUNSELOR', 'VOLUNTEER', 'EVENTS_MANAGER', 'SENIOR_PASTOR', 'FINANCE_ADMINISTRATOR', 'VOLUNTEER_COORDINATOR', 'WORSHIP_LEADER', 'OVERALL_MINISTRIES_COORDINATOR', 'MEN_MINISTRY_COORDINATOR', 'WOMEN_MINISTRY_COORDINATOR', 'YOUTH_MINISTRY_COORDINATOR', 'COUPLES_AND_FAMILY_MINISTRY_COORDINATOR', 'CHILDREN_MINISTRY_COORDINATOR', 'YOUNG_ADULTS_MINISTRY_COORDINATOR', 'ELDERS_MINISTRY_COORDINATOR', 'SINGLES_MINISTRY_COORDINATOR', 'OUTREACH_DIRECTOR', 'DISCIPLESHIP_LEADER', 'TECH_MEDIA_MANAGER', 'SMALL_GROUPS_LEADER', 'CHILDREN_YOUTH_DIRECTOR', 'SECRETARY', 'COMMUNICATIONS_OFFICER', 'MISSIONS_PASTOR');
@@ -121,8 +121,10 @@ CREATE TABLE "public"."User" (
 CREATE TABLE "public"."Certificate" (
     "id" TEXT NOT NULL,
     "userId" TEXT,
+    "certificateType" TEXT NOT NULL,
     "cloudinaryUrl" TEXT NOT NULL,
     "issuedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "eventName" TEXT,
     "pastorName" TEXT,
     "churchName" TEXT,
     "churchLocation" TEXT,
@@ -157,6 +159,8 @@ CREATE TABLE "public"."Lesson" (
     "imageUrl" TEXT,
     "externalLink" TEXT,
     "content" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Lesson_pkey" PRIMARY KEY ("id")
 );
@@ -262,6 +266,17 @@ CREATE TABLE "public"."MinistryMember" (
 );
 
 -- CreateTable
+CREATE TABLE "public"."MinistryJoinRequest" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "ministryId" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "requestedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "MinistryJoinRequest_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "public"."Group" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -294,6 +309,19 @@ CREATE TABLE "public"."Event" (
 );
 
 -- CreateTable
+CREATE TABLE "public"."WorshipSet" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "leaderId" TEXT NOT NULL,
+    "arrangedSongs" TEXT[],
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "WorshipSet_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "public"."WorshipResource" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
@@ -321,10 +349,23 @@ CREATE TABLE "public"."SongProposal" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "artist" TEXT NOT NULL,
+    "youtubeUrl" TEXT,
+    "spotifyUrl" TEXT,
     "userId" TEXT NOT NULL,
+    "likes" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "SongProposal_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."SongLike" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "songProposalId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "SongLike_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -364,7 +405,7 @@ CREATE TABLE "public"."Participant" (
 -- CreateTable
 CREATE TABLE "public"."Financials" (
     "id" TEXT NOT NULL,
-    "eventId" TEXT NOT NULL,
+    "eventId" TEXT,
     "budget" DOUBLE PRECISION NOT NULL,
     "expenses" DOUBLE PRECISION NOT NULL,
     "revenue" DOUBLE PRECISION NOT NULL,
@@ -400,6 +441,7 @@ CREATE TABLE "public"."Feedback" (
     "sentiment" "public"."Sentiment" NOT NULL,
     "comment" TEXT NOT NULL,
     "tags" TEXT[],
+    "imageUrl" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Feedback_pkey" PRIMARY KEY ("id")
@@ -440,7 +482,11 @@ CREATE TABLE "public"."Transaction" (
     "method" "public"."TransactionMethod" NOT NULL,
     "description" TEXT,
     "userId" TEXT,
+    "email" TEXT,
     "donationPlanId" TEXT,
+    "donorName" TEXT,
+    "donorEmail" TEXT,
+    "recurring" BOOLEAN NOT NULL DEFAULT false,
     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "anomaly" BOOLEAN NOT NULL DEFAULT false,
     "reconciliationStatus" "public"."ReconciliationStatus" NOT NULL DEFAULT 'PENDING',
@@ -453,6 +499,7 @@ CREATE TABLE "public"."DonationPlan" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
+    "email" TEXT,
     "imageUrl" TEXT,
     "goalAmount" DOUBLE PRECISION,
     "type" "public"."DonationPlanType" NOT NULL,
@@ -802,6 +849,20 @@ CREATE TABLE "public"."CanvasDesign" (
 );
 
 -- CreateTable
+CREATE TABLE "public"."WorshipMessage" (
+    "id" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "senderId" TEXT NOT NULL,
+    "recipientId" TEXT NOT NULL,
+    "worshipMinistryId" TEXT,
+    "messageType" "public"."MessageType" NOT NULL DEFAULT 'GENERAL',
+    "read" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "WorshipMessage_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "public"."VolunteeringOpportunity" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
@@ -833,6 +894,18 @@ CREATE TABLE "public"."VolunteeringApplication" (
 );
 
 -- CreateTable
+CREATE TABLE "public"."ProjectApplication" (
+    "id" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
+    "applicantId" TEXT NOT NULL,
+    "notes" TEXT,
+    "status" "public"."ApplicationStatus" NOT NULL DEFAULT 'PENDING',
+    "appliedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ProjectApplication_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "public"."FinancialSupportRequest" (
     "id" TEXT NOT NULL,
     "userId" TEXT,
@@ -846,6 +919,20 @@ CREATE TABLE "public"."FinancialSupportRequest" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "FinancialSupportRequest_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."LiveStream" (
+    "id" TEXT NOT NULL,
+    "streamUrl" TEXT,
+    "isLive" BOOLEAN NOT NULL DEFAULT false,
+    "platform" TEXT,
+    "mediaType" TEXT,
+    "viewerCount" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "LiveStream_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -882,6 +969,12 @@ CREATE UNIQUE INDEX "Role_name_key" ON "public"."Role"("name");
 CREATE UNIQUE INDEX "MinistryBudget_ministryId_fiscalYear_key" ON "public"."MinistryBudget"("ministryId", "fiscalYear");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "MinistryJoinRequest_userId_ministryId_key" ON "public"."MinistryJoinRequest"("userId", "ministryId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SongLike_userId_songProposalId_key" ON "public"."SongLike"("userId", "songProposalId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Financials_eventId_key" ON "public"."Financials"("eventId");
 
 -- CreateIndex
@@ -910,6 +1003,12 @@ CREATE UNIQUE INDEX "PostFeedback_userId_postId_key" ON "public"."PostFeedback"(
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Vote_userId_pollId_key" ON "public"."Vote"("userId", "pollId");
+
+-- CreateIndex
+CREATE INDEX "WorshipMessage_worshipMinistryId_idx" ON "public"."WorshipMessage"("worshipMinistryId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ProjectApplication_projectId_applicantId_key" ON "public"."ProjectApplication"("projectId", "applicantId");
 
 -- AddForeignKey
 ALTER TABLE "public"."Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -972,6 +1071,12 @@ ALTER TABLE "public"."MinistryMember" ADD CONSTRAINT "MinistryMember_ministryId_
 ALTER TABLE "public"."MinistryMember" ADD CONSTRAINT "MinistryMember_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "public"."MinistryJoinRequest" ADD CONSTRAINT "MinistryJoinRequest_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."MinistryJoinRequest" ADD CONSTRAINT "MinistryJoinRequest_ministryId_fkey" FOREIGN KEY ("ministryId") REFERENCES "public"."Ministry"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "public"."Group" ADD CONSTRAINT "Group_leaderId_fkey" FOREIGN KEY ("leaderId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -984,7 +1089,19 @@ ALTER TABLE "public"."Event" ADD CONSTRAINT "Event_groupId_fkey" FOREIGN KEY ("g
 ALTER TABLE "public"."Event" ADD CONSTRAINT "Event_ministryId_fkey" FOREIGN KEY ("ministryId") REFERENCES "public"."Ministry"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "public"."WorshipSet" ADD CONSTRAINT "WorshipSet_leaderId_fkey" FOREIGN KEY ("leaderId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "public"."WorshipResource" ADD CONSTRAINT "WorshipResource_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "public"."Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."SongProposal" ADD CONSTRAINT "SongProposal_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."SongLike" ADD CONSTRAINT "SongLike_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."SongLike" ADD CONSTRAINT "SongLike_songProposalId_fkey" FOREIGN KEY ("songProposalId") REFERENCES "public"."SongProposal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."ResourceAllocation" ADD CONSTRAINT "ResourceAllocation_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "public"."Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -1095,7 +1212,7 @@ ALTER TABLE "public"."ForumPost" ADD CONSTRAINT "ForumPost_topicId_fkey" FOREIGN
 ALTER TABLE "public"."ForumPost" ADD CONSTRAINT "ForumPost_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."TopicFeedback" ADD CONSTRAINT "TopicFeedback_topicId_fkey" FOREIGN KEY ("topicId") REFERENCES "public"."ForumTopic"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."TopicFeedback" ADD CONSTRAINT "TopicFeedback_topicId_fkey" FOREIGN KEY ("topicId") REFERENCES "public"."ForumTopic"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."TopicFeedback" ADD CONSTRAINT "TopicFeedback_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -1125,6 +1242,12 @@ ALTER TABLE "public"."Vote" ADD CONSTRAINT "Vote_userId_fkey" FOREIGN KEY ("user
 ALTER TABLE "public"."CanvasDesign" ADD CONSTRAINT "CanvasDesign_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "public"."WorshipMessage" ADD CONSTRAINT "WorshipMessage_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."WorshipMessage" ADD CONSTRAINT "WorshipMessage_recipientId_fkey" FOREIGN KEY ("recipientId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "public"."VolunteeringOpportunity" ADD CONSTRAINT "VolunteeringOpportunity_coordinatorId_fkey" FOREIGN KEY ("coordinatorId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -1132,6 +1255,12 @@ ALTER TABLE "public"."VolunteeringApplication" ADD CONSTRAINT "VolunteeringAppli
 
 -- AddForeignKey
 ALTER TABLE "public"."VolunteeringApplication" ADD CONSTRAINT "VolunteeringApplication_applicantId_fkey" FOREIGN KEY ("applicantId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."ProjectApplication" ADD CONSTRAINT "ProjectApplication_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "public"."Event"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."ProjectApplication" ADD CONSTRAINT "ProjectApplication_applicantId_fkey" FOREIGN KEY ("applicantId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."FinancialSupportRequest" ADD CONSTRAINT "FinancialSupportRequest_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

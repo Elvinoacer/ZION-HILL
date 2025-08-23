@@ -141,22 +141,22 @@ export default function LessonPage({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Lesson Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
             {lesson.title}
           </h1>
-          <div className="flex justify-center space-x-4">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
             {lesson.pdfUrl && (
               <a
                 href={lesson.pdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
+                className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors"
               >
-                <DocumentTextIcon className="h-4 w-4 mr-1" />
+                <DocumentTextIcon className="h-4 w-4 mr-1.5" />
                 PDF Notes
               </a>
             )}
@@ -165,9 +165,9 @@ export default function LessonPage({
                 href={lesson.imageUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200"
+                className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors"
               >
-                <PhotographIcon className="h-4 w-4 mr-1" />
+                <PhotographIcon className="h-4 w-4 mr-1.5" />
                 Visual Aid
               </a>
             )}
@@ -176,9 +176,9 @@ export default function LessonPage({
                 href={lesson.externalLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 hover:bg-purple-200"
+                className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors"
               >
-                <ExternalLinkIcon className="h-4 w-4 mr-1" />
+                <ExternalLinkIcon className="h-4 w-4 mr-1.5" />
                 External Resource
               </a>
             )}
@@ -186,17 +186,17 @@ export default function LessonPage({
         </div>
 
         {/* Lesson Content */}
-        <div className="bg-white rounded-2xl shadow-md overflow-hidden mb-12">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
           <div className="p-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
-          <div className="p-8">
+          <div className="p-6 sm:p-8">
             {lesson.content && (
               <div
-                className="prose max-w-none"
+                className="prose prose-lg max-w-none"
                 dangerouslySetInnerHTML={{ __html: lesson.content }}
               />
             )}
             {lesson.imageUrl && (
-              <div className="mt-6 rounded-lg overflow-hidden">
+              <div className="mt-6 rounded-lg overflow-hidden shadow-md">
                 <img
                   src={lesson.imageUrl}
                   alt={lesson.title}
@@ -209,67 +209,70 @@ export default function LessonPage({
 
         {/* Quiz Section */}
         {lesson.questions.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
             <div className="p-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
-            <div className="p-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Lesson Quiz
+            <div className="p-6 sm:p-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
+                Test Your Knowledge
               </h2>
 
               {!result ? (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {lesson.questions.map((question) => (
+                  {lesson.questions.map((question, index) => (
                     <div
                       key={question.id}
-                      className="p-6 border border-gray-200 rounded-xl hover:shadow-sm transition-shadow"
+                      className="p-4 sm:p-6 border border-gray-200 rounded-xl hover:shadow-lg transition-shadow bg-gray-50/50"
                     >
-                      <p className="text-lg font-medium text-gray-900 mb-4">
+                      <p className="text-md sm:text-lg font-medium text-gray-900 mb-4">
+                        <span className="font-bold">{index + 1}.</span>{" "}
                         {question.text}
                       </p>
                       <div className="space-y-3">
-                        {question.options.map((option, index) => (
+                        {question.options.map((option, idx) => (
                           <label
-                            key={index}
-                            className={`flex items-start p-3 rounded-lg cursor-pointer transition-colors ${
-                              answers[question.id] === index
-                                ? "bg-blue-50 border border-blue-200"
-                                : "hover:bg-gray-50 border border-transparent"
+                            key={idx}
+                            className={`flex items-start p-3 sm:p-4 rounded-lg cursor-pointer transition-all duration-200 border-2 ${
+                              answers[question.id] === idx
+                                ? "bg-blue-50 border-blue-400 shadow-sm"
+                                : "bg-white hover:bg-blue-50/50 border-gray-200 hover:border-blue-300"
                             }`}
                           >
                             <input
                               type="radio"
                               name={question.id}
-                              value={index}
-                              checked={answers[question.id] === index}
+                              value={idx}
+                              checked={answers[question.id] === idx}
                               onChange={() =>
-                                handleAnswerChange(question.id, index)
+                                handleAnswerChange(question.id, idx)
                               }
-                              className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500"
+                              className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                             />
-                            <span className="ml-3 text-gray-700">{option}</span>
+                            <span className="ml-3 text-md text-gray-700">
+                              {option}
+                            </span>
                           </label>
                         ))}
                       </div>
                     </div>
                   ))}
 
-                  <div className="flex justify-end">
+                  <div className="pt-4">
                     <button
                       type="submit"
                       disabled={
                         isSubmitting ||
                         Object.keys(answers).length !== lesson.questions.length
                       }
-                      className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105"
                     >
                       {isSubmitting ? (
                         <>
-                          <ArrowPathIcon className="animate-spin h-5 w-5 mr-2" />
+                          <ArrowPathIcon className="animate-spin h-5 w-5 mr-3" />
                           Submitting...
                         </>
                       ) : (
                         <>
-                          <CheckCircleIcon className="h-5 w-5 mr-2" />
+                          <CheckCircleIcon className="h-5 w-5 mr-3" />
                           Submit Quiz
                         </>
                       )}
@@ -279,7 +282,7 @@ export default function LessonPage({
               ) : (
                 <div className="text-center py-8">
                   <div
-                    className={`mx-auto flex items-center justify-center h-16 w-16 rounded-full ${
+                    className={`mx-auto flex items-center justify-center h-20 w-20 sm:h-24 sm:w-24 rounded-full animate-pulse ${
                       result.score >= 80
                         ? "bg-green-100 text-green-600"
                         : result.score >= 50
@@ -287,27 +290,29 @@ export default function LessonPage({
                         : "bg-red-100 text-red-600"
                     }`}
                   >
-                    <span className="text-2xl font-bold">
+                    <span className="text-3xl sm:text-4xl font-bold">
                       {result.score.toFixed(0)}%
                     </span>
                   </div>
-                  <h3 className="mt-4 text-2xl font-medium text-gray-900">
+                  <h3 className="mt-6 text-2xl sm:text-3xl font-medium text-gray-900">
                     {result.score >= 80
                       ? "Excellent Work!"
                       : result.score >= 50
                       ? "Good Job!"
                       : "Keep Practicing!"}
                   </h3>
-                  <p className="mt-2 text-gray-600">{result.feedback}</p>
+                  <p className="mt-2 text-md text-gray-600 max-w-md mx-auto">
+                    {result.feedback}
+                  </p>
                   <button
                     onClick={() => {
                       setResult(null);
                       setAnswers({});
                     }}
-                    className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="mt-8 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105"
                   >
-                    <ArrowPathIcon className="h-4 w-4 mr-2" />
-                    Try Again
+                    <ArrowPathIcon className="h-5 w-5 mr-2" />
+                    Try Quiz Again
                   </button>
                 </div>
               )}

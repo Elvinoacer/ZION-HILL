@@ -45,21 +45,21 @@ const LiveStreamPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 sm:p-6 animate-fade-in">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col items-center mb-8">
-            <Skeleton className="h-8 w-64 mb-2 bg-gray-700" />
-            <Skeleton className="h-4 w-32 bg-gray-700" />
+          <div className="flex flex-col items-center mb-6 sm:mb-8">
+            <Skeleton className="h-6 w-48 sm:w-64 mb-2 bg-gray-700 animate-pulse" />
+            <Skeleton className="h-3 w-24 sm:w-32 bg-gray-700 animate-pulse" />
           </div>
 
           <div className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl">
-            <Skeleton className="w-full h-96 bg-gray-700" />
+            <Skeleton className="w-full h-64 sm:h-80 md:h-96 bg-gray-700 animate-pulse" />
           </div>
 
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Skeleton className="h-20 rounded-lg bg-gray-800" />
-            <Skeleton className="h-20 rounded-lg bg-gray-800" />
-            <Skeleton className="h-20 rounded-lg bg-gray-800" />
+          <div className="mt-4 sm:mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            <Skeleton className="h-16 sm:h-20 rounded-lg bg-gray-800 animate-pulse" />
+            <Skeleton className="h-16 sm:h-20 rounded-lg bg-gray-800 animate-pulse" />
+            <Skeleton className="h-16 sm:h-20 rounded-lg bg-gray-800 animate-pulse" />
           </div>
         </div>
       </div>
@@ -68,14 +68,14 @@ const LiveStreamPage = () => {
 
   if (!streamData || !streamData.isLive) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 flex items-center justify-center">
-        <div className="container mx-auto max-w-2xl text-center">
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-gray-700/30">
-            <div className="mb-6">
-              <div className="w-20 h-20 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 sm:p-6 flex items-center justify-center animate-fade-in">
+        <div className="container mx-auto max-w-xl text-center">
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-2xl border border-gray-700/30 border-red-500/50">
+            <div className="mb-4 sm:mb-6">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 bg-red-500/20 rounded-full flex items-center justify-center animate-pulse-slow">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-10 w-10 text-red-500"
+                  className="h-8 w-8 sm:h-10 sm:w-10 text-red-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -88,53 +88,53 @@ const LiveStreamPage = () => {
                   />
                 </svg>
               </div>
-              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
+              <h1 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
                 Live Stream
               </h1>
-              <p className="text-gray-400 mt-4">
+              <p className="text-gray-400 mt-2 sm:mt-4 text-sm sm:text-base">
                 The live stream is currently offline.
               </p>
             </div>
 
-            <div className="mt-8 bg-gray-900/50 p-6 rounded-xl border border-gray-700/30">
-              <h2 className="text-xl font-semibold mb-4">
+            <div className="mt-6 sm:mt-8 bg-gray-900/50 p-5 sm:p-6 rounded-xl border border-gray-700/30">
+              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">
                 Next Stream Schedule
               </h2>
-              <div className="flex justify-center items-center space-x-4">
-                <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-                  <div className="text-2xl font-bold">12</div>
-                  <div className="text-sm text-gray-400">Hours</div>
+              <div className="flex justify-center items-center space-x-3 sm:space-x-4">
+                <div className="text-center p-2 sm:p-3 bg-gray-800/50 rounded-lg min-w-[60px] sm:min-w-[70px]">
+                  <div className="text-2xl sm:text-3xl font-extrabold">12</div>
+                  <div className="text-xs sm:text-sm text-gray-400">Hours</div>
                 </div>
-                <div className="text-2xl text-gray-400">:</div>
-                <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-                  <div className="text-2xl font-bold">45</div>
-                  <div className="text-sm text-gray-400">Minutes</div>
+                <div className="text-xl sm:text-2xl text-gray-400 font-bold">:</div>
+                <div className="text-center p-2 sm:p-3 bg-gray-800/50 rounded-lg min-w-[60px] sm:min-w-[70px]">
+                  <div className="text-2xl sm:text-3xl font-extrabold">45</div>
+                  <div className="text-xs sm:text-sm text-gray-400">Minutes</div>
                 </div>
-                <div className="text-2xl text-gray-400">:</div>
-                <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-                  <div className="text-2xl font-bold">22</div>
-                  <div className="text-sm text-gray-400">Seconds</div>
+                <div className="text-xl sm:text-2xl text-gray-400 font-bold">:</div>
+                <div className="text-center p-2 sm:p-3 bg-gray-800/50 rounded-lg min-w-[60px] sm:min-w-[70px]">
+                  <div className="text-2xl sm:text-3xl font-extrabold">22</div>
+                  <div className="text-xs sm:text-sm text-gray-400">Seconds</div>
                 </div>
               </div>
 
-              <button className="mt-6 w-full py-3 px-4 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 rounded-lg font-medium transition-all duration-300 transform hover:-translate-y-1">
+              <button className="mt-5 sm:mt-6 w-full py-2.5 sm:py-3 px-4 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 rounded-lg font-medium transition-all duration-300 transform hover:-translate-y-1 text-sm sm:text-base shadow-lg hover:shadow-xl">
                 Notify Me When Live
               </button>
             </div>
 
-            <p className="mt-6 text-sm text-gray-500">
+            <p className="mt-5 sm:mt-6 text-xs sm:text-sm text-gray-500">
               Follow us on social media to get updates
             </p>
-            <div className="flex justify-center space-x-4 mt-4">
-              <div className="h-10 w-10 rounded-full bg-gray-700/50 hover:bg-twitter-blue/20 cursor-pointer flex items-center justify-center transition-colors">
-                <span className="text-xl">🐦</span>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-gray-700/50 hover:bg-blue-600/20 cursor-pointer flex items-center justify-center transition-colors">
-                <span className="text-xl">📘</span>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-gray-700/50 hover:bg-red-500/20 cursor-pointer flex items-center justify-center transition-colors">
-                <span className="text-xl">📸</span>
-              </div>
+            <div className="flex justify-center space-x-3 sm:space-x-4 mt-3 sm:mt-4">
+              <a href="#" className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gray-700/50 hover:bg-blue-400/20 cursor-pointer flex items-center justify-center transition-colors duration-300 group">
+                <span className="text-lg sm:text-xl group-hover:text-blue-400 transition-colors duration-300">🐦</span>
+              </a>
+              <a href="#" className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gray-700/50 hover:bg-blue-600/20 cursor-pointer flex items-center justify-center transition-colors duration-300 group">
+                <span className="text-lg sm:text-xl group-hover:text-blue-600 transition-colors duration-300">📘</span>
+              </a>
+              <a href="#" className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gray-700/50 hover:bg-red-500/20 cursor-pointer flex items-center justify-center transition-colors duration-300 group">
+                <span className="text-lg sm:text-xl group-hover:text-red-500 transition-colors duration-300">📸</span>
+              </a>
             </div>
           </div>
         </div>
@@ -143,26 +143,26 @@ const LiveStreamPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 sm:p-6 animate-fade-in">
       <div className="container mx-auto max-w-6xl">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 sm:mb-6">
+          <div className="md:text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
               Live Stream
             </h1>
-            <p className="text-gray-400 mt-1 flex items-center">
-              <span className="flex h-3 w-3 relative">
+            <p className="text-gray-400 mt-0.5 sm:mt-1 flex items-center text-sm sm:text-base">
+              <span className="flex h-2.5 w-2.5 sm:h-3 sm:w-3 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-red-500 animate-pulse"></span>
               </span>
-              <span className="ml-2">
+              <span className="ml-1.5 sm:ml-2">
                 Live now • {streamData.viewerCount} viewers
               </span>
             </p>
           </div>
 
           <div className="flex space-x-3 mt-4 md:mt-0">
-            <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors flex items-center">
+            <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-all duration-300 flex items-center hover:scale-105 active:scale-95 shadow-md hover:shadow-lg">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 mr-2"
@@ -185,7 +185,7 @@ const LiveStreamPage = () => {
               </svg>
               Rewind
             </button>
-            <button className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg transition-colors flex items-center">
+            <button className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-300 flex items-center hover:scale-105 active:scale-95 shadow-md hover:shadow-lg">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 mr-2"
@@ -206,14 +206,18 @@ const LiveStreamPage = () => {
         </div>
 
         <div
-          className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl mb-6"
+          className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl mb-6 group relative cursor-pointer hover:ring-2 hover:ring-red-500 hover:ring-offset-2 hover:ring-offset-gray-900 transition-all duration-300"
           onClick={handlePlay}
         >
           <LiveStreamViewer streamUrl={streamData.streamUrl} />
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <span className="text-white text-xl font-bold">Click to Play</span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gray-800/50 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
+          <div className="bg-gray-800/50 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300 shadow-md hover:shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-700/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <h3 className="font-semibold text-lg mb-3 flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -247,7 +251,8 @@ const LiveStreamPage = () => {
             </ul>
           </div>
 
-          <div className="bg-gray-800/50 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
+          <div className="bg-gray-800/50 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300 shadow-md hover:shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-700/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <h3 className="font-semibold text-lg mb-3 flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -267,7 +272,7 @@ const LiveStreamPage = () => {
             </h3>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold">
+                <div className="text-2xl font-bold animate-pulse-fast">
                   {streamData.viewerCount}
                 </div>
                 <div className="text-sm text-gray-400">Viewers</div>
@@ -275,7 +280,8 @@ const LiveStreamPage = () => {
             </div>
           </div>
 
-          <div className="bg-gray-800/50 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
+          <div className="bg-gray-800/50 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300 shadow-md hover:shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-700/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <h3 className="font-semibold text-lg mb-3 flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -294,10 +300,10 @@ const LiveStreamPage = () => {
               Up Next
             </h3>
             <div className="flex items-center">
-              <div className="flex-shrink-0 bg-gray-700 rounded-lg w-16 h-16 flex items-center justify-center">
+              <div className="flex-shrink-0 bg-gray-700 rounded-lg w-16 h-16 flex items-center justify-center group-hover:bg-yellow-500/20 transition-colors duration-300">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-yellow-500"
+                  className="h-8 w-8 text-yellow-500 group-hover:scale-110 transition-transform duration-300"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -311,7 +317,7 @@ const LiveStreamPage = () => {
                 </svg>
               </div>
               <div className="ml-4">
-                <div className="font-medium">Q&A Session</div>
+                <div className="font-medium group-hover:text-yellow-300 transition-colors duration-300">Q&A Session</div>
                 <div className="text-sm text-gray-400">
                   Starts in 25 minutes
                 </div>

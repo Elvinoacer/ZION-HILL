@@ -94,44 +94,54 @@ export default async function CoursePage({
       : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Course Header */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
           <div className="p-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
-          <div className="p-8">
+          <div className="p-6 sm:p-8">
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <div className="flex-1">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                   {course.title}
                 </h1>
-                <p className="text-lg text-gray-600 mb-6">
+                <p className="text-md sm:text-lg text-gray-600 mb-4">
                   {course.description}
                 </p>
 
-                <div className="flex flex-wrap gap-4 mb-6">
-                  <div className="flex items-center text-gray-600">
+                <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-gray-600">
+                  <div className="flex items-center">
                     <CalendarIcon className="h-5 w-5 mr-2 text-blue-500" />
-                    {new Date(course.startDate).toLocaleDateString()} -{" "}
-                    {new Date(course.endDate).toLocaleDateString()}
+                    <span>
+                      {new Date(course.startDate).toLocaleDateString()} -{" "}
+                      {new Date(course.endDate).toLocaleDateString()}
+                    </span>
                   </div>
-                  <div className="flex items-center text-gray-600">
+                  <div className="flex items-center">
                     <BookOpenIcon className="h-5 w-5 mr-2 text-blue-500" />
-                    {course._count.lessons}{" "}
-                    {course._count.lessons === 1 ? "Lesson" : "Lessons"}
+                    <span>
+                      {course._count.lessons}{" "}
+                      {course._count.lessons === 1 ? "Lesson" : "Lessons"}
+                    </span>
                   </div>
-                  <div className="flex items-center text-gray-600">
+                  <div className="flex items-center">
                     <UsersIcon className="h-5 w-5 mr-2 text-blue-500" />
-                    {course._count.enrollments}{" "}
-                    {course._count.enrollments === 1 ? "Student" : "Students"}
+                    <span>
+                      {course._count.enrollments}{" "}
+                      {course._count.enrollments === 1
+                        ? "Student"
+                        : "Students"}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex-shrink-0">
-                {!enrollment && userId && <EnrollButton courseId={course.id} />}
+              <div className="flex-shrink-0 w-full md:w-auto">
+                {!enrollment && userId && (
+                  <EnrollButton courseId={course.id} />
+                )}
                 {enrollment && (
-                  <div className="flex items-center space-x-2 bg-green-50 text-green-800 px-4 py-3 rounded-lg">
+                  <div className="flex items-center justify-center space-x-2 bg-green-100 text-green-800 px-4 py-3 rounded-lg font-medium">
                     <CheckCircleIcon className="h-5 w-5" />
                     <span>Enrolled</span>
                   </div>
@@ -143,7 +153,7 @@ export default async function CoursePage({
               <div className="mt-6">
                 <div className="flex justify-between mb-1">
                   <span className="text-sm font-medium text-blue-700">
-                    Progress
+                    Your Progress
                   </span>
                   <span className="text-sm font-medium text-blue-700">
                     {progressPercentage}%
@@ -151,7 +161,7 @@ export default async function CoursePage({
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
-                    className="bg-blue-600 h-2.5 rounded-full"
+                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
                     style={{ width: `${progressPercentage}%` }}
                   ></div>
                 </div>
@@ -165,43 +175,63 @@ export default async function CoursePage({
         </div>
 
         {/* Lessons List */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-            <BookOpenIcon className="h-6 w-6 mr-2 text-blue-500" />
-            Course Lessons
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 flex items-center">
+            <BookOpenIcon className="h-6 w-6 mr-3 text-blue-500" />
+            Course Content
           </h2>
 
-          <div className="space-y-4">
-            {course.lessons.map((lesson) => (
+          <div className="space-y-3">
+            {course.lessons.map((lesson, index) => (
               <div
                 key={lesson.id}
-                className={`p-6 rounded-xl shadow-sm transition-all duration-200 ${
+                className={`rounded-lg transition-all duration-200 ${
                   enrollment
-                    ? "bg-white hover:shadow-md border border-gray-100"
-                    : "bg-gray-50 border border-gray-200"
+                    ? "bg-white shadow-sm hover:shadow-md border border-gray-200"
+                    : "bg-gray-100 border border-gray-200"
                 }`}
               >
                 {enrollment ? (
                   <Link
                     href={`/bible-study/lesson/${lesson.id}`}
-                    className="flex items-start"
+                    className="flex items-center justify-between p-4 sm:p-5"
                   >
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-blue-600 hover:underline">
-                        {lesson.order}. {lesson.title}
-                      </h3>
-                      {enrollment.progress.some(
-                        (p) => p.lessonId === lesson.id
-                      ) && (
-                        <span className="inline-flex items-center mt-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          <CheckCircleIcon className="h-3 w-3 mr-1" />
-                          Completed
-                        </span>
-                      )}
+                    <div className="flex items-center">
+                      <div
+                        className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full ${
+                          enrollment.progress.some(
+                            (p) => p.lessonId === lesson.id
+                          )
+                            ? "bg-green-500 text-white"
+                            : "bg-blue-500 text-white"
+                        }`}
+                      >
+                        {enrollment.progress.some(
+                          (p) => p.lessonId === lesson.id
+                        ) ? (
+                          <CheckCircleIcon className="h-5 w-5" />
+                        ) : (
+                          <span className="text-sm font-bold">
+                            {index + 1}
+                          </span>
+                        )}
+                      </div>
+                      <div className="ml-4">
+                        <h3 className="text-md sm:text-lg font-semibold text-gray-800 hover:text-blue-600">
+                          {lesson.title}
+                        </h3>
+                        {enrollment.progress.some(
+                          (p) => p.lessonId === lesson.id
+                        ) && (
+                          <span className="hidden sm:inline-flex items-center mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Completed
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-gray-400"
+                      className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -213,15 +243,17 @@ export default async function CoursePage({
                     </svg>
                   </Link>
                 ) : (
-                  <div className="flex items-start">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-gray-500">
-                        {lesson.order}. {lesson.title}
+                  <div className="flex items-center p-4 sm:p-5">
+                    <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-gray-300 text-gray-500">
+                      <LockClosedIcon className="h-5 w-5" />
+                    </div>
+                    <div className="ml-4">
+                      <h3 className="text-md sm:text-lg font-semibold text-gray-500">
+                        {lesson.title}
                       </h3>
-                      <div className="flex items-center mt-2 text-sm text-gray-500">
-                        <LockClosedIcon className="h-4 w-4 mr-1" />
-                        Enroll to view lesson
-                      </div>
+                      <p className="text-sm text-gray-400">
+                        Enroll to unlock
+                      </p>
                     </div>
                   </div>
                 )}

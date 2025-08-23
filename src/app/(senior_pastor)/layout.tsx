@@ -11,20 +11,28 @@ export default function SeniorPastorLayout({
   const { sidebarCollapsed, toggleSidebar, mobileMenuOpen, toggleMobileMenu } = useSeniorPastorStore();
 
   return (
-    <div className="relative flex min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
+    <div className="relative flex min-h-screen bg-gradient-to-br from-gray-900 to-black">
       <SeniorPastorSidebar />
       
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={toggleMobileMenu}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Toggle button for sidebar */}
       <div className="fixed top-4 right-4 z-50 md:hidden">
         <button
           onClick={toggleMobileMenu}
-          className="p-2 rounded-lg bg-white shadow-md focus:outline-none focus:ring-4 focus:ring-indigo-200"
+          className="p-2 rounded-lg bg-gray-800 shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500/50"
           aria-label="Toggle sidebar"
         >
-          {mobileMenuOpen || !sidebarCollapsed ? (
-            <X className="h-6 w-6 text-indigo-600" />
+          {mobileMenuOpen ? (
+            <X className="h-6 w-6 text-blue-400" />
           ) : (
-            <Menu className="h-6 w-6 text-indigo-600" />
+            <Menu className="h-6 w-6 text-blue-400" />
           )}
         </button>
       </div>

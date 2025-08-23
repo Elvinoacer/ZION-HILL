@@ -116,9 +116,9 @@ const ContactPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.7 }}
-      className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6"
+      className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 sm:p-6"
     >
-      <div className="max-w-7xl mx-auto space-y-16">
+      <div className="max-w-7xl mx-auto space-y-12 sm:space-y-16">
         {/* Hero Section */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
@@ -127,23 +127,23 @@ const ContactPage = () => {
           className="relative bg-cover bg-center rounded-2xl shadow-xl overflow-hidden"
           style={{
             backgroundImage: "url('/images/community-prayer.png')",
-            minHeight: "380px",
+            minHeight: "300px", // Adjusted for better mobile view
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-purple-800/70 flex flex-col items-center justify-center text-center p-8">
-            <div className="max-w-4xl space-y-6">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-purple-800/70 flex flex-col items-center justify-center text-center p-6 sm:p-8">
+            <div className="max-w-4xl space-y-4 sm:space-y-6">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.4, type: "spring" }}
-                className="bg-white/20 p-3 rounded-full backdrop-blur-sm"
+                className="bg-white/20 p-2 sm:p-3 rounded-full backdrop-blur-sm"
               >
-                <Church className="h-12 w-12 text-white mx-auto" />
+                <Church className="h-10 w-10 sm:h-12 sm:w-12 text-white mx-auto" />
               </motion.div>
-              <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 leading-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-2 sm:mb-4 leading-tight">
                 Connect With Our Church
               </h1>
-              <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-base sm:text-xl text-blue-100 mb-4 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
                 We're here to answer your questions, listen to your needs, and
                 welcome you into our faith community.
               </p>
@@ -151,9 +151,9 @@ const ContactPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="flex items-center justify-center gap-2 text-blue-100"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 text-blue-100 text-sm sm:text-base"
               >
-                <Heart className="h-5 w-5 text-red-300 animate-pulse" />
+                <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-red-300 animate-pulse" />
                 <span>Where faith, hope, and love come together</span>
               </motion.div>
             </div>
@@ -161,34 +161,34 @@ const ContactPage = () => {
         </motion.section>
 
         {/* Contact Information & Form Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
           {/* Contact Information */}
           <motion.section
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="bg-white p-10 rounded-2xl shadow-lg border border-slate-100 h-full flex flex-col justify-between"
+            className="bg-white p-6 sm:p-10 rounded-2xl shadow-lg border border-slate-100 h-full flex flex-col justify-between"
           >
             <div>
-              <h2 className="text-3xl font-bold text-slate-800 mb-8 flex items-center gap-3">
-                <Cross className="h-8 w-8 text-blue-600" />
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3">
+                <Cross className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
                 Reach Out Directly
               </h2>
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 <motion.div
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="flex items-center space-x-5 p-4 rounded-xl bg-blue-50/50 hover:bg-blue-50 transition-colors"
+                  className="flex items-center space-x-4 sm:space-x-5 p-3 sm:p-4 rounded-xl bg-blue-50/50 hover:bg-blue-50 transition-colors"
                 >
-                  <div className="bg-blue-100 p-3 rounded-full">
-                    <Mail className="h-6 w-6 text-blue-600" />
+                  <div className="bg-blue-100 p-2 sm:p-3 rounded-full">
+                    <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-800">
+                    <h3 className="text-lg sm:text-xl font-semibold text-slate-800">
                       Email Us
                     </h3>
-                    <p className="text-slate-600">info@ourchurch.org</p>
+                    <p className="text-sm sm:text-base text-slate-600">info@ourchurch.org</p>
                   </div>
                 </motion.div>
 
@@ -196,16 +196,16 @@ const ContactPage = () => {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.6 }}
-                  className="flex items-center space-x-5 p-4 rounded-xl bg-green-50/50 hover:bg-green-50 transition-colors"
+                  className="flex items-center space-x-4 sm:space-x-5 p-3 sm:p-4 rounded-xl bg-green-50/50 hover:bg-green-50 transition-colors"
                 >
-                  <div className="bg-green-100 p-3 rounded-full">
-                    <Phone className="h-6 w-6 text-green-600" />
+                  <div className="bg-green-100 p-2 sm:p-3 rounded-full">
+                    <Phone className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-800">
+                    <h3 className="text-lg sm:text-xl font-semibold text-slate-800">
                       Call Us
                     </h3>
-                    <p className="text-slate-600">(123) 456-7890</p>
+                    <p className="text-sm sm:text-base text-slate-600">(123) 456-7890</p>
                   </div>
                 </motion.div>
 
@@ -213,16 +213,16 @@ const ContactPage = () => {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.7 }}
-                  className="flex items-start space-x-5 p-4 rounded-xl bg-purple-50/50 hover:bg-purple-50 transition-colors"
+                  className="flex items-start space-x-4 sm:space-x-5 p-3 sm:p-4 rounded-xl bg-purple-50/50 hover:bg-purple-50 transition-colors"
                 >
-                  <div className="bg-purple-100 p-3 rounded-full mt-1">
-                    <MapPin className="h-6 w-6 text-purple-600" />
+                  <div className="bg-purple-100 p-2 sm:p-3 rounded-full mt-1">
+                    <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-800">
+                    <h3 className="text-lg sm:text-xl font-semibold text-slate-800">
                       Visit Us
                     </h3>
-                    <p className="text-slate-600">
+                    <p className="text-sm sm:text-base text-slate-600">
                       123 Church St, City, State, 12345
                     </p>
                   </div>
@@ -232,19 +232,19 @@ const ContactPage = () => {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.8 }}
-                  className="flex items-center space-x-5 p-4 rounded-xl bg-amber-50/50 hover:bg-amber-50 transition-colors"
+                  className="flex items-center space-x-4 sm:space-x-5 p-3 sm:p-4 rounded-xl bg-amber-50/50 hover:bg-amber-50 transition-colors"
                 >
-                  <div className="bg-amber-100 p-3 rounded-full">
-                    <Clock className="h-6 w-6 text-amber-600" />
+                  <div className="bg-amber-100 p-2 sm:p-3 rounded-full">
+                    <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-800">
+                    <h3 className="text-lg sm:text-xl font-semibold text-slate-800">
                       Office Hours
                     </h3>
-                    <p className="text-slate-600">
+                    <p className="text-sm sm:text-base text-slate-600">
                       Monday - Friday: 9:00 AM - 5:00 PM
                     </p>
-                    <p className="text-slate-600">
+                    <p className="text-sm sm:text-base text-slate-600">
                       Saturday - Sunday: Closed (except for services)
                     </p>
                   </div>
@@ -256,48 +256,48 @@ const ContactPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
-              className="mt-12"
+              className="mt-8 sm:mt-12"
             >
-              <h3 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <Users className="h-6 w-6 text-blue-600" />
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-800 mb-4 sm:mb-6 flex items-center gap-2">
+                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
                 Connect With Our Community
               </h3>
-              <div className="flex space-x-5 justify-center lg:justify-start">
+              <div className="flex space-x-3 sm:space-x-5 justify-center lg:justify-start">
                 <motion.a
                   whileHover={{ scale: 1.1, y: -3 }}
                   href="https://facebook.com/yourchurch"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-blue-100 p-3 rounded-full text-blue-700 hover:bg-blue-200 transition-colors"
+                  className="bg-blue-100 p-2 sm:p-3 rounded-full text-blue-700 hover:bg-blue-200 transition-colors"
                 >
-                  <Facebook size={28} />
+                  <Facebook size={24} />
                 </motion.a>
                 <motion.a
                   whileHover={{ scale: 1.1, y: -3 }}
                   href="https://twitter.com/yourchurch"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-sky-100 p-3 rounded-full text-sky-500 hover:bg-sky-200 transition-colors"
+                  className="bg-sky-100 p-2 sm:p-3 rounded-full text-sky-500 hover:bg-sky-200 transition-colors"
                 >
-                  <Twitter size={28} />
+                  <Twitter size={24} />
                 </motion.a>
                 <motion.a
                   whileHover={{ scale: 1.1, y: -3 }}
                   href="https://instagram.com/yourchurch"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-pink-100 p-3 rounded-full text-pink-500 hover:bg-pink-200 transition-colors"
+                  className="bg-pink-100 p-2 sm:p-3 rounded-full text-pink-500 hover:bg-pink-200 transition-colors"
                 >
-                  <Instagram size={28} />
+                  <Instagram size={24} />
                 </motion.a>
                 <motion.a
                   whileHover={{ scale: 1.1, y: -3 }}
                   href="https://youtube.com/yourchurch"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-red-100 p-3 rounded-full text-red-600 hover:bg-red-200 transition-colors"
+                  className="bg-red-100 p-2 sm:p-3 rounded-full text-red-600 hover:bg-red-200 transition-colors"
                 >
-                  <Youtube size={28} />
+                  <Youtube size={24} />
                 </motion.a>
               </div>
             </motion.div>
@@ -308,20 +308,20 @@ const ContactPage = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="bg-white p-10 rounded-2xl shadow-lg border border-slate-100"
+            className="bg-white p-6 sm:p-10 rounded-2xl shadow-lg border border-slate-100"
           >
-            <h2 className="text-3xl font-bold text-slate-800 mb-8 flex items-center gap-3">
-              <Send className="h-8 w-8 text-blue-600" />
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3">
+              <Send className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
               Send Us a Message
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-7">
+            <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-7">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="space-y-2"
+                className="space-y-1.5 sm:space-y-2"
               >
-                <Label htmlFor="name" className="text-slate-700 font-medium">
+                <Label htmlFor="name" className="text-slate-700 font-medium text-sm sm:text-base">
                   Your Name
                 </Label>
                 <Input
@@ -331,7 +331,7 @@ const ContactPage = () => {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full p-3 sm:p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base"
                   placeholder="Enter your full name"
                 />
               </motion.div>
@@ -340,9 +340,9 @@ const ContactPage = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="space-y-2"
+                className="space-y-1.5 sm:space-y-2"
               >
-                <Label htmlFor="email" className="text-slate-700 font-medium">
+                <Label htmlFor="email" className="text-slate-700 font-medium text-sm sm:text-base">
                   Your Email
                 </Label>
                 <Input
@@ -352,7 +352,7 @@ const ContactPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full p-3 sm:p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base"
                   placeholder="Enter your email address"
                 />
               </motion.div>
@@ -361,9 +361,9 @@ const ContactPage = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
-                className="space-y-2"
+                className="space-y-1.5 sm:space-y-2"
               >
-                <Label htmlFor="subject" className="text-slate-700 font-medium">
+                <Label htmlFor="subject" className="text-slate-700 font-medium text-sm sm:text-base">
                   Subject
                 </Label>
                 <Input
@@ -373,7 +373,7 @@ const ContactPage = () => {
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full p-3 sm:p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base"
                   placeholder="What is this regarding?"
                 />
               </motion.div>
@@ -382,9 +382,9 @@ const ContactPage = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
-                className="space-y-2"
+                className="space-y-1.5 sm:space-y-2"
               >
-                <Label htmlFor="message" className="text-slate-700 font-medium">
+                <Label htmlFor="message" className="text-slate-700 font-medium text-sm sm:text-base">
                   Your Message
                 </Label>
                 <Textarea
@@ -392,9 +392,9 @@ const ContactPage = () => {
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  rows={6}
+                  rows={5} // Adjusted rows for better mobile view
                   required
-                  className="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                  className="w-full p-3 sm:p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none text-sm sm:text-base"
                   placeholder="How can we help you today?"
                 />
               </motion.div>
@@ -406,9 +406,9 @@ const ContactPage = () => {
               >
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 rounded-xl text-lg font-semibold shadow-md hover:shadow-lg transition-all"
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold shadow-md hover:shadow-lg transition-all"
                 >
-                  <Send className="mr-2 h-5 w-5" />
+                  <Send className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Send Message
                 </Button>
               </motion.div>
@@ -421,18 +421,18 @@ const ContactPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="bg-white p-10 rounded-2xl shadow-lg border border-slate-100"
+          className="bg-white p-6 sm:p-10 rounded-2xl shadow-lg border border-slate-100"
         >
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-2 sm:mb-4">
               Frequently Asked Questions
             </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
               Find answers to common questions about our church community
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {faqs.map((faq, index) => (
               <motion.div
                 key={index}
@@ -440,17 +440,17 @@ const ContactPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 + index * 0.1 }}
               >
-                <Card className="h-full p-7 border-blue-100 shadow-md hover:shadow-lg transition-all duration-300 group hover:border-blue-200">
-                  <CardHeader className="p-0 mb-5">
-                    <div className="bg-blue-100 p-2 rounded-lg w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
-                      <Calendar className="h-6 w-6 text-blue-600" />
+                <Card className="h-full p-5 sm:p-7 border-blue-100 shadow-md hover:shadow-lg transition-all duration-300 group hover:border-blue-200">
+                  <CardHeader className="p-0 mb-4 sm:mb-5">
+                    <div className="bg-blue-100 p-1.5 sm:p-2 rounded-lg w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-blue-200 transition-colors">
+                      <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
                     </div>
-                    <CardTitle className="text-xl font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">
+                    <CardTitle className="text-lg sm:text-xl font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">
                       {faq.question}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-0">
-                    <p className="text-slate-600 leading-relaxed">
+                    <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                       {faq.answer}
                     </p>
                   </CardContent>
@@ -464,21 +464,21 @@ const ContactPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.0 }}
             >
-              <Card className="h-full p-7 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-md">
-                <CardHeader className="p-0 mb-5">
-                  <div className="bg-white p-2 rounded-lg w-12 h-12 flex items-center justify-center mb-4">
-                    <Heart className="h-6 w-6 text-blue-600" />
+              <Card className="h-full p-5 sm:p-7 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-md">
+                <CardHeader className="p-0 mb-4 sm:mb-5">
+                  <div className="bg-white p-1.5 sm:p-2 rounded-lg w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mb-3 sm:mb-4">
+                    <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
                   </div>
-                  <CardTitle className="text-xl font-semibold text-slate-800">
+                  <CardTitle className="text-lg sm:text-xl font-semibold text-slate-800">
                     Have more questions?
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <p className="text-slate-600 leading-relaxed mb-5">
+                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed mb-4 sm:mb-5">
                     We're always happy to answer any other questions you might
                     have about our church community.
                   </p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base py-2 sm:py-2.5 px-3 sm:px-4">
                     Contact Us
                   </Button>
                 </CardContent>
@@ -492,18 +492,18 @@ const ContactPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="bg-white p-10 rounded-2xl shadow-lg border border-slate-100"
+          className="bg-white p-6 sm:p-10 rounded-2xl shadow-lg border border-slate-100"
         >
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-2 sm:mb-4">
               Find Us on the Map
             </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
               Come visit us at our location. We'd love to welcome you in person!
             </p>
           </div>
 
-          <div className="w-full h-96 rounded-2xl overflow-hidden shadow-inner border border-slate-200">
+          <div className="w-full h-72 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-inner border border-slate-200">
             <MapContainer
               center={[DEFAULT_LATITUDE, DEFAULT_LONGITUDE]}
               zoom={DEFAULT_ZOOM}
@@ -516,11 +516,11 @@ const ContactPage = () => {
               />
               <Marker position={[DEFAULT_LATITUDE, DEFAULT_LONGITUDE]}>
                 <Popup>
-                  <div className="text-center p-2">
-                    <Church className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                    <strong>Our Church Location</strong>
+                  <div className="text-center p-1 sm:p-2">
+                    <Church className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 mx-auto mb-1 sm:mb-2" />
+                    <strong className="text-sm sm:text-base">Our Church Location</strong>
                     <br />
-                    123 Church St, City, State, 12345
+                    <span className="text-xs sm:text-sm">123 Church St, City, State, 12345</span>
                   </div>
                 </Popup>
               </Marker>
@@ -531,7 +531,7 @@ const ContactPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.0 }}
-            className="text-center text-slate-600 mt-6"
+            className="text-center text-slate-600 mt-4 sm:mt-6 text-sm sm:text-base"
           >
             Click{" "}
             <a

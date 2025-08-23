@@ -29,12 +29,13 @@ export default function TechMediaManagerSidebar() {
                 className={cn(
                   "flex items-center px-3 py-2 rounded-md text-sm font-medium",
                   pathname === item.href
-                    ? "bg-primary text-primary-foreground"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    ? "bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg" /* Dark theme active link */
+                    : "text-gray-300 hover:bg-gray-700/50 hover:text-white", /* Dark theme inactive link */
+                  "transition-all duration-200"
                 )}
                 onClick={closeMobileMenu}
               >
-                <item.icon className="h-6 w-6 mr-3" />
+                <item.icon className="h-6 w-6 mr-3 text-blue-300" /> {/* Dark theme icon color */}
                 {item.label}
               </Link>
             ))}
@@ -62,12 +63,13 @@ export default function TechMediaManagerSidebar() {
               className={cn(
                 "flex items-center px-3 py-2 rounded-md text-sm font-medium",
                 pathname === item.href
-                  ? "bg-primary text-primary-foreground"
-                  : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                sidebarCollapsed ? "justify-center" : ""
+                  ? "bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg" /* Dark theme active link */
+                  : "text-gray-300 hover:bg-gray-700/50 hover:text-white", /* Dark theme inactive link */
+                sidebarCollapsed ? "justify-center" : "",
+                "transition-all duration-200"
               )}
             >
-              <item.icon className={cn("h-6 w-6", sidebarCollapsed ? "" : "mr-3")} />
+              <item.icon className={cn("h-6 w-6", sidebarCollapsed ? "" : "mr-3", "text-blue-300")} /> {/* Dark theme icon color */}
               <span className={cn(sidebarCollapsed ? "hidden" : "block")}>
                 {item.label}
               </span>

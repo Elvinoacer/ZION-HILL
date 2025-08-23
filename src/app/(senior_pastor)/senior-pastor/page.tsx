@@ -237,33 +237,33 @@ const SeniorPastorDashboard = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4">
+      <div className="min-h-screen bg-gray-900 text-gray-200 p-4 sm:p-6 lg:p-8">
         <div className="mb-8">
-          <Skeleton className="h-10 w-64 mb-4" />
-          <Skeleton className="h-6 w-96" />
+          <Skeleton className="h-10 w-64 mb-4 bg-gray-700" />
+          <Skeleton className="h-6 w-96 bg-gray-700" />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-80 rounded-lg" />
+            <Skeleton key={i} className="h-80 rounded-lg bg-gray-800" />
           ))}
         </div>
-        <Skeleton className="h-96 w-full rounded-lg" />
+        <Skeleton className="h-96 w-full rounded-lg bg-gray-800" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto py-8 px-4 text-center">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-8 max-w-2xl mx-auto">
-          <Cross className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-red-600 mb-2">
+      <div className="min-h-screen bg-gray-900 text-gray-200 p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+        <div className="bg-red-900/30 border border-red-700/50 rounded-xl p-6 max-w-md mx-auto text-center text-white shadow-lg">
+          <Cross className="h-12 w-12 text-red-400 mx-auto mb-4" />
+          <h1 className="text-xl sm:text-2xl font-bold text-red-400 mb-2">
             Dashboard Error
           </h1>
-          <p className="text-red-500 mb-6">{error}</p>
+          <p className="text-red-300 mb-6">{error}</p>
           <Button
             variant="outline"
-            className="text-red-600 border-red-300 hover:bg-red-50"
+            className="bg-red-800/50 hover:bg-red-800/80 text-red-200 font-semibold py-2 px-4 rounded-lg border border-red-700 transition-colors"
             onClick={() => window.location.reload()}
           >
             Retry Loading Dashboard
@@ -274,55 +274,55 @@ const SeniorPastorDashboard = () => {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="min-h-screen bg-gray-900 text-gray-200 p-4 sm:p-6 lg:p-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-3">
+        <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
           Senior Pastor Dashboard
         </h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-base sm:text-lg text-gray-400">
           Oversee spiritual growth and church leadership with comprehensive
           insights and tools.
         </p>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Card className="hover:shadow-md transition-shadow">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <Card className="bg-gray-800 rounded-xl shadow-lg border border-gray-700/50 hover:shadow-xl transition-shadow">
           <CardContent className="p-6 flex items-center">
-            <div className="bg-blue-100 p-3 rounded-full mr-4">
-              <Users className="h-6 w-6 text-blue-600" />
+            <div className="bg-blue-900/30 p-3 rounded-full mr-4">
+              <Users className="h-6 w-6 text-blue-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Total Members</p>
-              <p className="text-2xl font-bold">
+              <p className="text-sm text-gray-400">Total Members</p>
+              <p className="text-2xl font-bold text-white">
                 {totalUsers !== null ? totalUsers : "N/A"}
               </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-md transition-shadow">
+        <Card className="bg-gray-800 rounded-xl shadow-lg border border-gray-700/50 hover:shadow-xl transition-shadow">
           <CardContent className="p-6 flex items-center">
-            <div className="bg-purple-100 p-3 rounded-full mr-4">
-              <BookOpen className="h-6 w-6 text-purple-600" />
+            <div className="bg-purple-900/30 p-3 rounded-full mr-4">
+              <BookOpen className="h-6 w-6 text-purple-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Active Ministries</p>
-              <p className="text-2xl font-bold">
+              <p className="text-sm text-gray-400">Active Ministries</p>
+              <p className="text-2xl font-bold text-white">
                 {totalMinistries !== null ? totalMinistries : "N/A"}
               </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-md transition-shadow">
+        <Card className="bg-gray-800 rounded-xl shadow-lg border border-gray-700/50 hover:shadow-xl transition-shadow">
           <CardContent className="p-6 flex items-center">
-            <div className="bg-green-100 p-3 rounded-full mr-4">
-              <Calendar className="h-6 w-6 text-green-600" />
+            <div className="bg-green-900/30 p-3 rounded-full mr-4">
+              <Calendar className="h-6 w-6 text-green-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Upcoming Events</p>
-              <p className="text-2xl font-bold">
+              <p className="text-sm text-gray-400">Upcoming Events</p>
+              <p className="text-2xl font-bold text-white">
                 {totalEvents !== null ? totalEvents : "N/A"}
               </p>
             </div>
@@ -333,57 +333,57 @@ const SeniorPastorDashboard = () => {
       {/* Main Dashboard Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         {/* Spiritual Growth Metrics */}
-        <Card className="lg:col-span-2 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="lg:col-span-2 bg-gray-800 rounded-xl shadow-lg border border-gray-700/50 hover:shadow-xl transition-shadow">
           <CardHeader>
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <HeartHandshake className="h-6 w-6 text-blue-600" />
+            <CardTitle className="text-2xl flex items-center gap-2 text-white">
+              <HeartHandshake className="h-6 w-6 text-blue-400" />
               Spiritual Growth Metrics
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-400">
               Key indicators of congregational health
             </CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-700">
+              <h3 className="text-lg font-semibold text-gray-200">
                 Church Growth
               </h3>
               <div className="space-y-2">
                 <p className="flex justify-between">
-                  <span className="text-gray-600">Weekly Attendance:</span>
-                  <span className="font-medium">1,250</span>
+                  <span className="text-gray-400">Weekly Attendance:</span>
+                  <span className="font-medium text-white">1,250</span>
                 </p>
                 <p className="flex justify-between">
-                  <span className="text-gray-600">Monthly Growth:</span>
-                  <span className="font-medium text-green-600">+3.2%</span>
+                  <span className="text-gray-400">Monthly Growth:</span>
+                  <span className="font-medium text-green-400">+3.2%</span>
                 </p>
                 <p className="flex justify-between">
-                  <span className="text-gray-600">New Believers:</span>
-                  <span className="font-medium">24</span>
+                  <span className="text-gray-400">New Believers:</span>
+                  <span className="font-medium text-white">24</span>
                 </p>
               </div>
 
-              <h3 className="text-lg font-semibold text-gray-700 mt-4">
+              <h3 className="text-lg font-semibold text-gray-200 mt-4">
                 Discipleship
               </h3>
               <div className="space-y-2">
                 <p className="flex justify-between">
-                  <span className="text-gray-600">Small Groups:</span>
-                  <span className="font-medium">42</span>
+                  <span className="text-gray-400">Small Groups:</span>
+                  <span className="font-medium text-white">42</span>
                 </p>
                 <p className="flex justify-between">
-                  <span className="text-gray-600">Bible Studies:</span>
-                  <span className="font-medium">18</span>
+                  <span className="text-gray-400">Bible Studies:</span>
+                  <span className="font-medium text-white">18</span>
                 </p>
               </div>
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-700">
+              <h3 className="text-lg font-semibold text-gray-200">
                 Engagement
               </h3>
-              <div className="bg-gray-50 rounded-lg p-4 h-48 flex items-center justify-center">
-                <p className="text-gray-400 text-center">
+              <div className="bg-gray-700 rounded-lg p-4 h-48 flex items-center justify-center border border-gray-600">
+                <p className="text-gray-500 text-center">
                   Engagement visualization coming soon
                 </p>
               </div>
@@ -392,24 +392,24 @@ const SeniorPastorDashboard = () => {
         </Card>
 
         {/* Communication Tools */}
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-gray-800 rounded-xl shadow-lg border border-gray-700/50 hover:shadow-xl transition-shadow">
           <CardHeader>
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <Mail className="h-6 w-6 text-purple-600" />
+            <CardTitle className="text-2xl flex items-center gap-2 text-white">
+              <Mail className="h-6 w-6 text-purple-400" />
               Communication Tools
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="w-full gap-2">
+                <Button className="w-full gap-2 bg-blue-700 hover:bg-blue-800 text-white">
                   <Bell className="h-4 w-4" />
                   Broadcast Announcement
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="bg-gray-800 text-white border-gray-700/50 rounded-xl">
                 <DialogHeader>
-                  <DialogTitle>Broadcast Announcement</DialogTitle>
+                  <DialogTitle className="text-white">Broadcast Announcement</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <Textarea
@@ -417,8 +417,9 @@ const SeniorPastorDashboard = () => {
                     value={broadcastMessage}
                     onChange={(e) => setBroadcastMessage(e.target.value)}
                     rows={5}
+                    className="bg-gray-900 text-gray-200 border-gray-700 focus:ring-blue-400 focus:border-blue-400"
                   />
-                  <Button onClick={handleBroadcast} className="w-full">
+                  <Button onClick={handleBroadcast} className="w-full bg-blue-700 hover:bg-blue-800 text-white">
                     Send to Entire Congregation
                   </Button>
                 </div>
@@ -427,14 +428,14 @@ const SeniorPastorDashboard = () => {
 
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" className="w-full gap-2">
+                <Button variant="outline" className="w-full gap-2 text-blue-400 hover:bg-blue-900/30 hover:text-blue-300 border-blue-700/50">
                   <Mail className="h-4 w-4" />
                   Send Pastoral Email
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="bg-gray-800 text-white border-gray-700/50 rounded-xl">
                 <DialogHeader>
-                  <DialogTitle>Compose Pastoral Email</DialogTitle>
+                  <DialogTitle className="text-white">Compose Pastoral Email</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <Input
@@ -443,6 +444,7 @@ const SeniorPastorDashboard = () => {
                     onChange={(e) =>
                       setEmailData({ ...emailData, recipient: e.target.value })
                     }
+                    className="bg-gray-900 text-gray-200 border-gray-700 focus:ring-blue-400 focus:border-blue-400"
                   />
                   <Input
                     placeholder="Subject"
@@ -450,6 +452,7 @@ const SeniorPastorDashboard = () => {
                     onChange={(e) =>
                       setEmailData({ ...emailData, subject: e.target.value })
                     }
+                    className="bg-gray-900 text-gray-200 border-gray-700 focus:ring-blue-400 focus:border-blue-400"
                   />
                   <Textarea
                     placeholder="Your message..."
@@ -458,8 +461,9 @@ const SeniorPastorDashboard = () => {
                       setEmailData({ ...emailData, message: e.target.value })
                     }
                     rows={5}
+                    className="bg-gray-900 text-gray-200 border-gray-700 focus:ring-blue-400 focus:border-blue-400"
                   />
-                  <Button onClick={handleSendPastoralEmail} className="w-full">
+                  <Button onClick={handleSendPastoralEmail} className="w-full bg-blue-700 hover:bg-blue-800 text-white">
                     Send Email
                   </Button>
                 </div>
@@ -468,7 +472,7 @@ const SeniorPastorDashboard = () => {
 
             <Button
               variant="outline"
-              className="w-full gap-2"
+              className="w-full gap-2 text-blue-400 hover:bg-blue-900/30 hover:text-blue-300 border-blue-700/50"
               onClick={() =>
                 (window.location.href = "/admin/preaching-calendar")
               }
@@ -480,16 +484,16 @@ const SeniorPastorDashboard = () => {
         </Card>
 
         {/* Leadership & Administration */}
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-gray-800 rounded-xl shadow-lg border border-gray-700/50 hover:shadow-xl transition-shadow">
           <CardHeader>
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <Users className="h-6 w-6 text-green-600" />
+            <CardTitle className="text-2xl flex items-center gap-2 text-white">
+              <Users className="h-6 w-6 text-green-400" />
               Leadership
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <Button
-              className="w-full gap-2"
+              className="w-full gap-2 bg-blue-700 hover:bg-blue-800 text-white"
               onClick={() =>
                 (window.location.href = "/worship-leader/dashboard")
               }
@@ -498,14 +502,14 @@ const SeniorPastorDashboard = () => {
             </Button>
             <Button
               variant="outline"
-              className="w-full gap-2"
+              className="w-full gap-2 text-blue-400 hover:bg-blue-900/30 hover:text-blue-300 border-blue-700/50"
               onClick={() => (window.location.href = "/admin/budgets")}
             >
               Ministry Budgets
             </Button>
             <Button
               variant="outline"
-              className="w-full gap-2"
+              className="w-full gap-2 text-blue-400 hover:bg-blue-900/30 hover:text-blue-300 border-blue-700/50"
               onClick={() => (window.location.href = "/admin/staff")}
             >
               Staff Management
@@ -514,30 +518,30 @@ const SeniorPastorDashboard = () => {
         </Card>
 
         {/* Pastoral Care */}
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-gray-800 rounded-xl shadow-lg border border-gray-700/50 hover:shadow-xl transition-shadow">
           <CardHeader>
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <HeartHandshake className="h-6 w-6 text-red-600" />
+            <CardTitle className="text-2xl flex items-center gap-2 text-white">
+              <HeartHandshake className="h-6 w-6 text-red-400" />
               Pastoral Care
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <Button
-              className="w-full gap-2"
+              className="w-full gap-2 bg-blue-700 hover:bg-blue-800 text-white"
               onClick={handleActivatePrayerChain}
             >
               Activate Prayer Chain
             </Button>
             <Button
               variant="outline"
-              className="w-full gap-2"
+              className="w-full gap-2 text-blue-400 hover:bg-blue-900/30 hover:text-blue-300 border-blue-700/50"
               onClick={() => (window.location.href = "/prayer-requests")}
             >
               View Prayer Requests
             </Button>
             <Button
               variant="outline"
-              className="w-full gap-2"
+              className="w-full gap-2 text-blue-400 hover:bg-blue-900/30 hover:text-blue-300 border-blue-700/50"
               onClick={() => (window.location.href = "/admin/counseling")}
             >
               Counseling Requests
@@ -546,16 +550,16 @@ const SeniorPastorDashboard = () => {
         </Card>
 
         {/* Baptism/Ordinance */}
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-gray-800 rounded-xl shadow-lg border border-gray-700/50 hover:shadow-xl transition-shadow">
           <CardHeader>
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <BookOpen className="h-6 w-6 text-orange-600" />
+            <CardTitle className="text-2xl flex items-center gap-2 text-white">
+              <BookOpen className="h-6 w-6 text-orange-400" />
               Baptism & Ordinances
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <Button
-              className="w-full gap-2"
+              className="w-full gap-2 bg-blue-700 hover:bg-blue-800 text-white"
               onClick={() =>
                 (window.location.href = "/admin/baptism-candidates")
               }
@@ -564,7 +568,7 @@ const SeniorPastorDashboard = () => {
             </Button>
             <Button
               variant="outline"
-              className="w-full gap-2"
+              className="w-full gap-2 text-blue-400 hover:bg-blue-900/30 hover:text-blue-300 border-blue-700/50"
               onClick={() => (window.location.href = "/admin/certificates")}
             >
               Generate Certificates
@@ -574,19 +578,19 @@ const SeniorPastorDashboard = () => {
       </div>
 
       {/* Prayer Request Management */}
-      <Card className="shadow-sm hover:shadow-md transition-shadow">
+      <Card className="bg-gray-800 rounded-xl shadow-lg border border-gray-700/50 hover:shadow-xl transition-shadow">
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <HeartHandshake className="h-6 w-6 text-blue-600" />
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <CardTitle className="text-2xl flex items-center gap-2 text-white">
+              <HeartHandshake className="h-6 w-6 text-blue-400" />
               Prayer Requests
             </CardTitle>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-full sm:w-[180px] bg-gray-900 text-gray-200 border-gray-700 focus:ring-blue-400 focus:border-blue-400">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-gray-800 text-gray-200 border-gray-700">
                   <SelectItem value="all">All Requests</SelectItem>
                   <SelectItem value="PENDING">Pending</SelectItem>
                   <SelectItem value="ONGOING">Ongoing</SelectItem>
@@ -600,31 +604,31 @@ const SeniorPastorDashboard = () => {
           {filteredPrayerRequests.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-gray-700/30">
                   <TableRow>
-                    <TableHead>Request</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Urgent</TableHead>
-                    <TableHead>Public</TableHead>
-                    <TableHead>Requested By</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-gray-300 font-semibold">Request</TableHead>
+                    <TableHead className="text-gray-300 font-semibold">Status</TableHead>
+                    <TableHead className="text-gray-300 font-semibold">Urgent</TableHead>
+                    <TableHead className="text-gray-300 font-semibold">Public</TableHead>
+                    <TableHead className="text-gray-300 font-semibold">Requested By</TableHead>
+                    <TableHead className="text-gray-300 font-semibold">Date</TableHead>
+                    <TableHead className="text-right text-gray-300 font-semibold">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className="divide-y divide-gray-700">
                   {filteredPrayerRequests.map((request) => (
-                    <TableRow key={request.id} className="hover:bg-gray-50">
-                      <TableCell className="font-medium max-w-xs truncate">
+                    <TableRow key={request.id} className="hover:bg-gray-700 transition-colors">
+                      <TableCell className="font-medium max-w-xs truncate text-white">
                         {request.request}
                       </TableCell>
                       <TableCell>
                         <Badge
-                          variant={
+                          className={
                             request.status === "PRAYED"
-                              ? "default"
+                              ? "bg-green-600 text-white"
                               : request.status === "ONGOING"
-                              ? "secondary"
-                              : "outline"
+                              ? "bg-yellow-600 text-white"
+                              : "bg-gray-600 text-white"
                           }
                         >
                           {request.status}
@@ -632,7 +636,7 @@ const SeniorPastorDashboard = () => {
                       </TableCell>
                       <TableCell>
                         {request.isUrgent ? (
-                          <Badge variant="destructive">Urgent</Badge>
+                          <Badge className="bg-red-600 text-white">Urgent</Badge>
                         ) : (
                           <span className="text-gray-400">Normal</span>
                         )}
@@ -641,11 +645,11 @@ const SeniorPastorDashboard = () => {
                         {request.isPublic ? (
                           <CheckCircle className="h-5 w-5 text-green-500" />
                         ) : (
-                          <XCircle className="h-5 w-5 text-gray-400" />
+                          <XCircle className="h-5 w-5 text-gray-500" />
                         )}
                       </TableCell>
-                      <TableCell>{request.user?.name || "Anonymous"}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-gray-300">{request.user?.name || "Anonymous"}</TableCell>
+                      <TableCell className="text-gray-300">
                         {new Date(request.createdAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-right">
@@ -654,6 +658,7 @@ const SeniorPastorDashboard = () => {
                             size="sm"
                             onClick={() => handleMarkAsPrayed(request.id)}
                             disabled={prayerRequestLoading === request.id}
+                            className="bg-blue-700 hover:bg-blue-800 text-white"
                           >
                             {prayerRequestLoading === request.id ? (
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -669,11 +674,11 @@ const SeniorPastorDashboard = () => {
             </div>
           ) : (
             <div className="text-center py-12">
-              <HeartHandshake className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-500">
+              <HeartHandshake className="h-12 w-12 text-gray-600 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-400">
                 No prayer requests found
               </h3>
-              <p className="text-gray-400 mt-2">
+              <p className="text-gray-500 mt-2">
                 {filterStatus === "all"
                   ? "There are currently no prayer requests."
                   : `No ${filterStatus.toLowerCase()} prayer requests.`}

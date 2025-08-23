@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar } from "lucide-react";
-import { Event } from "@prisma/client";
+import { Event } from "@/generated/prisma";
 
 interface MissionTripsProps {
   itineraries: Event[];
@@ -47,10 +47,15 @@ export default function MissionTrips({ itineraries }: MissionTripsProps) {
                     {itinerary.title}
                   </div>
                   <div className="text-sm text-gray-600 text-wrap">
-                    {itinerary.location} | {new Date(itinerary.date).toLocaleDateString()} - {new Date(itinerary.endDate || itinerary.date).toLocaleDateString()}
+                    {itinerary.location} |{" "}
+                    {new Date(itinerary.date).toLocaleDateString()} -{" "}
+                    {new Date(
+                      itinerary.endDate || itinerary.date
+                    ).toLocaleDateString()}
                   </div>
                   <div className="text-sm text-gray-600 text-wrap">
-                    Tasks: {itinerary.description} {/* Assuming description can be used for tasks */}
+                    Tasks: {itinerary.description}{" "}
+                    {/* Assuming description can be used for tasks */}
                   </div>
                 </div>
               </div>

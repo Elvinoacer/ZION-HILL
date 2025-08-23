@@ -134,18 +134,18 @@ const PastoralCareMessaging: React.FC<PastoralCareMessagingProps> = ({
   );
 
   return (
-    <Card className="h-[600px] flex flex-col">
-      <CardHeader className="border-b p-4 flex flex-row items-center justify-between">
-        <CardTitle className="text-xl font-bold flex items-center">
-          <MessageSquare className="mr-2" /> Pastoral Care Messaging
+    <Card className="flex flex-col h-full min-h-[calc(100vh-10rem)] bg-gray-800 rounded-xl shadow-2xl border border-gray-700/50">
+      <CardHeader className="border-b border-gray-700/50 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-900/50">
+        <CardTitle className="text-xl font-bold flex items-center text-white mb-2 sm:mb-0">
+          <MessageSquare className="mr-2 text-blue-400" /> Pastoral Care Messaging
         </CardTitle>
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600">Chatting with:</span>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+          <span className="text-sm text-gray-400">Chatting with:</span>
           <Select onValueChange={setSelectedRecipientId} value={selectedRecipientId || ""}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px] bg-gray-900 text-gray-200 border-gray-700 focus:ring-blue-400 focus:border-blue-400">
               <SelectValue placeholder="Select Recipient" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-gray-800 text-gray-200 border-gray-700">
               {availableRecipients.map((user) => (
                 <SelectItem key={user.id} value={user.id}>
                   {user.name} ({user.email})
@@ -158,7 +158,7 @@ const PastoralCareMessaging: React.FC<PastoralCareMessagingProps> = ({
       <CardContent className="flex-1 p-4 flex flex-col justify-end overflow-hidden">
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+            <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
           </div>
         ) : (
           <ScrollArea className="flex-1 pr-4">
@@ -179,8 +179,8 @@ const PastoralCareMessaging: React.FC<PastoralCareMessagingProps> = ({
                   >
                     <div
                       className={`max-w-[70%] p-3 rounded-lg ${msg.senderId === currentUserId
-                          ? "bg-blue-500 text-white rounded-br-none"
-                          : "bg-gray-200 text-gray-800 rounded-bl-none"
+                          ? "bg-blue-600 text-white rounded-br-none"
+                          : "bg-gray-700 text-gray-200 rounded-bl-none"
                       }`}
                     >
                       <p className="text-xs opacity-80 mb-1">
@@ -199,7 +199,7 @@ const PastoralCareMessaging: React.FC<PastoralCareMessagingProps> = ({
           </ScrollArea>
         )}
       </CardContent>
-      <div className="p-4 border-t flex items-center space-x-2">
+      <div className="p-4 border-t border-gray-700/50 flex items-center space-x-2 bg-gray-900/50">
         <Input
           placeholder="Type your message..."
           value={newMessage}
@@ -209,10 +209,10 @@ const PastoralCareMessaging: React.FC<PastoralCareMessagingProps> = ({
               handleSendMessage();
             }
           }}
-          className="flex-1"
+          className="flex-1 bg-gray-900 text-gray-200 border-gray-700 focus:ring-blue-400 focus:border-blue-400"
           disabled={!selectedRecipientId || sending}
         />
-        <Button onClick={handleSendMessage} disabled={!selectedRecipientId || sending}>
+        <Button onClick={handleSendMessage} disabled={!selectedRecipientId || sending} className="bg-blue-700 hover:bg-blue-800 text-white">
           {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </Button>
       </div>

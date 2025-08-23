@@ -29,12 +29,12 @@ export default function DigitalAssetManagement() {
   };
 
   return (
-    <div>
-      <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+    <div className="p-4 sm:p-6 lg:p-8"> {/* Added responsive padding */}
+      <h2 className="text-2xl font-semibold text-white mb-6">
         Digital Asset Management
       </h2>
       <div>
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-lg font-semibold text-white">
           AI Tagging System
         </h3>
         <div className="mt-4 space-y-2">
@@ -44,18 +44,18 @@ export default function DigitalAssetManagement() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="p-4 bg-white rounded-lg shadow-sm flex items-center"
+              className="p-4 bg-gray-700/50 rounded-lg shadow-sm flex items-center border border-gray-600" /* Dark theme background and border */
             >
-              <Database className="h-5 w-5 text-blue-600 mr-2" />
+              <Database className="h-5 w-5 text-blue-400 mr-2" /> {/* Dark theme icon color */}
               <div>
-                <div className="font-semibold text-gray-900">{asset.title}</div>
-                <div className="text-sm text-gray-600">
+                <div className="font-semibold text-white">{asset.title}</div> {/* Dark theme text */}
+                <div className="text-sm text-gray-300"> {/* Dark theme text */}
                   Type: {asset.type} | Scripture: {asset.scripture} | Speaker:{" "}
                   {asset.speaker}
                 </div>
                 <motion.button
                   onClick={() => handleTagAsset(asset.id)}
-                  className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200"
+                  className="mt-2 px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-500" /* Dark theme button */
                   whileHover={{ scale: 1.03 }}
                   aria-label={`Tag asset ${asset.title}`}
                 >

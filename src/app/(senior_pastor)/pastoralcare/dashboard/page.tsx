@@ -1,163 +1,220 @@
 "use client";
 
+import AddCounselingTopic from "@/components/admin/pastoralcare/AddCounselingTopic";
 import CounselingManagement from "@/components/admin/pastoralcare/CounselingManagement";
 import DataReporting from "@/components/admin/pastoralcare/DataReporting";
-import ResourceCoordination from "@/components/admin/pastoralcare/ResourceCoordination";
-import AddCounselingTopic from "@/components/admin/pastoralcare/AddCounselingTopic";
 import ManageCounselingTopics from "@/components/admin/pastoralcare/ManageCounselingTopics";
-import PastoralCareMessaging from "@/components/PastoralCareMessaging"; // New import
-import { motion } from "framer-motion";
-import { AlertTriangle, BarChart, Calendar, Menu, Users, X, BookOpen, MessageSquare } from "lucide-react"; // Added MessageSquare
-import { useEffect, useState } from "react";
+import ResourceCoordination from "@/components/admin/pastoralcare/ResourceCoordination";
+import PastoralCareMessaging from "@/components/PastoralCareMessaging";
 import { usePastoralCareStore } from "@/store";
-import { useSession } from "next-auth/react"; // New import
-import { RoleName } from "@/generated/prisma"; // New import
-
-const theme = {
-  primary: "bg-blue-600",
-  primaryHover: "hover:bg-blue-700",
-  secondary: "bg-gray-50",
-  secondaryHover: "hover:bg-gray-100",
-  textPrimary: "text-gray-900",
-  textSecondary: "text-gray-600",
-};
+import { motion } from "framer-motion";
+import {
+  AlertTriangle,
+  BarChart,
+  BookOpen,
+  Calendar,
+  Loader2,
+  Menu,
+  MessageSquare,
+  Users,
+  X,
+} from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 export default function PastoralCareDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("counseling");
-  const { loading, error, fetchSessions, fetchTherapists } = usePastoralCareStore();
-  const { data: session, status } = useSession(); // Get session
+  const { loading, error, fetchSessions, fetchTherapists } =
+    usePastoralCareStore();
+  const { data: session } = useSession();
 
   const currentUserId = session?.user?.id || "";
-  const currentUserRole = session?.user?.roles?.includes(RoleName.ADMIN) ? "ADMIN" : "COUNSELOR"; // Assuming admin for pastoral care dashboard
 
   useEffect(() => {
     fetchSessions();
     fetchTherapists();
-  }, []);
+  }, [fetchSessions, fetchTherapists]);
 
   if (loading)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="space-y-6 text-center"
+          className="flex flex-col items-center gap-4"
         >
-          <div className="flex justify-center">
-            <svg
-              className="animate-spin h-12 w-12 text-blue-600"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-          </div>
-          <p className="text-lg font-medium text-blue-600">Loading pastoral care data...</p>
+          <Loader2 className="h-10 w-10 animate-spin text-blue-400" />
+          <p className="text-lg font-medium text-gray-300">
+            Loading Pastoral Care Data...
+          </p>
         </motion.div>
       </div>
     );
 
   if (error)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-red-50 to-red-100">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="space-y-6 text-center"
-        >
-          <div className="flex justify-center">
-            <AlertTriangle className="h-12 w-12 text-red-600" />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex items-center justify-center min-h-screen bg-gray-900 p-4"
+      >
+        <div className="bg-red-900/30 border border-red-700/50 rounded-xl p-6 max-w-md mx-auto text-center text-white shadow-lg">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-900/50 mb-4">
+            <AlertTriangle className="h-6 w-6 text-red-400" />
           </div>
-          <p className="text-lg font-medium text-red-600">Error: {error}. Please try again.</p>
-        </motion.div>
-      </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-2">
+            Error Loading Data
+          </h2>
+          <p className="text-red-300 mb-6">{error}</p>
+          <button
+            onClick={() => {
+              fetchSessions();
+              fetchTherapists();
+            }}
+            className="bg-red-800/50 hover:bg-red-800/80 text-red-200 font-semibold py-2 px-4 rounded-lg border border-red-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </motion.div>
     );
 
   const sections = [
-    { id: "counseling", label: "Counseling Management", icon: Calendar },
-    { id: "resources", label: "Resource Coordination", icon: Users },
-    { id: "reporting", label: "Data & Reporting", icon: BarChart },
-    { id: "topics", label: "Counseling Topics", icon: BookOpen },
-    { id: "messaging", label: "Messaging", icon: MessageSquare }, // New section
+    { id: "counseling", label: "Counseling", icon: Calendar },
+    { id: "resources", label: "Resources", icon: Users },
+    { id: "reporting", label: "Reporting", icon: BarChart },
+    { id: "topics", label: "Topics", icon: BookOpen },
+    { id: "messaging", label: "Messaging", icon: MessageSquare },
   ];
 
+  const handleSectionClick = (sectionId: string) => {
+    setActiveSection(sectionId);
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
+  const SidebarContent = () => (
+    <>
+      <div className="p-4 flex justify-between items-center border-b border-gray-700/50 h-16">
+        {!sidebarCollapsed && (
+          <motion.h1
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent whitespace-nowrap"
+          >
+            Pastoral Care
+          </motion.h1>
+        )}
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="hidden md:block p-2 rounded-full hover:bg-gray-700/80 transition-colors"
+        >
+          <Menu className="h-5 w-5 text-blue-400" />
+        </button>
+        <button
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="md:hidden p-2 rounded-full hover:bg-gray-700/80 transition-colors"
+        >
+          <X className="h-5 w-5 text-blue-400" />
+        </button>
+      </div>
+      <nav className="mt-4 flex-1 overflow-y-auto p-2">
+        {sections.map((section) => (
+          <motion.button
+            key={section.id}
+            className={`w-full flex items-center rounded-lg px-4 py-3 mb-2 transition-all duration-200 text-left
+              ${
+                activeSection === section.id
+                  ? "bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg"
+                  : "text-gray-300 hover:bg-gray-700/50"
+              }
+              ${sidebarCollapsed ? "justify-center" : ""}
+            `}
+            onClick={() => handleSectionClick(section.id)}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <section.icon
+              className={`h-5 w-5 transition-all ${
+                sidebarCollapsed ? "mx-auto" : "mr-3"
+              } ${
+                activeSection === section.id ? "text-white" : "text-blue-300"
+              }`}
+            />
+            {!sidebarCollapsed && (
+              <span className="font-medium">{section.label}</span>
+            )}
+          </motion.button>
+        ))}
+      </nav>
+    </>
+  );
+
   return (
-    <div className="relative flex min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="flex min-h-screen bg-gray-900 text-gray-200">
+      {/* Mobile overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-30 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        ></div>
+      )}
+
       {/* Sidebar */}
       <motion.aside
-        className={`${
-          sidebarCollapsed ? "w-20" : "w-64"
-        } bg-white shadow-2xl border-r border-gray-200 transition-all duration-300 flex flex-col`}
-        initial={{ x: -30, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
+        className={`fixed top-0 left-0 h-full z-40 bg-gray-800 shadow-2xl border-r border-gray-700/50 flex flex-col transition-transform duration-300 ease-in-out md:relative md:translate-x-0
+          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+        initial={false}
+        animate={{ width: sidebarCollapsed ? 80 : 256 }}
+        transition={{ duration: 0.3 }}
       >
-        <div className="p-4 flex justify-between items-center border-b border-gray-200">
-          {!sidebarCollapsed && (
-            <h1 className={`${theme.textPrimary} text-2xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent`}>Pastoral Care</h1>
-          )}
-          <button
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
-          >
-            {sidebarCollapsed ? <Menu className="h-5 w-5 text-gray-600" /> : <X className="h-5 w-5 text-gray-600" />}
-          </button>
-        </div>
-        <nav className="mt-4 flex-1 overflow-y-auto p-2">
-          {sections.map((section) => (
-            <motion.button
-              key={section.id}
-              className={`w-full flex items-center rounded-lg px-4 py-3 mb-2 transition-all duration-200 text-left ${
-                activeSection === section.id
-                  ? `bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg`
-                  : `text-gray-700 hover:bg-gray-100`
-              }`}
-              onClick={() => setActiveSection(section.id)}
-              whileHover={{ scale: 1.02, x: 3 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <section.icon className={`h-5 w-5 ${sidebarCollapsed ? "mx-auto" : "mr-3"} ${activeSection === section.id ? "text-white" : "text-indigo-500"}`} />
-              {!sidebarCollapsed && <span className="font-medium">{section.label}</span>}
-            </motion.button>
-          ))}
-        </nav>
+        <SidebarContent />
       </motion.aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 overflow-y-auto">
-        <motion.div
-          className="bg-white rounded-xl shadow-2xl p-6 border border-gray-200 backdrop-blur-sm"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          {activeSection === "counseling" && <CounselingManagement />}
-          {activeSection === "resources" && <ResourceCoordination />}
-          {activeSection === "reporting" && <DataReporting />}
-          {activeSection === "topics" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <AddCounselingTopic />
-              <ManageCounselingTopics />
-            </div>
-          )}
-          {activeSection === "messaging" && (
-            <PastoralCareMessaging currentUserId={currentUserId} currentUserRole="ADMIN" />
-          )}
-        </motion.div>
-      </main>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="md:hidden flex items-center justify-between p-4 bg-gray-800/70 backdrop-blur-sm border-b border-gray-700/50 h-16">
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="p-2 rounded-md text-gray-300 hover:bg-gray-700"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+          <h2 className="text-lg font-semibold text-white">
+            {sections.find((s) => s.id === activeSection)?.label}
+          </h2>
+          <div className="w-8"></div>
+        </header>
+
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+          <motion.div
+            key={activeSection}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {activeSection === "counseling" && <CounselingManagement />}
+            {activeSection === "resources" && <ResourceCoordination />}
+            {activeSection === "reporting" && <DataReporting />}
+            {activeSection === "topics" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <AddCounselingTopic />
+                <ManageCounselingTopics />
+              </div>
+            )}
+            {activeSection === "messaging" && (
+              <PastoralCareMessaging
+                currentUserId={currentUserId}
+                currentUserRole="ADMIN"
+              />
+            )}
+          </motion.div>
+        </main>
+      </div>
     </div>
   );
 }

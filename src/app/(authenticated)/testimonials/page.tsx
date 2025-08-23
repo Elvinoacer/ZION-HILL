@@ -7,13 +7,14 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { safeFetch } from "@/lib/api";
 import { useSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MessageSquare, User, CalendarDays, Star, Send, Trash2, Edit } from "lucide-react";
+import { MessageSquare, User, CalendarDays, Star, Send, Trash2, Edit, ImagePlus, X, Loader2, Quote, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -26,7 +27,9 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogClose
 } from "@/components/ui/dialog";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Testimonial {
   id: string;
@@ -48,602 +51,333 @@ const TestimonialsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState<Testimonial | null>(null);
   const [editedComment, setEditedComment] = useState("");
   const [editedImage, setEditedImage] = useState<File | null>(null);
   const [editedImagePreview, setEditedImagePreview] = useState<string | null>(null);
 
-  const fetchTestimonials = async () => {
+  const fetchTestimonials = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await safeFetch<{ testimonials: Testimonial[], totalTestimonials: number }>("/api/testimonials");
+      const response = await safeFetch<{ testimonials: Testimonial[] }>("/api/testimonials");
       setTestimonials(response.testimonials);
-      setTotalPages(Math.ceil(response.totalTestimonials / 10)); // Assuming pageSize is 10, as per route.ts
     } catch (err: any) {
       setError(err.message);
-      toast.error("Failed to load testimonials", {
-        description: err.message,
-      });
+      toast.error("Failed to load testimonials", { description: err.message });
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchTestimonials();
   }, []);
 
   useEffect(() => {
+    fetchTestimonials();
+  }, [fetchTestimonials]);
+
+  useEffect(() => {
     return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-      if (editedImagePreview) {
-        URL.revokeObjectURL(editedImagePreview);
-      }
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+      if (editedImagePreview) URL.revokeObjectURL(editedImagePreview);
     };
   }, [imagePreview, editedImagePreview]);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
+    const file = e.target.files?.[0] || null;
+    if (isEdit) {
+        setEditedImage(file);
+        if (file) setEditedImagePreview(URL.createObjectURL(file));
+        else setEditedImagePreview(currentTestimonial?.imageUrl || null);
+    } else {
+        setImage(file);
+        if (file) setImagePreview(URL.createObjectURL(file));
+        else setImagePreview(null);
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!newTestimonial.trim() || !session?.user?.id) {
+      toast.error("Please write a testimonial and ensure you are logged in.");
+      return;
+    }
     setIsSubmitting(true);
-    setError(null);
-
-    if (!newTestimonial.trim()) {
-      setError("Please enter your testimonial");
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (!session?.user?.id) {
-      setError("You must be logged in to submit a testimonial");
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
       let imageUrl: string | undefined;
       if (image) {
         const formData = new FormData();
         formData.append("file", image);
-
-        const uploadRes = await fetch("/api/upload-image", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!uploadRes.ok) {
-          throw new Error("Failed to upload image.");
-        }
-
+        const uploadRes = await fetch("/api/upload-image", { method: "POST", body: formData });
+        if (!uploadRes.ok) throw new Error("Failed to upload image.");
         const uploadData = await uploadRes.json();
         imageUrl = uploadData.url;
       }
 
       await safeFetch("/api/testimonials", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          comment: newTestimonial,
-          userId: session.user.id,
-          sentiment: "POSITIVE",
-          imageUrl: imageUrl,
-          tags: ["testimonial"],
-        }),
+        body: JSON.stringify({ comment: newTestimonial, userId: session.user.id, imageUrl, tags: ["testimonial"] }),
       });
 
-      toast.success("Testimonial submitted!", {
-        description: "Thank you for sharing your experience with us.",
-      });
+      toast.success("Testimonial submitted!", { description: "Thank you for sharing your experience." });
       setNewTestimonial("");
       setImage(null);
       setImagePreview(null);
       fetchTestimonials();
     } catch (err: any) {
-      setError(err.message);
-      toast.error("Submission failed", {
-        description: err.message,
-      });
+      toast.error("Submission failed", { description: err.message });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (testimonialId: string) => {
-    if (!session?.user?.id) {
-      toast.error("You must be logged in to delete a testimonial");
-      return;
-    }
-
-    if (!confirm("Are you sure you want to delete this testimonial?")) {
-      return;
-    }
-
-    try {
-      await safeFetch(`/api/testimonials?id=${testimonialId}`, {
-        method: "DELETE",
-      });
-      toast.success("Testimonial deleted successfully!");
-      fetchTestimonials(); // Refresh the list
-    } catch (err: any) {
-      toast.error("Failed to delete testimonial", {
-        description: err.message,
-      });
-    }
+    toast.warning("Are you sure you want to delete this testimonial?", {
+        action: {
+            label: "Delete",
+            onClick: async () => {
+                try {
+                    await safeFetch(`/api/testimonials?id=${testimonialId}`, { method: "DELETE" });
+                    toast.success("Testimonial deleted successfully!");
+                    fetchTestimonials();
+                } catch (err: any) {
+                    toast.error("Failed to delete testimonial", { description: err.message });
+                }
+            }
+        },
+        cancel: {
+            label: "Cancel"
+        }
+    });
   };
 
   const handleEditClick = (testimonial: Testimonial) => {
     setCurrentTestimonial(testimonial);
     setEditedComment(testimonial.comment);
-    setEditedImage(null); // Clear previous image selection
-    setEditedImagePreview(testimonial.imageUrl || null); // Show existing image
+    setEditedImage(null);
+    setEditedImagePreview(testimonial.imageUrl || null);
     setIsEditModalOpen(true);
   };
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentTestimonial) return;
-
-    setIsSubmitting(true);
-    setError(null);
-
-    if (!editedComment.trim()) {
-      setError("Testimonial comment cannot be empty");
-      setIsSubmitting(false);
-      return;
+    if (!currentTestimonial || !editedComment.trim()) {
+        toast.error("Testimonial comment cannot be empty.");
+        return;
     }
-
+    setIsSubmitting(true);
     try {
       let imageUrl: string | undefined | null = currentTestimonial.imageUrl;
-
       if (editedImage) {
         const formData = new FormData();
         formData.append("file", editedImage);
-
-        const uploadRes = await fetch("/api/upload-image", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!uploadRes.ok) {
-          throw new Error("Failed to upload new image.");
-        }
-
+        const uploadRes = await fetch("/api/upload-image", { method: "POST", body: formData });
+        if (!uploadRes.ok) throw new Error("Failed to upload new image.");
         const uploadData = await uploadRes.json();
         imageUrl = uploadData.url;
-      } else if (editedImagePreview === null && currentTestimonial.imageUrl) {
-        // User removed the image
+      } else if (editedImagePreview === null) {
         imageUrl = null;
       }
 
       await safeFetch(`/api/testimonials?id=${currentTestimonial.id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          comment: editedComment,
-          imageUrl: imageUrl,
-        }),
+        body: JSON.stringify({ comment: editedComment, imageUrl }),
       });
 
       toast.success("Testimonial updated successfully!");
       setIsEditModalOpen(false);
       fetchTestimonials();
     } catch (err: any) {
-      setError(err.message);
-      toast.error("Failed to update testimonial", {
-        description: err.message,
-      });
+      toast.error("Failed to update testimonial", { description: err.message });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="mb-8">
-          <Skeleton className="h-10 w-64 mb-4" />
-          <Skeleton className="h-6 w-96" />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Skeleton className="h-80 rounded-lg" />
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-32 rounded-lg" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto py-8 px-4 text-center">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-8 max-w-2xl mx-auto">
-          <MessageSquare className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-red-600 mb-2">
-            Testimonials Error
-          </h1>
-          <p className="text-red-500 mb-6">{error}</p>
-          <Button
-            variant="outline"
-            className="text-red-600 border-red-300 hover:bg-red-50"
-            onClick={fetchTestimonials}
-          >
-            Retry Loading Testimonials
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingSkeleton />;
+  if (error) return <ErrorState message={error} onRetry={fetchTestimonials} />;
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold text-gray-800 mb-3">
-          Community Testimonials
-        </h1>
-        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-          Hear from our community and share your own experience with us
-        </p>
-      </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
+            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
+                Voices of Faith
+            </h1>
+            <p className="mt-4 max-w-3xl mx-auto text-lg text-gray-500 dark:text-gray-400">
+                Discover inspiring stories from our community and share your own journey of faith.
+            </p>
+        </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Submit Testimonial Card */}
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader>
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <MessageSquare className="h-6 w-6 text-blue-600" />
-              Share Your Story
-            </CardTitle>
-            <CardDescription>
-              Your experience can inspire others in our community
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label
-                  htmlFor="testimonial"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Your Testimonial
-                </label>
-                <Textarea
-                  id="testimonial"
-                  value={newTestimonial}
-                  onChange={(e) => setNewTestimonial(e.target.value)}
-                  required
-                  rows={5}
-                  disabled={!session?.user?.id || isSubmitting}
-                  placeholder="Tell us about your experience..."
-                  className="min-h-[120px]"
-                />
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-start">
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="lg:col-span-1 lg:sticky top-8">
+            <SubmitTestimonialForm {...{ handleSubmit, newTestimonial, setNewTestimonial, image, imagePreview, handleFileChange, isSubmitting, session, setImage, setImagePreview }} />
+          </motion.div>
 
-              <div className="space-y-2">
-                <label
-                  htmlFor="image"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Image
-                </label>
-                <Input
-                  id="image"
-                  type="file"
-                  onChange={(e) => {
-                    const file = e.target.files ? e.target.files[0] : null;
-                    setImage(file);
-                    if (file) {
-                      const objectUrl = URL.createObjectURL(file);
-                      setImagePreview(objectUrl);
-                    } else {
-                      setImagePreview(null);
-                    }
-                  }}
-                  disabled={!session?.user?.id || isSubmitting}
-                />
-                {imagePreview && (
-                  <div className="mt-4">
-                    <img src={imagePreview} alt="Image preview" className="w-full h-auto rounded-lg" />
-                    {console.log("Rendering image preview:", imagePreview)}
-                  </div>
-                )}
-              </div>
-
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-
-              <Button
-                type="submit"
-                disabled={
-                  !session?.user?.id || isSubmitting || !newTestimonial.trim()
-                }
-                className="w-full gap-2"
-              >
-                {isSubmitting ? (
-                  <>
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Send className="h-4 w-4" />
-                    Share Testimonial
-                  </>
-                )}
-              </Button>
-
-              {!session?.user?.id && (
-                <p className="text-sm text-gray-500 text-center">
-                  You must be signed in to submit a testimonial
-                </p>
+          <div className="lg:col-span-2 space-y-6">
+            <AnimatePresence>
+              {testimonials.length > 0 ? (
+                testimonials.map((testimonial, index) => (
+                  <motion.div key={testimonial.id} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ delay: index * 0.05 }}>
+                    <TestimonialCard {...{ testimonial, session, handleEditClick, handleDelete }} />
+                  </motion.div>
+                ))
+              ) : (
+                <NoTestimonials />
               )}
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Testimonials List */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              <MessageSquare className="h-6 w-6 text-blue-600" />
-              Community Voices
-            </h2>
-            <Badge variant="outline" className="text-sm">
-              {testimonials.length} testimonials
-            </Badge>
+            </AnimatePresence>
           </div>
-
-          {testimonials.length > 0 ? (
-            <div className="space-y-4">
-              {testimonials.map((testimonial) => (
-                <Card
-                  key={testimonial.id}
-                  className="shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <Avatar>
-                        <AvatarImage src={testimonial.user?.image} />
-                        <AvatarFallback>
-                          {testimonial.user?.name ? (
-                            testimonial.user.name.charAt(0).toUpperCase()
-                          ) : (
-                            <User className="h-4 w-4" />
-                          )}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-medium text-gray-800">
-                            {testimonial.user?.name || "Anonymous"}
-                          </h3>
-                          {testimonial.rating && (
-                            <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                              <span className="text-sm font-medium">
-                                {testimonial.rating}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-500 flex items-center gap-1">
-                          <CalendarDays className="h-3 w-3" />
-                          {format(
-                            new Date(testimonial.createdAt),
-                            "MMM d, yyyy"
-                          )}
-                        </p>
-                        {testimonial.imageUrl && (
-                          <div className="mt-3 w-full h-48 relative rounded-lg overflow-hidden">
-                            <img
-                              src={testimonial.imageUrl}
-                              alt="Testimonial image"
-                              className="object-cover w-full h-full"
-                            />
-                          </div>
-                        )}
-                        <p className="mt-3 text-gray-700">
-                          {testimonial.comment}
-                        </p>
-                        {testimonial.tags && testimonial.tags.length > 0 && (
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {testimonial.tags.map((tag, index) => (
-                              <Badge
-                                key={`${tag}-${index}`}
-                                variant="secondary"
-                                className="text-xs"
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-                        {session?.user?.id === testimonial.userId && (
-                          <div className="mt-4 flex justify-end space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditClick(testimonial)}
-                            >
-                              <Edit className="h-4 w-4 mr-2" /> Edit
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDelete(testimonial.id)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" /> Delete
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <Card className="shadow-sm">
-              <CardContent className="p-8 text-center">
-                <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-500">
-                  No testimonials yet
-                </h3>
-                <p className="text-gray-400 mt-2">
-                  Be the first to share your experience with our community
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center space-x-4 mt-8">
-              <Button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                variant="outline"
-              >
-                Previous
-              </Button>
-              <span className="text-gray-700">
-                Page {currentPage} of {totalPages}
-              </span>
-              <Button
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                variant="outline"
-              >
-                Next
-              </Button>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* Edit Testimonial Dialog */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit Testimonial</DialogTitle>
-            <DialogDescription>
-              Make changes to your testimonial here. Click save when you're done.
-            </DialogDescription>
-          </DialogHeader>
-          <form id="edit-testimonial-form" onSubmit={handleUpdate} className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <label htmlFor="editedComment" className="text-sm font-medium">
-                Testimonial
-              </label>
-              <Textarea
-                id="editedComment"
-                value={editedComment}
-                onChange={(e) => setEditedComment(e.target.value)}
-                rows={5}
-                required
-                className="min-h-[120px]"
-              />
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="editedImage" className="text-sm font-medium">
-                Image
-              </label>
-              <Input
-                id="editedImage"
-                type="file"
-                onChange={(e) => {
-                  const file = e.target.files ? e.target.files[0] : null;
-                  setEditedImage(file);
-                  if (file) {
-                    const objectUrl = URL.createObjectURL(file);
-                    setEditedImagePreview(objectUrl);
-                  } else {
-                    setEditedImagePreview(null);
-                  }
-                }}
-              />
-              {editedImagePreview && (
-                <div className="mt-2 relative">
-                  <img src={editedImagePreview} alt="Image preview" className="w-full h-auto rounded-lg" />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    className="absolute top-2 right-2"
-                    onClick={() => {
-                      setEditedImage(null);
-                      setEditedImagePreview(null);
-                    }}
-                  >
-                    Remove Image
-                  </Button>
-                </div>
-              )}
-            </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            <DialogFooter>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Saving...
-                  </>
-                ) : (
-                  "Save changes"
-                )}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <EditTestimonialDialog {...{ isEditModalOpen, setIsEditModalOpen, handleUpdate, editedComment, setEditedComment, editedImagePreview, handleFileChange, setEditedImagePreview, isSubmitting }} />
     </div>
   );
 };
+
+const LoadingSkeleton = () => (
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <Skeleton className="h-12 w-1/3 mx-auto mb-4" />
+        <Skeleton className="h-6 w-2/3 mx-auto mb-12" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-start">
+            <div className="lg:col-span-1"><Skeleton className="h-96 rounded-2xl" /></div>
+            <div className="lg:col-span-2 space-y-6">
+                {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-48 rounded-2xl" />)}
+            </div>
+        </div>
+    </div>
+);
+
+const ErrorState = ({ message, onRetry }: { message: string, onRetry: () => void }) => (
+    <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md text-center p-8 bg-red-50 dark:bg-red-900/20 border-red-500/50">
+            <CardHeader><CardTitle className="text-red-600 dark:text-red-400">An Error Occurred</CardTitle></CardHeader>
+            <CardContent><p className="text-red-500 dark:text-red-300">{message}</p></CardContent>
+            <CardFooter><Button onClick={onRetry} variant="destructive">Try Again</Button></CardFooter>
+        </Card>
+    </div>
+);
+
+const SubmitTestimonialForm = ({ handleSubmit, newTestimonial, setNewTestimonial, imagePreview, handleFileChange, isSubmitting, session, setImage, setImagePreview }: any) => (
+    <Card className="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/60 rounded-2xl shadow-lg">
+        <CardHeader>
+            <CardTitle className="flex items-center gap-3 text-2xl font-bold text-gray-800 dark:text-gray-100">
+                <Sparkles className="h-6 w-6 text-yellow-500" />
+                Share Your Story
+            </CardTitle>
+            <CardDescription className="dark:text-gray-400">Your journey can be a beacon of hope for others.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                    <Textarea id="testimonial" value={newTestimonial} onChange={(e) => setNewTestimonial(e.target.value)} required rows={5} disabled={!session?.user?.id || isSubmitting} placeholder="Tell us about your experience..." className="bg-gray-100 dark:bg-gray-700 border-0 focus:ring-2 focus:ring-yellow-500 rounded-xl p-4 transition" />
+                </div>
+                <div className="space-y-2">
+                    <label htmlFor="image-upload" className={`cursor-pointer w-full border-2 border-dashed dark:border-gray-600 rounded-xl p-4 text-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition ${!session?.user?.id || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                        <div className="flex flex-col items-center justify-center">
+                            <ImagePlus className="h-8 w-8 mb-2" />
+                            <span>{imagePreview ? "Change Photo" : "Add a Photo"}</span>
+                        </div>
+                    </label>
+                    <Input id="image-upload" type="file" accept="image/*" onChange={handleFileChange} disabled={!session?.user?.id || isSubmitting} className="sr-only" />
+                </div>
+                {imagePreview && (
+                    <div className="relative group">
+                        <img src={imagePreview} alt="Preview" className="w-full h-auto rounded-lg shadow-md" />
+                        <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => { setImage(null); setImagePreview(null); }}>
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                )}
+                <Button type="submit" disabled={!session?.user?.id || isSubmitting || !newTestimonial.trim()} className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+                    {isSubmitting ? <><Loader2 className="h-5 w-5 animate-spin" /> Submitting...</> : <><Send className="h-5 w-5" /> Share My Story</>}
+                </Button>
+                {!session?.user?.id && <p className="text-xs text-gray-500 dark:text-gray-400 text-center">Please sign in to share your testimonial.</p>}
+            </form>
+        </CardContent>
+    </Card>
+);
+
+const TestimonialCard = ({ testimonial, session, handleEditClick, handleDelete }: any) => (
+    <Card className="bg-white dark:bg-gray-800/50 rounded-2xl shadow-lg border border-gray-200/80 dark:border-gray-700/60 overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
+        <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+                <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
+                    <AvatarImage src={testimonial.user?.image} />
+                    <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">{testimonial.user?.name?.[0] || 'A'}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                    <div className="flex items-baseline justify-between">
+                        <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{testimonial.user?.name || "Anonymous"}</h3>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1.5">
+                            <CalendarDays className="h-3.5 w-3.5" />
+                            {format(new Date(testimonial.createdAt), "MMM d, yyyy")}
+                        </p>
+                    </div>
+                    {testimonial.rating && (
+                        <div className="flex items-center gap-0.5 mt-1">
+                            {[...Array(5)].map((_, i) => <Star key={i} className={`h-4 w-4 ${i < testimonial.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300 dark:text-gray-600'}`} />)}
+                        </div>
+                    )}
+                </div>
+            </div>
+            {testimonial.imageUrl && (
+                <div className="mt-4 -mx-6 aspect-video relative rounded-t-lg overflow-hidden">
+                    <Image src={testimonial.imageUrl} alt="Testimonial image" layout="fill" objectFit="cover" />
+                </div>
+            )}
+            <blockquote className="mt-4 text-gray-600 dark:text-gray-300 italic border-l-4 border-yellow-500 pl-4 py-2">
+                <Quote className="h-5 w-5 text-yellow-500/50 absolute -left-3 top-1"/>
+                {testimonial.comment}
+            </blockquote>
+            {testimonial.tags?.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                    {testimonial.tags.map((tag: string, index: number) => <Badge key={index} variant="secondary" className="font-normal">{tag}</Badge>)}
+                </div>
+            )}
+            {session?.user?.id === testimonial.userId && (
+                <div className="mt-4 flex justify-end space-x-2">
+                    <Button variant="ghost" size="sm" onClick={() => handleEditClick(testimonial)}><Edit className="h-4 w-4 mr-2" /> Edit</Button>
+                    <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50" onClick={() => handleDelete(testimonial.id)}><Trash2 className="h-4 w-4 mr-2" /> Delete</Button>
+                </div>
+            )}
+        </CardContent>
+    </Card>
+);
+
+const NoTestimonials = () => (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 px-6 bg-white dark:bg-gray-800/40 rounded-2xl shadow-sm">
+        <MessageSquare className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
+        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200">No Stories Shared Yet</h3>
+        <p className="mt-2 text-gray-500 dark:text-gray-400">Be the first to share your testimony and inspire our community!</p>
+    </motion.div>
+);
+
+const EditTestimonialDialog = ({ isEditModalOpen, setIsEditModalOpen, handleUpdate, editedComment, setEditedComment, editedImagePreview, handleFileChange, setEditedImagePreview, isSubmitting }: any) => (
+    <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-bold">Edit Your Testimonial</DialogTitle>
+                <DialogDescription>Make changes to your story. Click save when you're done.</DialogDescription>
+            </DialogHeader>
+            <form id="edit-testimonial-form" onSubmit={handleUpdate} className="space-y-4 pt-4">
+                <Textarea value={editedComment} onChange={(e) => setEditedComment(e.target.value)} rows={5} required className="min-h-[120px] bg-gray-100 dark:bg-gray-700 border-0 focus:ring-2 focus:ring-yellow-500" />
+                <Input id="edit-image-upload" type="file" accept="image/*" onChange={(e) => handleFileChange(e, true)} className="text-sm" />
+                {editedImagePreview && (
+                    <div className="relative group mt-2">
+                        <img src={editedImagePreview} alt="Preview" className="w-full h-auto rounded-lg shadow-md" />
+                        <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => setEditedImagePreview(null)}>
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                )}
+                <DialogFooter className="pt-4">
+                    <DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose>
+                    <Button type="submit" disabled={isSubmitting} className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                        {isSubmitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</> : "Save Changes"}
+                    </Button>
+                </DialogFooter>
+            </form>
+        </DialogContent>
+    </Dialog>
+);
 
 export default TestimonialsPage;

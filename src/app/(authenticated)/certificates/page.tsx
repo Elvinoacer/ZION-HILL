@@ -191,79 +191,121 @@ export default function PublicCertificatesPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="overflow-hidden bg-white shadow-lg rounded-xl max-w-5xl mx-auto border border-gray-100"
+          className="max-w-5xl mx-auto"
         >
-          <Table className="min-w-full divide-y divide-gray-200">
-            <TableHeader className="bg-gray-50">
-              <TableRow>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Recipient
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Certificate Type
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Issued By
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </TableHead>
-                <TableHead className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody className="bg-white divide-y divide-gray-200">
-              {certificates.map((certificate, index) => (
-                <motion.tr
-                  key={certificate.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + index * 0.05 }}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <TableCell className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-blue-600 font-medium">
-                          {certificate.recipientName.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {certificate.recipientName}
-                        </div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+          {/* Mobile View - Cards */}
+          <div className="md:hidden space-y-4">
+            {certificates.map((certificate) => (
+              <div
+                key={certificate.id}
+                className="bg-white p-4 rounded-lg shadow-md border border-gray-100"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-gray-800">
+                      {certificate.recipientName}
+                    </h3>
+                    <span className="text-sm px-2 py-0.5 mt-1 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                       {certificate.certificateType}
                     </span>
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {certificate.user.name}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleViewCertificate(certificate.id)}
+                    className="group border-blue-100 hover:bg-blue-50 hover:border-blue-200 transition-colors"
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2 text-blue-500" />
+                    <span className="text-blue-600">View</span>
+                  </Button>
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-500">
+                  <p>
+                    <strong>Issued By:</strong> {certificate.user.name}
+                  </p>
+                  <p>
+                    <strong>Date:</strong>{" "}
                     {format(new Date(certificate.issuedDate), "PPP")}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewCertificate(certificate.id)}
-                      className="group border-blue-100 hover:bg-blue-50 hover:border-blue-200 transition-colors"
-                    >
-                      <ExternalLink className="h-4 w-4 mr-2 text-blue-500 group-hover:text-blue-600 transition-colors" />
-                      <span className="text-blue-600 group-hover:text-blue-700">
-                        View
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop View - Table */}
+          <div className="hidden md:block overflow-hidden bg-white shadow-lg rounded-xl border border-gray-100">
+            <Table className="min-w-full divide-y divide-gray-200">
+              <TableHeader className="bg-gray-50">
+                <TableRow>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Recipient
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Certificate Type
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Issued By
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="bg-white divide-y divide-gray-200">
+                {certificates.map((certificate, index) => (
+                  <motion.tr
+                    key={certificate.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + index * 0.05 }}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <TableCell className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-blue-600 font-medium">
+                            {certificate.recipientName.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {certificate.recipientName}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        {certificate.certificateType}
                       </span>
-                    </Button>
-                  </TableCell>
-                </motion.tr>
-              ))}
-            </TableBody>
-          </Table>
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {certificate.user.name}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {format(new Date(certificate.issuedDate), "PPP")}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewCertificate(certificate.id)}
+                        className="group border-blue-100 hover:bg-blue-50 hover:border-blue-200 transition-colors"
+                      >
+                        <ExternalLink className="h-4 w-4 mr-2 text-blue-500 group-hover:text-blue-600 transition-colors" />
+                        <span className="text-blue-600 group-hover:text-blue-700">
+                          View
+                        </span>
+                      </Button>
+                    </TableCell>
+                  </motion.tr>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </motion.div>
       )}
     </motion.div>

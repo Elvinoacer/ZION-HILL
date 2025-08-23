@@ -2,37 +2,31 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import WorshipTeamManagement from "@/components/worship-leader/WorshipTeamManagement";
-import WorshipResourceManagement from "@/components/worship-leader/WorshipResourceManagement";
-import AnnouncementBoard from "@/components/worship-leader/AnnouncementBoard";
-import SongProposals from "@/components/worship-leader/SongProposals";
-import ServiceDurationChart from "@/components/worship-leader/ServiceDurationChart";
-import TeamParticipationChart from "@/components/worship-leader/TeamParticipationChart";
-import TopSongsChart from "@/components/worship-leader/TopSongsChart";
-import StreamManagement from "@/components/worship-leader/StreamManagement";
-import SongArrangement from "@/components/worship-leader/SongArrangement";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+  Calendar,
+  Clock,
+  Edit,
+  MapPin,
+  Trash2,
+  Users,
+  Music,
+  MessageSquare,
+  Bell,
+  BarChart3,
+  Video,
+  Layout,
+  Plus,
+  Search,
+  Filter,
+  X,
+  CheckCircle,
+  XCircle,
+  Send,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { useSession } from "next-auth/react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Calendar, Clock, Edit, MapPin, Trash2 } from "lucide-react";
-import { toast, Toaster } from 'sonner';
+import { toast } from "sonner";
 
 interface Service {
   id: string;
@@ -75,6 +69,13 @@ interface WorshipSet {
   leader?: { name: string; email: string };
 }
 
+interface SongProposal {
+  id: string;
+  title: string;
+  artist: string;
+  status: string;
+}
+
 const WorshipLeaderDashboard = () => {
   const { data: session } = useSession();
   const [services, setServices] = useState<Service[]>([]);
@@ -95,7 +96,7 @@ const WorshipLeaderDashboard = () => {
   );
   const [currentMinistryMembers, setCurrentMinistryMembers] = useState<any[]>(
     []
-  ); // MinistryMember[]
+  );
 
   const [worshipSets, setWorshipSets] = useState<WorshipSet[]>([]);
   const [selectedWorshipSet, setSelectedWorshipSet] =
@@ -104,12 +105,12 @@ const WorshipLeaderDashboard = () => {
   const [newWorshipSetDate, setNewWorshipSetDate] = useState("");
   const [showCreateWorshipSetForm, setShowCreateWorshipSetForm] =
     useState(false);
-  const [showCreateMinistryForm, setShowCreateMinistryForm] = useState(false); // New state
-  const [newMinistryName, setNewMinistryName] = useState("Worship Ministry"); // Pre-fill
+  const [showCreateMinistryForm, setShowCreateMinistryForm] = useState(false);
+  const [newMinistryName, setNewMinistryName] = useState("Worship Ministry");
   const [newMinistryLeaderId, setNewMinistryLeaderId] = useState<string | null>(
     null
-  ); // To select a leader
-  const [allUsers, setAllUsers] = useState<User[]>([]); // To populate leader select
+  );
+  const [allUsers, setAllUsers] = useState<User[]>([]);
 
   const [showChatModal, setShowChatModal] = useState(false);
   const [selectedChatMember, setSelectedChatMember] = useState<User | null>(
@@ -124,6 +125,11 @@ const WorshipLeaderDashboard = () => {
     null
   );
 
+  const [activeTab, setActiveTab] = useState("services");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [expandedService, setExpandedService] = useState<string | null>(null);
+
   const handleDeleteService = async (serviceId: string) => {
     setServiceToDeleteId(serviceId);
     setShowDeleteConfirm(true);
@@ -133,13 +139,10 @@ const WorshipLeaderDashboard = () => {
     if (!serviceToDeleteId) return;
 
     const originalServices = [...services];
-    const serviceToRemove = services.find(s => s.id === serviceToDeleteId);
-
-    // Optimistically update UI
-    setServices(services.filter(s => s.id !== serviceToDeleteId));
+    setServices(services.filter((s) => s.id !== serviceToDeleteId));
     setShowDeleteConfirm(false);
     setServiceToDeleteId(null);
-    setSelectedService(null); // Deselect if the deleted service was selected
+    setSelectedService(null);
 
     toast.loading("Deleting service...", { id: "delete-service" });
 
@@ -155,12 +158,11 @@ const WorshipLeaderDashboard = () => {
 
       toast.success("Service deleted successfully!", { id: "delete-service" });
     } catch (err: any) {
-      // Revert UI on error
       setServices(originalServices);
-      toast.error(`Error deleting service: ${err.message}`, { id: "delete-service" });
+      toast.error(`Error deleting service: ${err.message}`, {
+        id: "delete-service",
+      });
       setError(err.message);
-    } finally {
-      // setLoading(false); // No longer needed here as UI is optimistically updated
     }
   };
 
@@ -271,7 +273,7 @@ const WorshipLeaderDashboard = () => {
         body: JSON.stringify({
           title: newWorshipSetTitle,
           date: newWorshipSetDate,
-          arrangedSongs: [], // Initially empty
+          arrangedSongs: [],
         }),
       });
 
@@ -308,7 +310,7 @@ const WorshipLeaderDashboard = () => {
         },
         body: JSON.stringify({
           name: newMinistryName,
-          description: "", // Optional description
+          description: "",
           leaderId: newMinistryLeaderId,
         }),
       });
@@ -319,7 +321,6 @@ const WorshipLeaderDashboard = () => {
       }
 
       setShowCreateMinistryForm(false);
-      // Re-fetch all data to update ministry list and select the new worship ministry
       const ministriesRes = await fetch("/api/ministries");
       const ministriesData = await ministriesRes.json();
       const worshipMinistry = ministriesData.find(
@@ -381,7 +382,6 @@ const WorshipLeaderDashboard = () => {
         fetchSongProposals();
         fetchAnalyticsData();
 
-        // Fetch ministries and find Worship Ministry ID
         try {
           const ministriesRes = await fetch("/api/ministries");
           if (!ministriesRes.ok) throw new Error("Failed to fetch ministries");
@@ -395,8 +395,7 @@ const WorshipLeaderDashboard = () => {
             setWorshipMinistryId(worshipMinistry.id);
             fetchMinistryMembers(worshipMinistry.id);
           } else {
-            setShowCreateMinistryForm(true); // Show form if Worship Ministry not found
-            // Fetch all users to populate leader selection
+            setShowCreateMinistryForm(true);
             const usersRes = await fetch("/api/users");
             if (!usersRes.ok) throw new Error("Failed to fetch users");
             const usersData = await usersRes.json();
@@ -485,7 +484,6 @@ const WorshipLeaderDashboard = () => {
       if (!res.ok) throw new Error("Failed to fetch messages");
       const allMessages: WorshipMessage[] = await res.json();
 
-      // Group messages by conversation partner
       const conversationsMap = new Map<string, WorshipMessage[]>();
       allMessages.forEach((msg) => {
         const otherParticipantId =
@@ -528,7 +526,7 @@ const WorshipLeaderDashboard = () => {
         );
         setChatMessages(filteredMessages);
       } else {
-        setChatMessages([]); // Clear messages if no specific member is selected
+        setChatMessages([]);
       }
     } catch (err: any) {
       console.error("Error fetching chat messages:", err);
@@ -566,7 +564,7 @@ const WorshipLeaderDashboard = () => {
       }
 
       setNewChatMessage("");
-      fetchChatMessages(selectedChatMember.id); // Refresh messages for the current conversation
+      fetchChatMessages(selectedChatMember.id);
     } catch (err: any) {
       console.error("Error sending message:", err);
       setError(err.message);
@@ -576,18 +574,32 @@ const WorshipLeaderDashboard = () => {
   const [serviceDurationData, setServiceDurationData] = useState<any[]>([]);
   const [teamParticipationData, setTeamParticipationData] = useState<any[]>([]);
   const [topSongsData, setTopSongsData] = useState<any[]>([]);
-
   const [songs, setSongs] = useState<SongProposal[]>([]);
+
+  const filteredServices = services.filter((service) => {
+    const matchesSearch =
+      service.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      service.location?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = filterType === "all" || service.type === filterType;
+    return matchesSearch && matchesType;
+  });
+
+  const toggleExpandService = (serviceId: string) => {
+    setExpandedService(expandedService === serviceId ? null : serviceId);
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col space-y-6">
-            <Skeleton className="h-12 w-64 rounded-lg" />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="h-12 bg-gray-200 rounded-lg animate-pulse w-64"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(6)].map((_, i) => (
-                <Skeleton key={i} className="h-64 rounded-xl" />
+                <div
+                  key={i}
+                  className="h-64 bg-gray-200 rounded-xl animate-pulse"
+                ></div>
               ))}
             </div>
           </div>
@@ -598,730 +610,319 @@ const WorshipLeaderDashboard = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4 flex items-center justify-center">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full text-center"
+          className="bg-white p-6 rounded-xl shadow-lg max-w-md w-full text-center"
         >
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">Error</h1>
-          <p className="text-lg text-red-500 mb-6">{error}</p>
-          <Button
+          <h1 className="text-2xl font-bold text-gray-800 mb-3">Error</h1>
+          <p className="text-red-500 mb-4">{error}</p>
+          <button
             onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600"
+            className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-lg hover:from-purple-600 hover:to-blue-600 transition-colors"
           >
             Try Again
-          </Button>
+          </button>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4">
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="mb-8 flex justify-between items-center" // Added flex and justify-between
+          className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
         >
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent mb-2">
+            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent mb-2">
               Worship Leader Dashboard
             </h1>
-            <p className="text-lg text-gray-600">
-              Manage worship services, teams, and resources with ease
+            <p className="text-gray-600">
+              Manage worship services, teams, and resources
             </p>
           </div>
-          <Button
+          <button
             onClick={() => setShowChatModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
           >
-            View Messages
-          </Button>
+            <MessageSquare size={18} />
+            Messages
+          </button>
         </motion.div>
 
+        {/* Ministry Creation Form */}
         <AnimatePresence>
           {showCreateMinistryForm && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-8 p-6 rounded-lg bg-white shadow-sm border border-blue-100 overflow-hidden"
+              className="mb-6 p-4 rounded-lg bg-white shadow-sm border border-blue-100 overflow-hidden"
             >
-              <h3 className="text-xl font-semibold text-blue-700 mb-4">
+              <h3 className="text-xl font-semibold text-blue-700 mb-3">
                 Create Worship Ministry
               </h3>
               <p className="text-gray-600 mb-4">
-                It looks like the &quot;Worship Ministry&quot; doesn&apos;t
-                exist yet. Please create it to manage your team members.
+                Create the Worship Ministry to manage your team members.
               </p>
               <form
                 onSubmit={handleCreateWorshipMinistry}
-                className="space-y-4"
+                className="space-y-3"
               >
-                <div className="space-y-2">
-                  <Label htmlFor="ministryName">Ministry Name</Label>
-                  <Input
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Ministry Name
+                  </label>
+                  <input
                     type="text"
-                    id="ministryName"
                     value={newMinistryName}
                     onChange={(e) => setNewMinistryName(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
-                    readOnly // Pre-filled, not editable
+                    readOnly
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ministryLeader">Ministry Leader</Label>
-                  <Select onValueChange={setNewMinistryLeaderId} required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a leader" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {allUsers.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {user.name || user.email}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Ministry Leader
+                  </label>
+                  <select
+                    value={newMinistryLeaderId || ""}
+                    onChange={(e) => setNewMinistryLeaderId(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select a leader</option>
+                    {allUsers.map((user) => (
+                      <option key={user.id} value={user.id}>
+                        {user.name || user.email}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div className="flex space-x-2">
-                  <Button type="submit" className="flex-1">
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
                     Create Ministry
-                  </Button>
-                  <Button
+                  </button>
+                  <button
                     type="button"
-                    variant="outline"
                     onClick={() => setShowCreateMinistryForm(false)}
-                    className="flex-1"
+                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors"
                   >
                     Cancel
-                  </Button>
+                  </button>
                 </div>
               </form>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Service Management Card */}
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="h-full bg-gradient-to-br from-white to-purple-50 border border-purple-100 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-purple-700">
-                  Service Management
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  onClick={() => {
-                    setNewServiceTitle("");
-                    setNewServiceDate("");
-                    setNewServiceLocation("");
-                    setNewServiceType("SERVICE");
-                    setEditingService(null);
-                    setShowServiceForm(true);
-                  }}
-                  className="mb-4 w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                >
-                  Add New Service
-                </Button>
-
-                <AnimatePresence>
-                  {showServiceForm && (
-                    <motion.form
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      onSubmit={
-                        editingService ? handleUpdateService : handleAddService
-                      }
-                      className="space-y-4 mb-6 overflow-hidden"
-                    >
-                      <div className="space-y-2">
-                        <Label htmlFor="title">Title</Label>
-                        <Input
-                          type="text"
-                          id="title"
-                          value={newServiceTitle}
-                          onChange={(e) => setNewServiceTitle(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="date">Date</Label>
-                        <Input
-                          type="datetime-local"
-                          id="date"
-                          value={newServiceDate}
-                          onChange={(e) => setNewServiceDate(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="location">Location</Label>
-                        <Input
-                          type="text"
-                          id="location"
-                          value={newServiceLocation}
-                          onChange={(e) =>
-                            setNewServiceLocation(e.target.value)
-                          }
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="type">Type</Label>
-                        <Select
-                          value={newServiceType}
-                          onValueChange={(value) => setNewServiceType(value)}
-                          required
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select service type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="SERVICE">Service</SelectItem>
-                            <SelectItem value="MEETING">Meeting</SelectItem>
-                            <SelectItem value="TRIP">Trip</SelectItem>
-                            <SelectItem value="APPOINTMENT">
-                              Appointment
-                            </SelectItem>
-                            <SelectItem value="CLASS">Class</SelectItem>
-                            <SelectItem value="EVENT">Event</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="flex space-x-2 pt-2">
-                        <Button
-                          type="submit"
-                          className="flex-1 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                        >
-                          {editingService ? "Update Service" : "Create Service"}
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setShowServiceForm(false)}
-                          className="flex-1"
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </motion.form>
-                  )}
-                </AnimatePresence>
-
-                <h3 className="text-lg font-semibold mb-2 text-gray-700">
-                  Existing Services
-                </h3>
-                {services.length > 0 ? (
-                  <ul className="space-y-3">
-                    {services.map((service) => (
-                      <motion.li
-                        key={service.id}
-                        whileHover={{ scale: 1.01 }}
-                        className={`p-4 rounded-lg border transition-all ${
-                          selectedService?.id === service.id
-                            ? "bg-purple-50 border-purple-400 shadow-sm"
-                            : "bg-white border-gray-200 hover:border-purple-300"
-                        }`}
-                      >
-                        <div className="flex flex-col">
-                          {/* Service Info - Full width */}
-                          <div
-                            className="flex-grow min-w-0 cursor-pointer mb-3"
-                            onClick={() => handleServiceSelect(service)}
-                          >
-                            <div className="flex items-start gap-3">
-                              <div className="bg-purple-100 text-purple-700 p-2 rounded-md flex-shrink-0 mt-0.5">
-                                <Calendar size={16} />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <h3 className="font-semibold text-gray-900 truncate">
-                                  {service.title}
-                                </h3>
-                                <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-gray-600">
-                                  <span className="inline-flex items-center gap-1">
-                                    <Calendar size={14} />
-                                    {new Date(
-                                      service.date
-                                    ).toLocaleDateString()}
-                                  </span>
-                                  <span className="text-gray-400">•</span>
-                                  <span className="inline-flex items-center gap-1">
-                                    <Clock size={14} />
-                                    {new Date(service.date).toLocaleTimeString(
-                                      [],
-                                      {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                      }
-                                    )}
-                                  </span>
-                                  {service.location && (
-                                    <>
-                                      <span className="text-gray-400">•</span>
-                                      <span className="inline-flex items-center gap-1 truncate">
-                                        <MapPin size={14} />
-                                        {service.location}
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
-                                {service.type && (
-                                  <div className="mt-2">
-                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                      {service.type}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Action Buttons - Now on their own row */}
-                          <div className="flex items-center justify-end gap-2 border-t pt-3">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingService(service);
-                                setNewServiceTitle(service.title);
-                                setNewServiceDate(
-                                  service.date.substring(0, 16)
-                                );
-                                setNewServiceLocation(service.location || "");
-                                setNewServiceType(service.type);
-                                setShowServiceForm(true);
-                              }}
-                              className="text-purple-600 border-purple-300 hover:bg-purple-50 h-8 px-3 text-xs"
-                            >
-                              <Edit size={12} className="mr-1" />
-                              Edit
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteService(service.id);
-                              }}
-                              className="h-8 px-3 text-xs"
-                            >
-                              <Trash2 size={12} className="mr-1" />
-                              Delete
-                            </Button>
-                          </div>
-                        </div>
-                      </motion.li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="text-center py-6">
-                    <p className="text-gray-500">No worship services found</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Selected Service Attendance */}
-          {selectedService && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="md:col-span-2"
+        {/* Navigation Tabs */}
+        <div className="mb-6 bg-white rounded-lg shadow-sm p-1 flex overflow-x-auto">
+          {[
+            "services",
+            "team",
+            "resources",
+            "analytics",
+            "songs",
+            "stream",
+          ].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+                activeTab === tab
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
             >
-              <Card className="h-full bg-gradient-to-br from-white to-blue-50 border border-blue-100 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-blue-700">
-                    Attendance for{" "}
-                    <span className="font-bold">{selectedService.title}</span>
-                  </CardTitle>
-                  <p className="text-sm text-gray-500">
-                    {new Date(selectedService.date).toLocaleDateString()} •{" "}
-                    {selectedService.location}
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  {participants.length > 0 ? (
-                    <div className="space-y-3">
-                      {participants.map((participant) => (
-                        <motion.div
-                          key={participant.id}
-                          whileHover={{ x: 5 }}
-                          className="flex items-center justify-between p-3 rounded-lg bg-white shadow-xs border border-gray-100"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white">
-                              {participant.user?.name?.charAt(0) || "P"}
-                            </div>
-                            <span className="font-medium text-gray-700">
-                              {participant.user?.name ||
-                                `Participant ${participant.userId}`}
-                            </span>
-                          </div>
-                          <Checkbox
-                            checked={participant.status === "Attended"}
-                            onCheckedChange={(checked) =>
-                              handleAttendanceChange(
-                                participant.id,
-                                checked ? "Attended" : "Registered"
-                              )
-                            }
-                            className="h-6 w-6 border-2 border-blue-300 data-[state=checked]:bg-blue-500"
-                          />
-                        </motion.div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">
-                        No participants found for this service
-                      </p>
-                      <Button
-                        variant="outline"
-                        className="mt-4 border-blue-300 text-blue-600 hover:bg-blue-50"
-                      >
-                        Invite Team Members
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {/* Team Members Card */}
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="h-full bg-gradient-to-br from-white to-indigo-50 border border-indigo-100 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-indigo-700">Team Members</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <WorshipTeamManagement
-                  worshipMinistryId={worshipMinistryId}
-                  currentMinistryMembers={currentMinistryMembers}
-                  fetchMinistryMembers={fetchMinistryMembers}
-                  onMessageMember={handleMessageMember}
-                />
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Resources Card */}
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="h-full bg-gradient-to-br from-white to-teal-50 border border-teal-100 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-teal-700">Resources</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <WorshipResourceManagement
-                  selectedServiceId={selectedService?.id || null}
-                />
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Announcements Card */}
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="h-full bg-gradient-to-br from-white to-amber-50 border border-amber-100 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-amber-700">
-                  Team Announcements
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <AnnouncementBoard />
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Song Proposals Card */}
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="h-full bg-gradient-to-br from-white to-pink-50 border border-pink-100 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-pink-700">Song Proposals</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <SongProposals />
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Analytics Card */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="lg:col-span-3"
-          >
-            <Card className="bg-gradient-to-br from-white to-gray-50 border border-gray-100 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-gray-700">
-                  Worship Analytics
-                </CardTitle>
-              </CardHeader>
-              <CardContent
-                className="grid grid-cols-1 md:grid-cols-3 gap-6"
-                style={{ minHeight: "300px" }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="col-span-1 p-4 bg-white rounded-lg shadow-xs border border-gray-100"
-                >
-                  <h4 className="text-center font-semibold text-gray-700 mb-4">
-                    Service Duration
-                  </h4>
-                  <ServiceDurationChart data={serviceDurationData} />
-                </motion.div>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="col-span-1 p-4 bg-white rounded-lg shadow-xs border border-gray-100"
-                >
-                  <h4 className="text-center font-semibold text-gray-700 mb-4">
-                    Team Participation
-                  </h4>
-                  <TeamParticipationChart data={teamParticipationData} />
-                </motion.div>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="col-span-1 p-4 bg-white rounded-lg shadow-xs border border-gray-100"
-                >
-                  <h4 className="text-center font-semibold text-gray-700 mb-4">
-                    Top Songs
-                  </h4>
-                  <TopSongsChart data={topSongsData} />
-                </motion.div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Live Stream Card */}
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="h-full bg-gradient-to-br from-white to-red-50 border border-red-100 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-red-700">Live Stream</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <StreamManagement />
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Song Arrangement Card */}
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="h-full bg-gradient-to-br from-white to-green-50 border border-green-100 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-green-700">
-                  Song Arrangement
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-700">
-                      Select Worship Set
-                    </h3>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setShowCreateWorshipSetForm(true);
-                        setNewWorshipSetTitle("");
-                        setNewWorshipSetDate("");
-                      }}
-                    >
-                      Create New
-                    </Button>
-                  </div>
-
-                  <AnimatePresence>
-                    {showCreateWorshipSetForm && (
-                      <motion.form
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        onSubmit={handleCreateWorshipSet}
-                        className="space-y-4 mb-4 overflow-hidden p-4 border rounded-lg bg-gray-50"
-                      >
-                        <h4 className="font-medium text-gray-800">
-                          New Worship Set
-                        </h4>
-                        <div className="space-y-2">
-                          <Label htmlFor="worshipSetTitle">Title</Label>
-                          <Input
-                            type="text"
-                            id="worshipSetTitle"
-                            value={newWorshipSetTitle}
-                            onChange={(e) =>
-                              setNewWorshipSetTitle(e.target.value)
-                            }
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="worshipSetDate">Date</Label>
-                          <Input
-                            type="datetime-local"
-                            id="worshipSetDate"
-                            value={newWorshipSetDate}
-                            onChange={(e) =>
-                              setNewWorshipSetDate(e.target.value)
-                            }
-                            required
-                          />
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button type="submit" className="flex-1">
-                            Create
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setShowCreateWorshipSetForm(false)}
-                            className="flex-1"
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      </motion.form>
-                    )}
-                  </AnimatePresence>
-
-                  <Select
-                    onValueChange={handleWorshipSetSelect}
-                    value={selectedWorshipSet?.id || ""}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a Worship Set" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {worshipSets.map((set) => (
-                        <SelectItem key={set.id} value={set.id}>
-                          {set.title} -{" "}
-                          {new Date(set.date).toLocaleDateString()}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {selectedWorshipSet && (
-                    <div className="mt-4 p-4 border rounded-lg bg-blue-50">
-                      <h4 className="font-semibold text-blue-800">
-                        Selected Set: {selectedWorshipSet.title}
-                      </h4>
-                      <p className="text-sm text-blue-700">
-                        Date:{" "}
-                        {new Date(selectedWorshipSet.date).toLocaleDateString()}
-                      </p>
-                      <p className="text-sm text-blue-700">
-                        Leader: {selectedWorshipSet.leader?.name || "N/A"}
-                      </p>
-                    </div>
-                  )}
-
-                  {selectedWorshipSet ? (
-                    <SongArrangement
-                      songs={songs.filter((song) =>
-                        selectedWorshipSet.arrangedSongs.includes(song.id)
-                      )}
-                      worshipSetId={selectedWorshipSet.id}
-                      allSongProposals={songs}
-                    />
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      <p>
-                        Please select or create a Worship Set to arrange songs.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+              {tab === "services" && <Calendar size={16} />}
+              {tab === "team" && <Users size={16} />}
+              {tab === "resources" && <Layout size={16} />}
+              {tab === "analytics" && <BarChart3 size={16} />}
+              {tab === "songs" && <Music size={16} />}
+              {tab === "stream" && <Video size={16} />}
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
 
-      <Toaster position="bottom-right" />
-
-      {/* Chat Modal */}
-        <AnimatePresence>
-          {showChatModal && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4"
+        {/* Search and Filter */}
+        <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search services..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <Dialog open={showChatModal} onOpenChange={setShowChatModal}>
-                <DialogContent className="sm:max-w-[900px] h-[80vh] p-0 flex overflow-hidden">
-                  <div className="w-1/3 border-r flex flex-col">
-                    <DialogHeader className="p-4 border-b">
-                      <DialogTitle>Conversations</DialogTitle>
-                    </DialogHeader>
-                    <div className="flex-grow overflow-y-auto">
-                      {conversations.length > 0 ? (
-                        conversations.map((member) => (
-                          <div
-                            key={member.id}
-                            className={`p-3 cursor-pointer hover:bg-gray-100 ${
-                              selectedChatMember?.id === member.id
-                                ? "bg-blue-50"
-                                : ""
-                            }`}
-                            onClick={() => setSelectedChatMember(member)}
-                          >
-                            <div className="font-semibold">
-                              {member.name || member.email}
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="p-4 text-gray-500 text-center">
-                          No conversations yet.
-                        </div>
-                      )}
+              <option value="all">All Types</option>
+              <option value="SERVICE">Service</option>
+              <option value="MEETING">Meeting</option>
+              <option value="EVENT">Event</option>
+            </select>
+            <button
+              onClick={() => {
+                setNewServiceTitle("");
+                setNewServiceDate("");
+                setNewServiceLocation("");
+                setNewServiceType("SERVICE");
+                setEditingService(null);
+                setShowServiceForm(true);
+              }}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            >
+              <Plus size={16} />
+              New Service
+            </button>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Services List */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Services
+              </h2>
+
+              <AnimatePresence>
+                {showServiceForm && (
+                  <motion.form
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    onSubmit={
+                      editingService ? handleUpdateService : handleAddService
+                    }
+                    className="space-y-3 mb-6 p-4 border border-gray-200 rounded-lg overflow-hidden"
+                  >
+                    <h3 className="font-medium text-gray-800">
+                      {editingService ? "Edit Service" : "New Service"}
+                    </h3>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Title
+                      </label>
+                      <input
+                        type="text"
+                        value={newServiceTitle}
+                        onChange={(e) => setNewServiceTitle(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
+                      />
                     </div>
-                  </div>
-                  <div className="w-2/3 flex flex-col">
-                    <DialogHeader className="p-4 border-b">
-                      <DialogTitle>
-                        {selectedChatMember
-                          ? `Chat with ${
-                              selectedChatMember.name ||
-                              selectedChatMember.email
-                            }`
-                          : "Select a conversation"}
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="p-4 flex-grow overflow-y-auto flex flex-col-reverse">
-                      {selectedChatMember ? (
-                        chatMessages
-                          .slice()
-                          .reverse()
-                          .map((msg) => (
-                            <div
-                              key={msg.id}
-                              className={`flex mb-2 ${
-                                msg.senderId === session?.user?.id
-                                  ? "justify-end"
-                                  : "justify-start"
-                              }`}
-                            >
-                              <div
-                                className={`rounded-lg p-3 max-w-[70%] ${
-                                  msg.senderId === session?.user?.id
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-gray-200 text-gray-800"
-                                }`}
-                              >
-                                <p className="text-sm">{msg.content}</p>
-                                <span className="text-xs opacity-75 mt-1 block">
-                                  {new Date(msg.createdAt).toLocaleTimeString(
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Date & Time
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={newServiceDate}
+                        onChange={(e) => setNewServiceDate(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Location
+                      </label>
+                      <input
+                        type="text"
+                        value={newServiceLocation}
+                        onChange={(e) => setNewServiceLocation(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Type
+                      </label>
+                      <select
+                        value={newServiceType}
+                        onChange={(e) => setNewServiceType(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="SERVICE">Service</option>
+                        <option value="MEETING">Meeting</option>
+                        <option value="EVENT">Event</option>
+                      </select>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="submit"
+                        className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        {editingService ? "Update" : "Create"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowServiceForm(false)}
+                        className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </motion.form>
+                )}
+              </AnimatePresence>
+
+              {filteredServices.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+                  <p>No services found</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {filteredServices.map((service) => (
+                    <motion.div
+                      key={service.id}
+                      whileHover={{ scale: 1.01 }}
+                      className={`border rounded-lg p-4 transition-all ${
+                        selectedService?.id === service.id
+                          ? "border-blue-400 bg-blue-50"
+                          : "border-gray-200 hover:border-blue-300"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-start gap-3">
+                            <div className="bg-purple-100 text-purple-700 p-2 rounded-md flex-shrink-0">
+                              <Calendar size={16} />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-gray-900">
+                                {service.title}
+                              </h3>
+                              <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-gray-600">
+                                <span className="flex items-center gap-1">
+                                  <Calendar size={14} />
+                                  {new Date(service.date).toLocaleDateString()}
+                                </span>
+                                <span className="text-gray-400">•</span>
+                                <span className="flex items-center gap-1">
+                                  <Clock size={14} />
+                                  {new Date(service.date).toLocaleTimeString(
                                     [],
                                     {
                                       hour: "2-digit",
@@ -1329,73 +930,397 @@ const WorshipLeaderDashboard = () => {
                                     }
                                   )}
                                 </span>
+                                {service.location && (
+                                  <>
+                                    <span className="text-gray-400">•</span>
+                                    <span className="flex items-center gap-1">
+                                      <MapPin size={14} />
+                                      {service.location}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                              <div className="mt-2">
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                  {service.type}
+                                </span>
                               </div>
                             </div>
-                          ))
-                      ) : (
-                        <div className="p-4 text-gray-500 text-center">
-                          Select a conversation from the left to view messages.
+                          </div>
                         </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingService(service);
+                              setNewServiceTitle(service.title);
+                              setNewServiceDate(service.date.substring(0, 16));
+                              setNewServiceLocation(service.location || "");
+                              setNewServiceType(service.type);
+                              setShowServiceForm(true);
+                            }}
+                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteService(service.id)}
+                            className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 pt-3 border-t border-gray-100">
+                        <button
+                          onClick={() => handleServiceSelect(service)}
+                          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                        >
+                          {selectedService?.id === service.id
+                            ? "Hide Attendance"
+                            : "View Attendance"}
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Selected Service Attendance */}
+            {selectedService && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mt-6 bg-white rounded-lg shadow-sm p-4"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Attendance for {selectedService.title}
+                  </h3>
+                  <button
+                    onClick={() => setSelectedService(null)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {participants.length > 0 ? (
+                  <div className="space-y-3">
+                    {participants.map((participant) => (
+                      <div
+                        key={participant.id}
+                        className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-200"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white">
+                            {participant.user?.name?.charAt(0) || "P"}
+                          </div>
+                          <span className="font-medium text-gray-700">
+                            {participant.user?.name ||
+                              `Participant ${participant.userId}`}
+                          </span>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={participant.status === "Attended"}
+                            onChange={(e) =>
+                              handleAttendanceChange(
+                                participant.id,
+                                e.target.checked ? "Attended" : "Registered"
+                              )
+                            }
+                            className="sr-only"
+                          />
+                          <div
+                            className={`w-12 h-6 rounded-full transition-colors ${
+                              participant.status === "Attended"
+                                ? "bg-green-500"
+                                : "bg-gray-300"
+                            }`}
+                          ></div>
+                          <div
+                            className={`absolute left-0.5 top-0.5 bg-white w-5 h-5 rounded-full transition-transform ${
+                              participant.status === "Attended"
+                                ? "transform translate-x-6"
+                                : ""
+                            }`}
+                          ></div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <Users className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+                    <p>No participants found for this service</p>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </div>
+
+          {/* Sidebar Content */}
+          <div className="space-y-6">
+            {/* Team Members */}
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                Team Members
+              </h3>
+              {currentMinistryMembers.length > 0 ? (
+                <div className="space-y-3">
+                  {currentMinistryMembers.slice(0, 5).map((member) => (
+                    <div
+                      key={member.id}
+                      className="flex items-center justify-between p-2 rounded-lg bg-gray-50"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-r from-indigo-400 to-purple-400 flex items-center justify-center text-white">
+                          {member.user?.name?.charAt(0) || "M"}
+                        </div>
+                        <span className="font-medium text-sm">
+                          {member.user?.name}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleMessageMember(member.user)}
+                        className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                      >
+                        <MessageSquare size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-4">
+                  No team members
+                </p>
+              )}
+            </div>
+
+            {/* Quick Stats */}
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                Quick Stats
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-blue-50 p-3 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {services.length}
+                  </div>
+                  <div className="text-sm text-blue-800">Services</div>
+                </div>
+                <div className="bg-green-50 p-3 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-green-600">
+                    {currentMinistryMembers.length}
+                  </div>
+                  <div className="text-sm text-green-800">Team Members</div>
+                </div>
+                <div className="bg-purple-50 p-3 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {songs.length}
+                  </div>
+                  <div className="text-sm text-purple-800">Songs</div>
+                </div>
+                <div className="bg-orange-50 p-3 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-orange-600">
+                    {worshipSets.length}
+                  </div>
+                  <div className="text-sm text-orange-800">Worship Sets</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                Recent Activity
+              </h3>
+              <div className="space-y-3">
+                {services.slice(0, 3).map((service) => (
+                  <div
+                    key={service.id}
+                    className="flex items-center gap-3 p-2 rounded-lg bg-gray-50"
+                  >
+                    <div className="bg-blue-100 p-2 rounded-lg">
+                      <Calendar size={16} className="text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{service.title}</p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(service.date).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Chat Modal */}
+        <AnimatePresence>
+          {showChatModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            >
+              <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[80vh] flex flex-col">
+                <div className="p-4 border-b flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Team Chat</h3>
+                  <button
+                    onClick={() => setShowChatModal(false)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="flex flex-1 overflow-hidden">
+                  {/* Conversations List */}
+                  <div className="w-1/3 border-r overflow-y-auto">
+                    <div className="p-3">
+                      <h4 className="font-medium text-gray-700 mb-2">
+                        Conversations
+                      </h4>
+                      {conversations.length > 0 ? (
+                        <div className="space-y-2">
+                          {conversations.map((member) => (
+                            <div
+                              key={member.id}
+                              className={`p-2 rounded-lg cursor-pointer ${
+                                selectedChatMember?.id === member.id
+                                  ? "bg-blue-50"
+                                  : "hover:bg-gray-50"
+                              }`}
+                              onClick={() => setSelectedChatMember(member)}
+                            >
+                              <div className="font-medium text-sm">
+                                {member.name || member.email}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-sm">
+                          No conversations yet
+                        </p>
                       )}
                     </div>
-                    {selectedChatMember && (
-                      <form
-                        onSubmit={handleSendChatMessage}
-                        className="p-4 border-t flex gap-2"
-                      >
-                        <Input
-                          value={newChatMessage}
-                          onChange={(e) => setNewChatMessage(e.target.value)}
-                          placeholder="Type your message..."
-                          className="flex-grow"
-                        />
-                        <Button type="submit">Send</Button>
-                      </form>
+                  </div>
+
+                  {/* Chat Messages */}
+                  <div className="w-2/3 flex flex-col">
+                    {selectedChatMember ? (
+                      <>
+                        <div className="p-4 border-b">
+                          <h4 className="font-semibold">
+                            Chat with{" "}
+                            {selectedChatMember.name ||
+                              selectedChatMember.email}
+                          </h4>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                          {chatMessages.length > 0 ? (
+                            chatMessages.map((msg) => (
+                              <div
+                                key={msg.id}
+                                className={`flex ${
+                                  msg.senderId === session?.user?.id
+                                    ? "justify-end"
+                                    : "justify-start"
+                                }`}
+                              >
+                                <div
+                                  className={`max-w-xs p-3 rounded-lg ${
+                                    msg.senderId === session?.user?.id
+                                      ? "bg-blue-500 text-white"
+                                      : "bg-gray-100 text-gray-800"
+                                  }`}
+                                >
+                                  <p className="text-sm">{msg.content}</p>
+                                  <p className="text-xs opacity-75 mt-1">
+                                    {new Date(
+                                      msg.createdAt
+                                    ).toLocaleTimeString()}
+                                  </p>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-center text-gray-500 py-8">
+                              No messages yet. Start a conversation!
+                            </div>
+                          )}
+                        </div>
+                        <form
+                          onSubmit={handleSendChatMessage}
+                          className="p-4 border-t flex gap-2"
+                        >
+                          <input
+                            type="text"
+                            value={newChatMessage}
+                            onChange={(e) => setNewChatMessage(e.target.value)}
+                            placeholder="Type your message..."
+                            className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                          <button
+                            type="submit"
+                            className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors"
+                          >
+                            <Send size={16} />
+                          </button>
+                        </form>
+                      </>
+                    ) : (
+                      <div className="flex-1 flex items-center justify-center text-gray-500">
+                        Select a conversation to start chatting
+                      </div>
                     )}
                   </div>
-                </DialogContent>
-              </Dialog>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Delete Confirmation Dialog */}
+        {/* Delete Confirmation */}
         <AnimatePresence>
           {showDeleteConfirm && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
             >
-              <Dialog
-                open={showDeleteConfirm}
-                onOpenChange={setShowDeleteConfirm}
-              >
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Confirm Deletion</DialogTitle>
-                  </DialogHeader>
-                  <div className="py-4">
-                    Are you sure you want to delete this service? This action
-                    cannot be undone.
-                  </div>
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowDeleteConfirm(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={confirmDeleteService}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+              <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  Confirm Deletion
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Are you sure you want to delete this service? This action
+                  cannot be undone.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDeleteService}
+                    className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

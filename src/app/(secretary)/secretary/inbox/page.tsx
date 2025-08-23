@@ -6,18 +6,18 @@ import { Button } from "@/components/ui/button";
 
 const InboxPage = () => {
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">Secretary Inbox</h1>
-      <p className="text-lg text-gray-600 mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black p-4 sm:p-6 md:p-8">
+      <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">Secretary Inbox</h1>
+      <p className="text-base sm:text-lg text-gray-300 mb-6">
         This page will display the unified inbox for managing communications.
       </p>
-      <Card>
-        <CardHeader>
-          <CardTitle>Unified Inbox</CardTitle>
+      <Card className="bg-gray-800 border-gray-700/50 shadow-lg text-white">
+        <CardHeader className="bg-gray-700/30 pb-3">
+          <CardTitle className="text-xl sm:text-2xl font-bold text-blue-400">Unified Inbox</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p>Inbox content will appear here. (Under Development)</p>
-          <Button className="mt-4" onClick={() => window.history.back()}>Go Back to Dashboard</Button>
+        <CardContent className="pt-6">
+          <p className="text-base text-gray-300 mb-4">Inbox content will appear here. (Under Development)</p>
+          <Button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base py-2" onClick={() => window.history.back()}>Go Back to Dashboard</Button>
         </CardContent>
       </Card>
     </div>

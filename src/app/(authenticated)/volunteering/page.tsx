@@ -1,11 +1,36 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useSession } from 'next-auth/react';
-import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect, useMemo } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  HandHeart,
+  Loader2,
+  Check,
+  X,
+  UserPlus,
+  LogIn,
+  Inbox,
+  Calendar,
+  User,
+  Users,
+  AlertCircle,
+} from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
 
 interface VolunteeringOpportunity {
   id: string;
@@ -32,260 +57,320 @@ interface VolunteeringOpportunity {
 interface UserApplication {
   id: string;
   opportunityId: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  status: "PENDING" | "APPROVED" | "REJECTED";
   appliedAt: string;
   opportunity: {
     title: string;
   };
 }
 
+const statusStyles: { [key: string]: string } = {
+  PENDING:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 border-yellow-400/50",
+  APPROVED:
+    "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 border-green-400/50",
+  REJECTED:
+    "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300 border-red-400/50",
+};
+
+const LoadingSkeleton = () => (
+  <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
+    <div className="max-w-7xl mx-auto">
+      <Skeleton className="h-12 w-1/3 mb-4" />
+      <Skeleton className="h-6 w-2/3 mb-10" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {[...Array(6)].map((_, i) => (
+          <Card
+            key={i}
+            className="bg-white dark:bg-gray-800/50 rounded-2xl shadow-sm overflow-hidden"
+          >
+            <Skeleton className="h-48 w-full" />
+            <CardHeader>
+              <Skeleton className="h-8 w-3/4" />
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-5 w-5/6" />
+            </CardContent>
+            <CardFooter>
+              <Skeleton className="h-12 w-full rounded-lg" />
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 export default function VolunteeringPage() {
   const { data: session, status } = useSession();
-  const [opportunities, setOpportunities] = useState<VolunteeringOpportunity[]>([]);
-  const [userApplications, setUserApplications] = useState<UserApplication[]>([]);
+  const [opportunities, setOpportunities] = useState<VolunteeringOpportunity[]>(
+    []
+  );
+  const [userApplications, setUserApplications] = useState<UserApplication[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
-  const [applying, setApplying] = useState<string | null>(null);
-  const [withdrawing, setWithdrawing] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchData();
-  }, [session]); // Refetch data when session changes
+  const [actioning, setActioning] = useState<string | null>(null);
 
   const fetchData = async () => {
-    setLoading(true);
     try {
-      // Fetch all public opportunities
-      const opportunitiesRes = await fetch('/api/volunteering-opportunities');
-      if (!opportunitiesRes.ok) {
-        throw new Error('Failed to fetch opportunities');
-      }
-      const opportunitiesData = await opportunitiesRes.json();
-      setOpportunities(opportunitiesData);
-
-      // Fetch user's applications if authenticated
-      if (session?.user) {
-        const userApplicationsRes = await fetch('/api/volunteering-applications');
-        if (!userApplicationsRes.ok) {
-          throw new Error('Failed to fetch user applications');
-        }
-        const userApplicationsData = await userApplicationsRes.json();
-        setUserApplications(userApplicationsData);
-      }
+      const [opps, apps] = await Promise.all([
+        fetch("/api/volunteering-opportunities").then((res) =>
+          res.ok ? res.json() : Promise.reject("Failed to fetch opportunities")
+        ),
+        session?.user
+          ? fetch("/api/volunteering-applications").then((res) =>
+              res.ok
+                ? res.json()
+                : Promise.reject("Failed to fetch applications")
+            )
+          : Promise.resolve([]),
+      ]);
+      setOpportunities(opps);
+      setUserApplications(apps);
     } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Failed to load volunteering data.');
+      console.error("Error fetching data:", error);
+      toast.error("Failed to load volunteering data.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleApply = async (opportunityId: string) => {
-    if (status !== 'authenticated') {
-      toast.info('Please log in to apply for volunteering opportunities.');
+  useEffect(() => {
+    setLoading(true);
+    fetchData();
+  }, [session]);
+
+  const handleAction = async (action: "apply" | "withdraw", id: string) => {
+    if (status !== "authenticated") {
+      toast.info("Please log in to get involved.");
       return;
     }
-
-    setApplying(opportunityId);
+    setActioning(id);
     try {
-      const res = await fetch('/api/volunteering-applications', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ opportunityId }),
-      });
+      let res;
+      if (action === "apply") {
+        res = await fetch("/api/volunteering-applications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ opportunityId: id }),
+        });
+      } else {
+        if (!confirm("Are you sure you want to withdraw this application?")) {
+          setActioning(null);
+          return;
+        }
+        res = await fetch(`/api/volunteering-applications/${id}`, {
+          method: "DELETE",
+        });
+      }
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to apply for opportunity');
+        throw new Error(errorData.message || `Failed to ${action} application`);
       }
-
-      toast.success('Application submitted successfully!');
-      fetchData(); // Refresh all data
+      toast.success(
+        `Application ${
+          action === "apply" ? "submitted" : "withdrawn"
+        } successfully!`
+      );
+      fetchData();
     } catch (error: any) {
-      console.error('Error applying:', error);
-      toast.error(error.message || 'Failed to submit application.');
+      toast.error(error.message || `Failed to ${action} application.`);
     } finally {
-      setApplying(null);
+      setActioning(null);
     }
   };
 
-  const handleWithdraw = async (applicationId: string) => {
-    if (!confirm('Are you sure you want to withdraw this application?')) {
-      return;
-    }
-    setWithdrawing(applicationId);
-    try {
-      const res = await fetch(`/api/volunteering-applications/${applicationId}`, {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to withdraw application');
-      }
-
-      toast.success('Application withdrawn successfully!');
-      fetchData(); // Refresh all data
-    } catch (error: any) {
-      console.error('Error withdrawing:', error);
-      toast.error(error.message || 'Failed to withdraw application.');
-    } finally {
-      setWithdrawing(null);
-    }
-  };
-
-  if (loading) {
-    return <div className="container mx-auto p-4">Loading opportunities...</div>;
-  }
+  if (loading) return <LoadingSkeleton />;
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Volunteering Opportunities</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {opportunities.length === 0 ? (
-          <p>No volunteering opportunities available at the moment.</p>
-        ) : (
-          opportunities.map((opportunity) => {
-            const userApplication = userApplications.find(
-              (app) => app.opportunityId === opportunity.id
-            );
-            const hasApplied = !!userApplication;
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-rose-500 via-red-500 to-orange-500 bg-clip-text text-transparent">
+            Serve With Us
+          </h1>
+          <p className="mt-4 max-w-3xl mx-auto text-lg text-gray-500 dark:text-gray-400">
+            Find meaningful ways to use your gifts and time to make a difference
+            in our community.
+          </p>
+        </motion.div>
 
-            return (
-              <Card key={opportunity.id} className="flex flex-col">
-                {opportunity.imageUrl && (
-                  <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
-                    <img
-                      src={opportunity.imageUrl}
-                      alt={opportunity.title}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-                )}
-                <CardHeader>
-                  <CardTitle>{opportunity.title}</CardTitle>
-                  <p className="text-sm text-gray-500">Type: {opportunity.type}</p>
-                </CardHeader>
-                <CardContent className="flex-grow flex flex-col justify-between">
-                  <p className="text-gray-700 mb-4">{opportunity.description}</p>
-                  {opportunity.customFields && (
-                    <div className="mb-4">
-                      {Object.entries(opportunity.customFields).map(([key, value]) => (
-                        <p key={key} className="text-sm text-gray-600">
-                          <strong>{key}:</strong> {String(value)}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                  <div className="mt-auto">
-                    <p className="text-sm text-gray-600">
-                      Required: {opportunity.requiredPeople} people
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Applicants: {opportunity.currentApplicants}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Coordinator: {opportunity.coordinator?.name || 'N/A'}
-                    </p>
-                    {opportunity.isAssigned && (
-                      <p className="text-sm text-green-600 font-semibold">
-                        This opportunity is fully assigned!
-                      </p>
-                    )}
-                    {session?.user && !opportunity.isAssigned && (
-                      <>
-                        {hasApplied ? (
-                          <div className="flex items-center justify-between mt-4">
-                            <p className="text-sm text-gray-700">
-                              Your Status:{' '}
-                              <Badge
-                                className={`${
-                                  userApplication?.status === 'APPROVED'
-                                    ? 'bg-green-500'
-                                    : userApplication?.status === 'REJECTED'
-                                    ? 'bg-red-500'
-                                    : 'bg-yellow-500'
-                                }`}
-                              >
-                                {userApplication?.status}
-                              </Badge>
-                            </p>
-                            {userApplication?.status === 'PENDING' && (
-                              <Button
-                                variant="outline"
-                                onClick={() => handleWithdraw(userApplication.id)}
-                                disabled={withdrawing === userApplication.id}
-                              >
-                                {withdrawing === userApplication.id ? 'Withdrawing...' : 'Withdraw'}
-                              </Button>
-                            )}
-                          </div>
-                        ) : (
-                          <Button
-                            onClick={() => handleApply(opportunity.id)}
-                            disabled={applying === opportunity.id}
-                            className="mt-4 w-full"
-                          >
-                            {applying === opportunity.id ? 'Applying...' : 'Apply Now'}
-                          </Button>
-                        )}
-                      </>
-                    )}
-                    {!session?.user && !opportunity.isAssigned && (
-                      <Button className="mt-4 w-full" disabled>
-                        Log in to Apply
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })
+        {session?.user && userApplications.length > 0 && (
+          <MyApplications
+            applications={userApplications}
+            onWithdraw={handleAction}
+            withdrawingId={actioning}
+          />
         )}
-      </div>
 
-      {session?.user && userApplications.length > 0 && (
-        <div className="mt-10">
-          <h2 className="text-2xl font-bold mb-4">My Applications</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {userApplications.map((app) => (
-              <Card key={app.id}>
-                <CardHeader>
-                  <CardTitle>{app.opportunity.title}</CardTitle>
-                  <p className="text-sm text-gray-500">Applied On: {new Date(app.appliedAt).toLocaleDateString()}</p>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-700">
-                    Status:{' '}
-                    <Badge
-                      className={`${
-                        app.status === 'APPROVED'
-                          ? 'bg-green-500'
-                          : app.status === 'REJECTED'
-                          ? 'bg-red-500'
-                          : 'bg-yellow-500'
-                      }`}
-                    >
-                      {app.status}
-                    </Badge>
-                  </p>
-                  {app.status === 'PENDING' && (
-                    <Button
-                      variant="outline"
-                      onClick={() => handleWithdraw(app.id)}
-                      disabled={withdrawing === app.id}
-                      className="mt-4 w-full"
-                    >
-                      {withdrawing === app.id ? 'Withdrawing...' : 'Withdraw'}
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        <div className="mt-12">
+          <h2 className="text-3xl font-bold text-center mb-10">
+            Current Opportunities
+          </h2>
+          {opportunities.length === 0 ? (
+            <NoOpportunities />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <AnimatePresence>
+                {opportunities.map((opp) => (
+                  <OpportunityCard
+                    key={opp.id}
+                    opportunity={opp}
+                    userApplications={userApplications}
+                    onApply={handleAction}
+                    applyingId={actioning}
+                    session={session}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
+
+const OpportunityCard = ({
+  opportunity,
+  userApplications,
+  onApply,
+  applyingId,
+  session,
+}: any) => {
+  const userApplication = userApplications.find(
+    (app: UserApplication) => app.opportunityId === opportunity.id
+  );
+  const progress =
+    opportunity.requiredPeople > 0
+      ? (opportunity.currentApplicants / opportunity.requiredPeople) * 100
+      : 0;
+  const isFull = opportunity.currentApplicants >= opportunity.requiredPeople;
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className="h-full flex flex-col bg-white dark:bg-gray-800/50 rounded-2xl shadow-lg border border-gray-200/80 dark:border-gray-700/60 overflow-hidden transform hover:-translate-y-1.5 transition-transform duration-300">
+        {opportunity.imageUrl && (
+          <div className="aspect-w-16 aspect-h-9 w-full overflow-hidden">
+            <img
+              src={opportunity.imageUrl}
+              alt={opportunity.title}
+              className="object-cover w-full h-full"
+            />
+          </div>
+        )}
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100">
+            {opportunity.title}
+          </CardTitle>
+          <Badge variant="secondary" className="font-medium mt-1">
+            {opportunity.type}
+          </Badge>
+        </CardHeader>
+        <CardContent className="flex-grow">
+          <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
+            {opportunity.description}
+          </p>
+          <div>
+            <Label className="text-xs font-semibold text-gray-500">
+              PROGRESS
+            </Label>
+            <Progress value={progress} className="mt-1 h-2" />
+            <p className="text-xs text-right mt-1 text-gray-500">
+              {opportunity.currentApplicants} of {opportunity.requiredPeople}{" "}
+              spots filled
+            </p>
+          </div>
+        </CardContent>
+        <CardFooter className="p-4 bg-gray-50 dark:bg-gray-800 border-t dark:border-gray-700/60">
+          {session?.user ? (
+            userApplication ? (
+              <Button variant="outline" className="w-full" disabled>
+                {" "}
+                <Check className="mr-2 h-4 w-4" /> Applied (
+                {userApplication.status})
+              </Button>
+            ) : (
+              <Link href={`/volunteering/${opportunity.id}`} passHref>
+                <Button
+                  className="w-full"
+                  disabled={isFull || applyingId === opportunity.id}
+                >
+                  {isFull ? "Full" : "View Details"}
+                </Button>
+              </Link>
+            )
+          ) : (
+            <Button className="w-full" disabled>
+              <LogIn className="mr-2 h-4 w-4" /> Log in to Apply
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
+    </motion.div>
+  );
+};
+
+const MyApplications = ({ applications, onWithdraw, withdrawingId }: any) => (
+  <div className="mb-12">
+    <h2 className="text-3xl font-bold text-center mb-6">My Applications</h2>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {applications.map((app: UserApplication) => (
+        <Card
+          key={app.id}
+          className="bg-white dark:bg-gray-800/50 rounded-2xl shadow-md"
+        >
+          <CardHeader>
+            <CardTitle className="text-lg">{app.opportunity.title}</CardTitle>
+            <CardDescription>
+              Applied on: {new Date(app.appliedAt).toLocaleDateString()}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex items-center justify-between">
+            <Badge className={statusStyles[app.status]}>{app.status}</Badge>
+            {app.status === "PENDING" && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onWithdraw("withdraw", app.id)}
+                disabled={withdrawingId === app.id}
+              >
+                {withdrawingId === app.id ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <X className="h-4 w-4" />
+                )}
+                <span className="ml-2">Withdraw</span>
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  </div>
+);
+
+const NoOpportunities = () => (
+  <div className="text-center col-span-full py-16 px-6 bg-white dark:bg-gray-800/40 rounded-2xl shadow-sm">
+    <Inbox className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
+    <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+      No Opportunities Available
+    </h3>
+    <p className="mt-2 text-gray-500 dark:text-gray-400">
+      Please check back later for new ways to serve.
+    </p>
+  </div>
+);

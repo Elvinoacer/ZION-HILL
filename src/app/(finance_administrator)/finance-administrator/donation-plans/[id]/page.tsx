@@ -5,10 +5,12 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { HandHeart, ArrowUpRight, Loader2 } from "lucide-react";
+import { HandHeart, ArrowUpRight, Loader2, Download, ChevronDown, Calendar, Target, BarChart3, Trophy, Zap, Filter, X } from "lucide-react";
 import { format as formatDate } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface DonationPlan {
   id: string;
@@ -36,14 +38,24 @@ export default function DonationPlanDetails() {
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [showExportDropdown, setShowExportDropdown] = useState(false);
+  const [filterStatus, setFilterStatus] = useState<string>("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"date" | "amount">("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const params = useParams();
   const { id } = params;
+  const exportDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Module refs for preloaded libs
-  const xlsxRef = useRef<any>(null);
-  const jspdfRef = useRef<any>(null);
-  const autotableRef = useRef<any>(null);
-  const docxRef = useRef<any>(null);
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (exportDropdownRef.current && !exportDropdownRef.current.contains(event.target as Node)) {
+        setShowExportDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -70,14 +82,14 @@ export default function DonationPlanDetails() {
   useEffect(() => {
     (async () => {
       try {
-        xlsxRef.current = await import("xlsx");
+        const xlsxModule = await import("xlsx");
+        xlsxRef.current = xlsxModule;
       } catch (e) {
         console.warn("Could not preload xlsx:", e);
       }
       try {
         const jspdfModule = await import("jspdf");
-        jspdfRef.current =
-          jspdfModule.jsPDF ?? jspdfModule.default ?? jspdfModule;
+        jspdfRef.current = jspdfModule.jsPDF ?? jspdfModule.default ?? jspdfModule;
       } catch (e) {
         console.warn("Could not preload jspdf:", e);
       }
@@ -88,12 +100,19 @@ export default function DonationPlanDetails() {
         console.warn("Could not preload jspdf-autotable:", e);
       }
       try {
-        docxRef.current = await import("docx");
+        const docxModule = await import("docx");
+        docxRef.current = docxModule;
       } catch (e) {
         console.warn("Could not preload docx:", e);
       }
     })();
   }, []);
+
+  // Module refs for preloaded libs
+  const xlsxRef = useRef<any>(null);
+  const jspdfRef = useRef<any>(null);
+  const autotableRef = useRef<any>(null);
+  const docxRef = useRef<any>(null);
 
   const downloadBlob = (blob: Blob, filename: string) => {
     const url = URL.createObjectURL(blob);
@@ -114,6 +133,7 @@ export default function DonationPlanDetails() {
       }
 
       setExporting(true);
+      setShowExportDropdown(false);
 
       const plainData = plan.transactions.map((t) => ({
         ID: t.id,
@@ -156,13 +176,28 @@ export default function DonationPlanDetails() {
           const autoTable =
             autotableRef.current ?? (await import("jspdf-autotable")).default;
           const doc = new jsPDFClass({ unit: "pt", format: "a4" });
+          
+          // Add title
+          doc.setFontSize(18);
+          doc.text(`${plan.name} Donations`, 40, 40);
+          doc.setFontSize(12);
+          doc.text(`Generated on ${new Date().toLocaleDateString()}`, 40, 60);
+          
           if (typeof autoTable === "function") {
             autoTable(doc, {
               head: [Object.keys(plainData[0])],
               body: plainData.map((r) => Object.values(r)),
-              styles: { fontSize: 8 },
-              headStyles: { fillColor: [20, 83, 136] }, // A nice blue for headers
-              margin: { top: 30 },
+              startY: 80,
+              styles: { fontSize: 9, cellPadding: 3 },
+              headStyles: { 
+                fillColor: [59, 130, 246],
+                textColor: 255,
+                fontStyle: 'bold'
+              },
+              alternateRowStyles: {
+                fillColor: [241, 245, 249]
+              },
+              margin: { top: 80 },
             });
           }
           doc.save(`${fileName}.pdf`);
@@ -177,6 +212,7 @@ export default function DonationPlanDetails() {
             TableCell,
             WidthType,
             TextRun,
+            HeadingLevel,
           } = docx;
 
           const headerRow = new TableRow({
@@ -188,6 +224,9 @@ export default function DonationPlanDetails() {
                       children: [new TextRun({ text: k, bold: true })],
                     }),
                   ],
+                  shading: {
+                    fill: "D3D3D3",
+                  },
                 })
             ),
           });
@@ -197,7 +236,9 @@ export default function DonationPlanDetails() {
               new TableRow({
                 children: Object.values(r).map(
                   (val) =>
-                    new TableCell({ children: [new Paragraph(String(val))] })
+                    new TableCell({
+                      children: [new Paragraph(String(val))],
+                    })
                 ),
               })
           );
@@ -213,8 +254,12 @@ export default function DonationPlanDetails() {
                 children: [
                   new Paragraph({
                     text: `${plan.name} Donations`,
-                    heading: docx.HeadingLevel?.HEADING_1 ?? undefined,
+                    heading: HeadingLevel.HEADING_1,
                   }),
+                  new Paragraph({
+                    text: `Generated on ${new Date().toLocaleDateString()}`,
+                  }),
+                  new Paragraph({}),
                   table,
                 ],
               },
@@ -235,11 +280,38 @@ export default function DonationPlanDetails() {
     [plan]
   );
 
+  // Filter and sort transactions
+  const filteredTransactions = plan?.transactions
+    ?.filter(transaction => {
+      const matchesStatus = filterStatus === "ALL" || transaction.reconciliationStatus === filterStatus;
+      const matchesSearch = searchQuery === "" || 
+        transaction.donorName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        transaction.donorEmail?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        transaction.method.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesStatus && matchesSearch;
+    })
+    ?.sort((a, b) => {
+      if (sortBy === "date") {
+        return sortOrder === "desc" 
+          ? new Date(b.date).getTime() - new Date(a.date).getTime()
+          : new Date(a.date).getTime() - new Date(b.date).getTime();
+      } else {
+        return sortOrder === "desc" ? b.amount - a.amount : a.amount - b.amount;
+      }
+    }) || [];
+
+  const recentTransactions = filteredTransactions.slice(0, 10);
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
         <div className="flex flex-col items-center">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600 mb-4" />
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          >
+            <Loader2 className="h-10 w-10 text-indigo-600 mb-4" />
+          </motion.div>
           <p className="text-gray-600">Loading donation plan details...</p>
         </div>
       </div>
@@ -248,11 +320,14 @@ export default function DonationPlanDetails() {
 
   if (!plan) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <HandHeart className="h-10 w-10 text-gray-400 mx-auto mb-4" />
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
+        <div className="text-center max-w-md mx-4">
+          <HandHeart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-medium text-gray-900">Donation plan not found</h2>
           <p className="text-gray-600 mt-2">The requested donation plan could not be loaded.</p>
+          <Button className="mt-4" onClick={() => window.history.back()}>
+            Go Back
+          </Button>
         </div>
       </div>
     );
@@ -263,38 +338,52 @@ export default function DonationPlanDetails() {
     0
   );
   const progress = plan.goalAmount ? (totalDonated / plan.goalAmount) * 100 : 0;
-  const recentTransactions = [...plan.transactions].sort((a, b) => 
-    new Date(b.date).getTime() - new Date(a.date).getTime()
-  ).slice(0, 10);
+  
+  // Calculate stats
+  const maxDonation = plan.transactions.length > 0 
+    ? Math.max(...plan.transactions.map(t => t.amount))
+    : 0;
+  
+  const avgDonation = plan.transactions.length > 0 
+    ? totalDonated / plan.transactions.length 
+    : 0;
+  
+  const pendingCount = plan.transactions.filter(t => t.reconciliationStatus === "PENDING").length;
+  const approvedCount = plan.transactions.filter(t => t.reconciliationStatus === "APPROVED").length;
+  const flaggedCount = plan.transactions.filter(t => t.reconciliationStatus === "FLAGGED").length;
 
   const getBadgeVariant = (type: string) => {
     switch (type) {
       case "PROJECT":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 text-blue-800 border-blue-200";
       case "MINISTRY":
-        return "bg-purple-100 text-purple-800";
+        return "bg-purple-100 text-purple-800 border-purple-200";
       case "USER_REQUEST":
-        return "bg-orange-100 text-orange-800";
+        return "bg-orange-100 text-orange-800 border-orange-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
-
-  // Calculate max donation amount
-  const maxDonation = plan.transactions.length > 0 
-    ? Math.max(...plan.transactions.map(t => t.amount))
-    : 0;
 
   const getReconciliationBadgeVariant = (status: string) => {
     switch (status) {
       case "APPROVED":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 border-green-200";
       case "PENDING":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "FLAGGED":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-800 border-red-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const handleSort = (field: "date" | "amount") => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("desc");
     }
   };
 
@@ -303,263 +392,452 @@ export default function DonationPlanDetails() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto px-4 py-8"
+      className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 py-6 px-4 sm:px-6 lg:px-8"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Card */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="border-0 shadow-lg">
-            {plan.imageUrl && (
-              <div className="relative h-64 w-full overflow-hidden rounded-t-lg">
-                <img
-                  src={plan.imageUrl}
-                  alt={plan.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <h1 className="text-2xl font-bold text-white">{plan.name}</h1>
-                      <Badge className={getBadgeVariant(plan.type)}>
-                        {plan.type.replace("_", " ")}
-                      </Badge>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-white/80 text-sm">Created on {new Date(plan.createdAt).toLocaleDateString()}</p>
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Header Card */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card className="border-0 shadow-lg overflow-hidden">
+                {plan.imageUrl && (
+                  <div className="relative h-48 sm:h-64 w-full overflow-hidden">
+                    <img
+                      src={plan.imageUrl}
+                      alt={plan.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3">
+                        <div>
+                          <h1 className="text-xl sm:text-2xl font-bold text-white">{plan.name}</h1>
+                          <Badge className={`mt-2 ${getBadgeVariant(plan.type)}`}>
+                            {plan.type.replace("_", " ")}
+                          </Badge>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-white/80 text-sm">Created on {new Date(plan.createdAt).toLocaleDateString()}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
-            <CardContent className="p-6">
-              {plan.description && (
-                <p className="text-gray-600 mb-6">{plan.description}</p>
-              )}
-              
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">
-                      KES {totalDonated.toLocaleString()} raised
-                    </span>
-                    {plan.goalAmount && (
-                      <span className="text-sm font-medium text-gray-700">
-                        KES {plan.goalAmount.toLocaleString()} goal
-                      </span>
-                    )}
-                  </div>
-                  <Progress 
-                    value={progress} 
-                    className="h-3"
-                    indicatorClassName={progress >= 100 ? "bg-green-500" : "bg-indigo-500"}
-                  />
-                  {plan.goalAmount && (
-                    <p className="text-right text-sm text-gray-500 mt-1">
-                      {Math.round(progress)}% of goal reached
-                    </p>
+                )}
+                
+                <CardContent className="p-4 sm:p-6">
+                  {plan.description && (
+                    <p className="text-gray-600 mb-6">{plan.description}</p>
                   )}
-                </div>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          KES {totalDonated.toLocaleString()} raised
+                        </span>
+                        {plan.goalAmount && (
+                          <span className="text-sm font-medium text-gray-700">
+                            KES {plan.goalAmount.toLocaleString()} goal
+                          </span>
+                        )}
+                      </div>
+                      <Progress 
+                        value={progress} 
+                        className="h-2 sm:h-3"
+                        indicatorClassName={progress >= 100 ? "bg-green-500" : "bg-indigo-500"}
+                      />
+                      {plan.goalAmount && (
+                        <p className="text-right text-sm text-gray-500 mt-1">
+                          {Math.round(progress)}% of goal reached
+                        </p>
+                      )}
+                    </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <p className="text-sm text-blue-600">Total Donations</p>
-                    <p className="text-xl font-bold">{plan.transactions.length}</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                      <div className="bg-blue-50 p-3 sm:p-4 rounded-lg border border-blue-100">
+                        <p className="text-xs sm:text-sm text-blue-600 flex items-center">
+                          <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> Total
+                        </p>
+                        <p className="text-lg sm:text-xl font-bold">{plan.transactions.length}</p>
+                      </div>
+                      <div className="bg-purple-50 p-3 sm:p-4 rounded-lg border border-purple-100">
+                        <p className="text-xs sm:text-sm text-purple-600 flex items-center">
+                          <Target className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> Average
+                        </p>
+                        <p className="text-lg sm:text-xl font-bold">
+                          KES {avgDonation.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                        </p>
+                      </div>
+                      <div className="bg-green-50 p-3 sm:p-4 rounded-lg border border-green-100">
+                        <p className="text-xs sm:text-sm text-green-600 flex items-center">
+                          <Trophy className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> Top
+                        </p>
+                        <p className="text-lg sm:text-xl font-bold">
+                          KES {maxDonation.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="bg-orange-50 p-3 sm:p-4 rounded-lg border border-orange-100">
+                        <p className="text-xs sm:text-sm text-orange-600 flex items-center">
+                          <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> Recent
+                        </p>
+                        <p className="text-lg sm:text-xl font-bold">
+                          {plan.transactions.length > 0 
+                            ? formatDate(new Date(plan.transactions[0].date), "MMM dd") 
+                            : "—"}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-purple-50 p-4 rounded-lg">
-                    <p className="text-sm text-purple-600">Average Donation</p>
-                    <p className="text-xl font-bold">
-                      KES {(totalDonated / (plan.transactions.length || 1)).toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                    </p>
-                  </div>
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <p className="text-sm text-green-600">Top Donation</p>
-                    <p className="text-xl font-bold">
-                      KES {maxDonation.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="bg-orange-50 p-4 rounded-lg">
-                    <p className="text-sm text-orange-600">Recent Activity</p>
-                    <p className="text-xl font-bold">
-                      {plan.transactions.length > 0 
-                        ? new Date(recentTransactions[0].date).toLocaleDateString() 
-                        : new Date(plan.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-          {/* Recent Transactions */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>Recent Donations</CardTitle>
-                <div className="relative">
-                  <button
-                    onClick={() => setShowExportDropdown((s) => !s)}
-                    disabled={exporting || plan.transactions.length === 0}
-                    className="text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center"
-                  >
-                    {exporting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Exporting...
-                      </>
-                    ) : (
-                      <>
-                        Export All
-                        <ArrowUpRight className="h-4 w-4 ml-1" />
-                      </>
-                    )}
-                  </button>
-                  {showExportDropdown && (
-                    <div className="absolute right-0 mt-1 w-44 bg-white rounded-lg shadow-md border z-50">
-                      {["xlsx", "csv", "html", "pdf", "docx"].map((fmt) => (
-                        <button
-                          key={fmt}
-                          className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50"
+            {/* Transactions Card */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Card className="border-0 shadow-lg">
+                <CardHeader className="pb-3">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                      <CardTitle>Donations</CardTitle>
+                      <CardDescription>
+                        {filteredTransactions.length} of {plan.transactions.length} total donations
+                      </CardDescription>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <div className="relative" ref={exportDropdownRef}>
+                        <Button
+                          onClick={() => setShowExportDropdown((s) => !s)}
+                          disabled={exporting || plan.transactions.length === 0}
+                          variant="outline"
+                          size="sm"
+                          className="flex items-center"
+                        >
+                          {exporting ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Exporting...
+                            </>
+                          ) : (
+                            <>
+                              <Download className="h-4 w-4 mr-2" />
+                              Export
+                              <ChevronDown className="h-4 w-4 ml-1" />
+                            </>
+                          )}
+                        </Button>
+                        <AnimatePresence>
+                          {showExportDropdown && (
+                            <motion.div
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -10 }}
+                              className="absolute right-0 mt-1 w-44 bg-white rounded-lg shadow-md border z-50"
+                            >
+                              {["xlsx", "csv", "pdf", "docx"].map((fmt) => (
+                                <button
+                                  key={fmt}
+                                  className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg"
+                                  onClick={() => handleExport(fmt as any)}
+                                >
+                                  Export as {fmt.toUpperCase()}
+                                </button>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                
+                <CardContent>
+                  {/* Filters */}
+                  <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                    <div className="relative flex-1">
+                      <Input
+                        placeholder="Search donors..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pr-8"
+                      />
+                      {searchQuery && (
+                        <button 
+                          onClick={() => setSearchQuery("")}
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <select
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                        className="text-sm border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      >
+                        <option value="ALL">All Status</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="FLAGGED">Flagged</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {filteredTransactions.length > 0 ? (
+                    <>
+                      <div className="overflow-x-auto rounded-lg border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Donor</TableHead>
+                              <TableHead>
+                                <button 
+                                  onClick={() => handleSort("amount")}
+                                  className="flex items-center font-medium"
+                                >
+                                  Amount
+                                  {sortBy === "amount" && (
+                                    <span className="ml-1">
+                                      {sortOrder === "asc" ? "↑" : "↓"}
+                                    </span>
+                                  )}
+                                </button>
+                              </TableHead>
+                              <TableHead>Method</TableHead>
+                              <TableHead>Status</TableHead>
+                              <TableHead>
+                                <button 
+                                  onClick={() => handleSort("date")}
+                                  className="flex items-center font-medium"
+                                >
+                                  Date
+                                  {sortBy === "date" && (
+                                    <span className="ml-1">
+                                      {sortOrder === "asc" ? "↑" : "↓"}
+                                    </span>
+                                  )}
+                                </button>
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {recentTransactions.map((transaction) => (
+                              <TableRow key={transaction.id} className="group hover:bg-gray-50">
+                                <TableCell>
+                                  <div>
+                                    <p className="font-medium">{transaction.donorName || "Anonymous"}</p>
+                                    {transaction.donorEmail && (
+                                      <p className="text-sm text-gray-500 truncate max-w-[150px]">
+                                        {transaction.donorEmail}
+                                      </p>
+                                    )}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="font-medium">
+                                  KES {transaction.amount.toLocaleString()}
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="outline" className="capitalize text-xs">
+                                    {transaction.method.toLowerCase()}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge 
+                                    className={`text-xs ${getReconciliationBadgeVariant(transaction.reconciliationStatus)}`}
+                                  >
+                                    {transaction.reconciliationStatus}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  {formatDate(new Date(transaction.date), "MMM dd, yyyy")}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                      
+                      {filteredTransactions.length > 10 && (
+                        <div className="text-center mt-4">
+                          <Button variant="outline" size="sm">
+                            View all {filteredTransactions.length} donations
+                          </Button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Filter className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-sm font-medium text-gray-900">No donations match your filters</h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Try adjusting your search or filter criteria
+                      </p>
+                      {(searchQuery || filterStatus !== "ALL") && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="mt-4"
                           onClick={() => {
-                            setShowExportDropdown(false);
-                            handleExport(fmt as any);
+                            setSearchQuery("");
+                            setFilterStatus("ALL");
                           }}
                         >
-                          {fmt.toUpperCase()}
-                        </button>
-                      ))}
+                          Clear filters
+                        </Button>
+                      )}
                     </div>
                   )}
-                </div>
-              </div>
-              <CardDescription>
-                Last {recentTransactions.length} of {plan.transactions.length} total donations
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Donor</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Method</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentTransactions.map((transaction) => (
-                      <TableRow key={transaction.id}>
-                        <TableCell>
-                          <div>
-                            <p className="font-medium">{transaction.donorName || "Anonymous"}</p>
-                            {transaction.donorEmail && (
-                              <p className="text-sm text-gray-500">{transaction.donorEmail}</p>
-                            )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Status Summary */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Card className="border-0 shadow-lg">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Status Summary</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div>
+                      <p className="text-sm font-medium text-green-800">Approved</p>
+                      <p className="text-2xl font-bold">{approvedCount}</p>
+                    </div>
+                    <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                      <span className="text-green-600 font-bold">✓</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <div>
+                      <p className="text-sm font-medium text-yellow-800">Pending</p>
+                      <p className="text-2xl font-bold">{pendingCount}</p>
+                    </div>
+                    <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                      <span className="text-yellow-600 font-bold">…</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg border border-red-200">
+                    <div>
+                      <p className="text-sm font-medium text-red-800">Flagged</p>
+                      <p className="text-2xl font-bold">{flaggedCount}</p>
+                    </div>
+                    <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+                      <span className="text-red-600 font-bold">!</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Top Donors */}
+            {plan.transactions.length > 0 && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <Card className="border-0 shadow-lg">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">Top Donors</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[...plan.transactions]
+                        .sort((a, b) => b.amount - a.amount)
+                        .slice(0, 5)
+                        .map((transaction, index) => (
+                          <div key={transaction.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+                            <div className="flex items-center">
+                              <div className={`h-8 w-8 rounded-full flex items-center justify-center ${index === 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>
+                                <span className="text-sm font-bold">{index + 1}</span>
+                              </div>
+                              <div className="ml-3">
+                                <p className="text-sm font-medium">{transaction.donorName || "Anonymous"}</p>
+                                <p className="text-xs text-gray-500">
+                                  {formatDate(new Date(transaction.date), "MMM dd")}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="font-medium">
+                              KES {transaction.amount.toLocaleString()}
+                            </span>
                           </div>
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          KES {transaction.amount.toLocaleString()}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="capitalize">
-                            {transaction.method.toLowerCase()}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getReconciliationBadgeVariant(transaction.reconciliationStatus)}>
-                            {transaction.reconciliationStatus}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {new Date(transaction.date).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                          })}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              {plan.transactions.length > 10 && (
-                <div className="text-center mt-4">
-                  <button className="text-sm text-indigo-600 hover:text-indigo-800">
-                    View all {plan.transactions.length} donations
-                  </button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                        ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Quick Stats */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle>Quick Stats</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-500">First Donation</p>
-                <p className="font-medium">
-                  {plan.transactions.length > 0 
-                    ? new Date(plan.transactions[plan.transactions.length - 1].date).toLocaleDateString()
-                    : "No donations yet"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Last Donation</p>
-                <p className="font-medium">
-                  {plan.transactions.length > 0 
-                    ? new Date(plan.transactions[0].date).toLocaleDateString()
-                    : "No donations yet"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Donation Frequency</p>
-                <p className="font-medium">
-                  {plan.transactions.length > 1
-                    ? `${Math.round(plan.transactions.length / ((new Date().getTime() - new Date(plan.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 30)))} per month`
-                    : "Not enough data"}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Top Donors */}
-          {plan.transactions.length > 0 && (
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle>Top Donors</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[...plan.transactions]
-                    .sort((a, b) => b.amount - a.amount)
-                    .slice(0, 5)
-                    .map((transaction, index) => (
-                      <div key={transaction.id} className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <span className="text-gray-500 w-6">{index + 1}.</span>
+            {/* Activity Timeline */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Card className="border-0 shadow-lg">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Recent Activity</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {plan.transactions.length > 0 ? (
+                      <>
+                        <div className="flex items-start">
+                          <div className="h-2 w-2 bg-indigo-500 rounded-full mt-2 mr-3"></div>
                           <div>
-                            <p className="font-medium">{transaction.donorName || "Anonymous"}</p>
-                            <p className="text-sm text-gray-500">
-                              {new Date(transaction.date).toLocaleDateString('short')}
+                            <p className="text-sm font-medium">Last donation received</p>
+                            <p className="text-xs text-gray-500">
+                              {formatDate(new Date(plan.transactions[0].date), "MMM dd, yyyy 'at' h:mm a")}
                             </p>
                           </div>
                         </div>
-                        <span className="font-medium">
-                          KES {transaction.amount.toLocaleString()}
-                        </span>
-                      </div>
-                    ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                        <div className="flex items-start">
+                          <div className="h-2 w-2 bg-indigo-500 rounded-full mt-2 mr-3"></div>
+                          <div>
+                            <p className="text-sm font-medium">First donation received</p>
+                            <p className="text-xs text-gray-500">
+                              {formatDate(new Date(plan.transactions[plan.transactions.length - 1].date), "MMM dd, yyyy")}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-start">
+                          <div className="h-2 w-2 bg-indigo-500 rounded-full mt-2 mr-3"></div>
+                          <div>
+                            <p className="text-sm font-medium">Plan created</p>
+                            <p className="text-xs text-gray-500">
+                              {formatDate(new Date(plan.createdAt), "MMM dd, yyyy")}
+                            </p>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-sm text-gray-500">No activity yet</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
         </div>
       </div>
     </motion.div>

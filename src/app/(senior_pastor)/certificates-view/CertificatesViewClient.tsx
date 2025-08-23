@@ -158,18 +158,18 @@ export default function CertificatesPage() {
 
   if (loading)
     return (
-      <div className="container mx-auto py-8 px-4">
+      <div className="p-4 sm:p-6 md:p-8">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <Skeleton className="h-10 w-64" />
-            <Skeleton className="h-4 w-80" />
+            <Skeleton className="h-8 w-48 sm:h-10 sm:w-64" />
+            <Skeleton className="h-3 w-64 sm:h-4 sm:w-80" />
           </div>
           <div className="flex gap-4">
-            <Skeleton className="h-10 w-full max-w-sm" />
+            <Skeleton className="h-8 w-full max-w-xs sm:max-w-sm" />
           </div>
           <div className="space-y-4">
             {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-16 w-full rounded-lg" />
+              <Skeleton key={i} className="h-12 w-full rounded-lg sm:h-16" />
             ))}
           </div>
         </div>
@@ -181,22 +181,22 @@ export default function CertificatesPage() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="container mx-auto py-8 px-4"
+        className="p-4 sm:p-6 md:p-8"
       >
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6 max-w-2xl mx-auto text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-4">
-            <X className="h-6 w-6 text-red-600" />
+        <div className="bg-red-900/30 border border-red-700/50 rounded-xl p-6 max-w-md mx-auto text-center text-white shadow-lg">
+          <div className="mx-auto flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-red-900/50 mb-4">
+            <X className="h-5 w-5 sm:h-6 sm:w-6 text-red-400" />
           </div>
-          <h2 className="text-2xl font-bold text-red-600 mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-2">
             Error Loading Certificates
           </h2>
-          <p className="text-red-500 mb-6">{error}</p>
+          <p className="text-red-300 mb-6">{error}</p>
           <Button
             variant="outline"
-            className="border-red-300 text-red-600 hover:bg-red-50 gap-2"
+            className="border-red-700 text-red-300 hover:bg-red-800/50 gap-2"
             onClick={fetchCertificates}
           >
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin text-red-300" />
             Try Again
           </Button>
         </div>
@@ -208,14 +208,14 @@ export default function CertificatesPage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto py-8 px-4"
+      className="p-4 sm:p-6 md:p-8"
     >
       <div className="flex flex-col gap-2 mb-8">
         <motion.h1
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+          className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"
         >
           Certificate Management
         </motion.h1>
@@ -223,12 +223,12 @@ export default function CertificatesPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-lg text-gray-600"
+          className="text-base sm:text-lg text-gray-300"
         >
           Manage and review all issued certificates
         </motion.p>
         <Link href="/certificate-generator" passHref>
-          <Button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className="mt-4 bg-blue-700 hover:bg-blue-800 text-white py-2.5 px-5 rounded-lg shadow-lg text-base">
             Generate New Certificate
           </Button>
         </Link>
@@ -238,20 +238,20 @@ export default function CertificatesPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="relative mb-8 max-w-md"
+        className="relative mb-8 w-full sm:max-w-md"
       >
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
           <Input
             placeholder="Search certificates..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-10 py-5"
+            className="pl-10 pr-10 py-2.5 border border-gray-700 bg-gray-900 text-gray-200 placeholder-gray-500 rounded-lg"
           />
           {searchTerm && (
             <button
               onClick={clearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-400"
             >
               <X className="h-4 w-4" />
             </button>
@@ -266,27 +266,27 @@ export default function CertificatesPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100"
+            className="text-center py-12 sm:py-16 bg-gray-800 rounded-xl shadow-lg border border-gray-700/50 text-white"
           >
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 mb-6">
-              <FileText className="h-10 w-10 text-blue-500" />
+            <div className="mx-auto flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-blue-900/30 mb-6">
+              <FileText className="h-8 w-8 sm:h-10 sm:w-10 text-blue-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+            <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
               {searchTerm
                 ? "No matching certificates found"
                 : "No certificates issued yet"}
             </h3>
-            <p className="text-gray-500 mb-6">
+            <p className="text-gray-300 mb-6">
               {searchTerm
                 ? "Try adjusting your search query"
                 : "When certificates are issued, they will appear here"}
             </p>
             {searchTerm ? (
-              <Button variant="outline" onClick={clearSearch}>
+              <Button variant="outline" className="border-gray-700 text-gray-300 hover:bg-gray-700/50" onClick={clearSearch}>
                 Clear search
               </Button>
             ) : (
-              <Button onClick={fetchCertificates}>Refresh</Button>
+              <Button onClick={fetchCertificates} className="bg-blue-700 hover:bg-blue-800 text-white py-2.5 px-5 rounded-lg shadow-lg text-base">Refresh</Button>
             )}
           </motion.div>
         ) : (
@@ -295,82 +295,82 @@ export default function CertificatesPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="overflow-hidden bg-white shadow-lg rounded-xl border border-gray-100"
+            className="overflow-hidden bg-gray-800 shadow-lg rounded-xl border border-gray-700/50"
           >
             <Table className="min-w-full divide-y divide-gray-200">
-              <TableHeader className="bg-gray-50">
+              <TableHeader className="bg-gray-700/30">
                 <TableRow>
-                  <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                  <TableHead className="px-6 py-4 text-left text-xs sm:text-sm font-medium text-gray-300 uppercase tracking-wider">
                     <div className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
+                      <User className="h-4 w-4 text-gray-400" />
                       Recipient
                     </div>
                   </TableHead>
-                  <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                  <TableHead className="px-6 py-4 text-left text-xs sm:text-sm font-medium text-gray-300 uppercase tracking-wider">
                     Certificate Type
                   </TableHead>
-                  <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                  <TableHead className="px-6 py-4 text-left text-xs sm:text-sm font-medium text-gray-300 uppercase tracking-wider">
                     Issued By
                   </TableHead>
-                  <TableHead className="px-6 py-4 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                  <TableHead className="px-6 py-4 text-left text-xs sm:text-sm font-medium text-gray-300 uppercase tracking-wider">
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
+                      <Calendar className="h-4 w-4 text-gray-400" />
                       Issued Date
                     </div>
                   </TableHead>
-                  <TableHead className="px-6 py-4 text-right text-sm font-medium text-gray-500 uppercase tracking-wider">
+                  <TableHead className="px-6 py-4 text-right text-xs sm:text-sm font-medium text-gray-300 uppercase tracking-wider">
                     Actions
                   </TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody className="bg-white divide-y divide-gray-200">
+              <TableBody className="bg-gray-800 divide-y divide-gray-700">
                 {filteredCertificates.map((certificate, index) => (
                   <motion.tr
                     key={certificate.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="hover:bg-gray-50 transition-colors"
+                    className="hover:bg-gray-700 transition-colors"
                   >
-                    <TableCell className="px-6 py-4 whitespace-nowrap">
+                    <TableCell className="px-3 py-2 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 flex items-center justify-center">
-                          <span className="font-medium text-blue-600">
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-blue-900/30 to-purple-900/30 flex items-center justify-center">
+                          <span className="font-medium text-blue-400">
                             {certificate.recipientName.charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-white">
                             {certificate.recipientName}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-400">
                             {certificate.user.email}
                           </div>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">
+                    <TableCell className="px-3 py-2 whitespace-nowrap">
                       <Badge
                         variant="outline"
-                        className="border-blue-200 text-blue-700 bg-blue-50"
+                        className="border-blue-700 text-blue-400 bg-blue-900/30"
                       >
                         {certificate.certificateType}
                       </Badge>
                     </TableCell>
                     <TableCell className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-white">
                         {certificate.user.name}
                       </div>
                     </TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                    <TableCell className="px-3 py-2 whitespace-nowrap">
+                      <div className="text-sm text-white">
                         {format(new Date(certificate.issuedDate), "PPP")}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-400">
                         {format(new Date(certificate.issuedDate), "pp")}
                       </div>
                     </TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                    <TableCell className="px-3 py-2 whitespace-nowrap text-right text-sm font-medium space-x-1 sm:space-x-2">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -380,9 +380,9 @@ export default function CertificatesPage() {
                               onClick={() =>
                                 handlePreviewClick(certificate.cloudinaryUrl)
                               }
-                              className="group border-blue-100 hover:bg-blue-50 hover:border-blue-200"
+                              className="group border-blue-700 text-blue-400 hover:bg-blue-800/50 hover:border-blue-700"
                             >
-                              <Eye className="h-4 w-4 text-blue-500 group-hover:text-blue-600" />
+                              <Eye className="h-4 w-4 text-blue-400 group-hover:text-blue-300" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -400,9 +400,9 @@ export default function CertificatesPage() {
                               onClick={() =>
                                 handleViewInNewTab(certificate.cloudinaryUrl)
                               }
-                              className="group border-green-100 hover:bg-green-50 hover:border-green-200"
+                              className="group border-green-700 text-green-400 hover:bg-green-800/50 hover:border-green-700"
                             >
-                              <ExternalLink className="h-4 w-4 text-green-500 group-hover:text-green-600" />
+                              <ExternalLink className="h-4 w-4 text-green-400 group-hover:text-green-300" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -418,9 +418,9 @@ export default function CertificatesPage() {
                               variant="destructive"
                               size="sm"
                               onClick={() => handleDeleteClick(certificate.id)}
-                              className="hover:bg-red-600"
+                              className="bg-red-700 hover:bg-red-800"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-4 w-4 text-white" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -439,24 +439,24 @@ export default function CertificatesPage() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-4">
-              <Trash2 className="h-6 w-6 text-red-600" />
+        <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white border-gray-700/50 shadow-lg">
+          <DialogHeader className="bg-gray-700/30 p-4">
+            <div className="mx-auto flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-red-900/50 mb-4">
+              <Trash2 className="h-5 w-5 sm:h-6 sm:w-6 text-red-400" />
             </div>
-            <DialogTitle className="text-center">
+            <DialogTitle className="text-center text-xl font-bold text-red-400">
               Delete Certificate?
             </DialogTitle>
           </DialogHeader>
-          <div className="text-center text-gray-600 py-4">
+          <div className="text-center text-gray-300 py-4">
             This action cannot be undone. The certificate will be permanently
             removed.
           </div>
-          <DialogFooter className="sm:justify-center gap-3">
+          <DialogFooter className="sm:justify-center gap-3 bg-gray-700/30 p-4">
             <Button
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
-              className="w-full"
+              className="w-full border-gray-700 text-gray-300 hover:bg-gray-700/50"
             >
               Cancel
             </Button>
@@ -464,11 +464,11 @@ export default function CertificatesPage() {
               variant="destructive"
               onClick={confirmDelete}
               disabled={isDeleting}
-              className="w-full"
+              className="w-full bg-red-700 hover:bg-red-800 text-white"
             >
               {isDeleting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin text-white" />
                   Deleting...
                 </>
               ) : (
@@ -481,11 +481,11 @@ export default function CertificatesPage() {
 
       {/* Certificate Preview Dialog */}
       <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
-        <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Certificate Preview</DialogTitle>
+        <DialogContent className="max-w-4xl h-[90vh] flex flex-col bg-gray-800 text-white border-gray-700/50 shadow-lg">
+          <DialogHeader className="bg-gray-700/30 p-4">
+            <DialogTitle className="text-xl font-bold text-blue-400">Certificate Preview</DialogTitle>
           </DialogHeader>
-          <div className="flex-grow flex items-center justify-center overflow-auto bg-gray-50 rounded-lg">
+          <div className="flex-grow flex items-center justify-center overflow-auto bg-gray-900 rounded-lg">
             {certificateToPreview ? (
               <Document
                 file={certificateToPreview}
@@ -498,13 +498,13 @@ export default function CertificatesPage() {
                 }}
                 loading={
                   <div className="flex flex-col items-center justify-center gap-4">
-                    <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                    <p className="text-gray-500">Loading certificate...</p>
+                    <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                    <p className="text-gray-400">Loading certificate...</p>
                   </div>
                 }
                 noData={
                   <div className="flex flex-col items-center justify-center gap-4">
-                    <FileText className="h-8 w-8 text-gray-400" />
+                    <FileText className="h-8 w-8 text-gray-500" />
                     <p className="text-gray-500">No certificate to display</p>
                   </div>
                 }
@@ -517,23 +517,23 @@ export default function CertificatesPage() {
                       width={800}
                       renderTextLayer={false}
                       renderAnnotationLayer={false}
-                      className="border border-gray-200 shadow-sm"
+                      className="border border-gray-700 shadow-md"
                     />
                   ))}
               </Document>
             ) : (
               <div className="flex flex-col items-center justify-center gap-4">
                 <FileText className="h-8 w-8 text-gray-400" />
-                <p className="text-gray-500">
+                <p className="text-gray-400">
                   No certificate selected for preview
                 </p>
               </div>
             )}
           </div>
-          <DialogFooter>
+          <DialogFooter className="bg-gray-700/30 p-4">
             <Button
               onClick={() => setIsPreviewDialogOpen(false)}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto bg-blue-700 hover:bg-blue-800 text-white py-2.5 px-5 rounded-lg shadow-lg text-base"
             >
               Close Preview
             </Button>

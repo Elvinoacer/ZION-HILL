@@ -168,11 +168,15 @@ export default function MinistryMembers({
     );
 
   const filteredMembers = ministryMembers
-    ? ministryMembers.filter(
-        (member) =>
-          member?.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) || // Added ?.
-          member.role?.toLowerCase().includes(searchTerm.toLowerCase()) // Added ?.
-      ).slice(0, 3) // Limit to 3 members for the main card
+    ? ministryMembers
+        .filter(
+          (member) =>
+            member?.user?.name
+              ?.toLowerCase()
+              .includes(searchTerm.toLowerCase()) || // Added ?.
+            member.role?.toLowerCase().includes(searchTerm.toLowerCase()) // Added ?.
+        )
+        .slice(0, 3) // Limit to 3 members for the main card
     : [];
 
   // filteredModalMembers should always filter from the original ministryMembers
@@ -229,12 +233,16 @@ export default function MinistryMembers({
       )}
 
       {/* View All Modal */}
-      <Dialog open={isModalOpen} onOpenChange={(open) => {
-        setIsModalOpen(open);
-        if (open) { // When modal opens
-          setModalSearchTerm(""); // Clear modal search term
-        }
-      }}>
+      <Dialog
+        open={isModalOpen}
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+          if (open) {
+            // When modal opens
+            setModalSearchTerm(""); // Clear modal search term
+          }
+        }}
+      >
         <DialogTrigger asChild>
           <Button
             variant="outline"

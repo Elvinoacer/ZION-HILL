@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { useEffect, useState, useMemo } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -18,10 +18,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
+} from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -29,7 +29,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   PlusCircle,
   Trash2,
@@ -40,8 +40,12 @@ import {
   CheckCircle,
   XCircle,
   HandHeart,
-} from "lucide-react";
+  Users as UsersIcon,
+  Search
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
+// Interfaces
 interface Ministry {
   id: string;
   name: string;
@@ -49,6 +53,7 @@ interface Ministry {
   leaderId: string;
   leader?: { id: string; name: string };
   photo?: string;
+  members: any[]; // Add members to ministry type
 }
 
 interface User {
@@ -60,764 +65,343 @@ interface MinistryJoinRequest {
   id: string;
   userId: string;
   ministryId: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
   user: { id: string; name: string; email: string };
   ministry: { id: string; name: string };
 }
 
+// Main Page Component
 const AdminMinistriesPage = () => {
   const [ministries, setMinistries] = useState<Ministry[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [pendingJoinRequests, setPendingJoinRequests] = useState<MinistryJoinRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [formLoading, setFormLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const [newMinistry, setNewMinistry] = useState({
-    name: "",
-    description: "",
-    leaderId: "",
-    photo: "",
-  });
-
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingMinistry, setEditingMinistry] = useState<Ministry | null>(null);
-  const [ministryToDelete, setMinistryToDelete] = useState<Ministry | null>(
-    null
-  );
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-
-  const fetchMinistries = async () => {
+  const fetchData = async () => {
     try {
-      const res = await fetch("/api/ministry");
-      if (!res.ok) throw new Error("Failed to fetch ministries");
-      const data = await res.json();
-      setMinistries(data.ministries);
+      const [ministriesRes, usersRes, requestsRes] = await Promise.all([
+        fetch("/api/ministry"),
+        fetch("/api/users"),
+        fetch("/api/ministry-join-requests?status=PENDING"),
+      ]);
+      if (!ministriesRes.ok) throw new Error("Failed to fetch ministries");
+      if (!usersRes.ok) throw new Error("Failed to fetch users");
+      if (!requestsRes.ok) throw new Error("Failed to fetch join requests");
+
+      const ministriesData = await ministriesRes.json();
+      const usersData = await usersRes.json();
+      const requestsData = await requestsRes.json();
+
+      setMinistries(ministriesData.ministries);
+      setUsers(usersData);
+      setPendingJoinRequests(requestsData);
     } catch (err: any) {
       setError(err.message);
-    }
-  };
-
-  const fetchUsers = async () => {
-    try {
-      const res = await fetch("/api/users");
-      if (!res.ok) throw new Error("Failed to fetch users");
-      const data = await res.json();
-      setUsers(data);
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
-
-  const fetchJoinRequests = async () => {
-    try {
-      const res = await fetch("/api/ministry-join-requests?status=PENDING");
-      if (!res.ok) throw new Error("Failed to fetch join requests");
-      const data = await res.json();
-      setPendingJoinRequests(data);
-    } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    setLoading(true);
-    Promise.all([fetchMinistries(), fetchUsers(), fetchJoinRequests()]).finally(() =>
-      setLoading(false)
-    );
+    fetchData();
   }, []);
 
-  const handleNewMinistryChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleFormSubmit = () => {
+    fetchData();
+    setIsFormOpen(false);
+    setEditingMinistry(null);
+  };
+
+  const handleEdit = (ministry: Ministry) => {
+    setEditingMinistry(ministry);
+    setIsFormOpen(true);
+  };
+
+  const handleAddNew = () => {
+    setEditingMinistry(null);
+    setIsFormOpen(true);
+  }
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen"><Loader2 className="h-16 w-16 animate-spin text-blue-600" /></div>;
+  }
+
+  if (error) {
+    return <div className="container mx-auto py-8 px-4 text-center text-red-600">Error: {error}</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50/50 p-4 sm:p-6 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+            <div className="mb-4 sm:mb-0">
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-800 tracking-tight">Ministries</h1>
+              <p className="text-lg text-gray-600 mt-1">Oversee all church ministries and member requests.</p>
+            </div>
+            <Button onClick={handleAddNew} className="shadow-lg bg-blue-600 hover:bg-blue-700">
+              <PlusCircle className="mr-2 h-5 w-5" />
+              Add Ministry
+            </Button>
+        </header>
+
+        <AnimatePresence>
+          {isFormOpen && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+              <MinistryForm
+                ministry={editingMinistry}
+                users={users}
+                onSubmit={handleFormSubmit}
+                onCancel={() => setIsFormOpen(false)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <MinistriesList ministries={ministries} onEdit={handleEdit} onDelete={fetchData} />
+          </div>
+          <div>
+            <JoinRequests requests={pendingJoinRequests} onUpdate={fetchData} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Ministry Form Component
+const MinistryForm = ({ ministry, users, onSubmit, onCancel }) => {
+  const [formData, setFormData] = useState(ministry || { name: '', description: '', leaderId: '' });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(ministry?.photo || null);
+  const [loading, setLoading] = useState(false);
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewMinistry((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleEditingMinistryChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setEditingMinistry((prev) => (prev ? { ...prev, [name]: value } : null));
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith("image/")) {
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
-  };
-
-  const cancelImageSelection = () => {
-    setSelectedFile(null);
-    setPreviewUrl(null);
-  };
-
-  const uploadImageToCloudinary = async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch("/api/upload-image", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!res.ok) {
-      throw new Error("Image upload failed");
-    }
-
-    const data = await res.json();
-    return data.url;
-  };
-
-  const handleAddMinistry = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    setFormLoading(true);
-
+    setLoading(true);
     try {
-      let photoUrl = newMinistry.photo;
+      let photoUrl = ministry?.photo;
       if (selectedFile) {
-        photoUrl = await uploadImageToCloudinary(selectedFile);
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', selectedFile);
+        const res = await fetch('/api/upload-image', { method: 'POST', body: uploadFormData });
+        if (!res.ok) throw new Error('Image upload failed');
+        const data = await res.json();
+        photoUrl = data.url;
       }
 
-      const res = await fetch("/api/ministry", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...newMinistry, photo: photoUrl }),
+      const url = ministry ? `/api/ministry?id=${ministry.id}` : '/api/ministry';
+      const method = ministry ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, photo: photoUrl }),
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to add ministry");
+        throw new Error(errorData.error || `Failed to ${ministry ? 'update' : 'create'} ministry`);
       }
 
-      setNewMinistry({ name: "", description: "", leaderId: "", photo: "" });
-      setSelectedFile(null);
-      setPreviewUrl(null);
-      fetchMinistries();
-      toast.success("Ministry added successfully!");
+      toast.success(`Ministry ${ministry ? 'updated' : 'created'} successfully!`);
+      onSubmit();
     } catch (err: any) {
       toast.error(err.message);
     } finally {
-      setFormLoading(false);
+      setLoading(false);
     }
   };
-
-  const handleUpdateMinistry = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingMinistry) return;
-    setFormLoading(true);
-
-    try {
-      let photoUrl = editingMinistry.photo;
-      if (selectedFile) {
-        photoUrl = await uploadImageToCloudinary(selectedFile);
-      }
-
-      const res = await fetch(`/api/ministry?id=${editingMinistry.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...editingMinistry, photo: photoUrl }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to update ministry");
-      }
-
-      setEditingMinistry(null);
-      setSelectedFile(null);
-      setPreviewUrl(null);
-      fetchMinistries();
-      toast.success("Ministry updated successfully!");
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setFormLoading(false);
-    }
-  };
-
-  const handleDeleteMinistry = async (id: string) => {
-    setDeleteLoading(true);
-    try {
-      const res = await fetch(`/api/ministry?id=${id}`, { method: "DELETE" });
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to delete ministry");
-      }
-      fetchMinistries();
-      toast.success("Ministry deleted successfully!");
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setDeleteLoading(false);
-      setMinistryToDelete(null);
-    }
-  };
-
-  const handleApproveRequest = async (id: string) => {
-    try {
-      const res = await fetch(`/api/ministry-join-requests?id=${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "APPROVED" }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to approve request");
-      }
-
-      toast.success("Join request approved and member added!");
-      fetchJoinRequests(); // Refresh pending requests
-      fetchMinistries(); // Refresh ministries to update member count
-    } catch (err: any) {
-      toast.error(err.message);
-    }
-  };
-
-  const handleRejectRequest = async (id: string) => {
-    try {
-      const res = await fetch(`/api/ministry-join-requests?id=${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "REJECTED" }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to reject request");
-      }
-
-      toast.success("Join request rejected!");
-      fetchJoinRequests(); // Refresh pending requests
-    } catch (err: any) {
-      toast.error(err.message);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-16 w-16 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-          Error: {error}
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Ministry Management
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Create and manage church ministries
-          </p>
+    <Card className="mb-8 shadow-lg border-gray-200/80 rounded-2xl">
+      <CardHeader>
+        <CardTitle>{ministry ? 'Edit Ministry' : 'Create New Ministry'}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="Ministry Name" required />
+            <Select onValueChange={(value) => setFormData(p => ({...p, leaderId: value}))} value={formData.leaderId}>
+              <SelectTrigger><SelectValue placeholder="Select Leader" /></SelectTrigger>
+              <SelectContent>
+                {users.map(user => <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <Textarea name="description" value={formData.description} onChange={handleInputChange} placeholder="Description" />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Ministry Photo</label>
+            <Input type="file" onChange={handleFileChange} accept="image/*" />
+            {previewUrl && <img src={previewUrl} alt="Preview" className="mt-4 w-32 h-32 object-cover rounded-lg" />}
+          </div>
+          <div className="flex justify-end gap-4">
+            <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+            <Button type="submit" disabled={loading}>{loading ? <Loader2 className="animate-spin"/> : 'Save'}</Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Ministries List Component
+const MinistriesList = ({ ministries, onEdit, onDelete }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [ministryToDelete, setMinistryToDelete] = useState<Ministry | null>(null);
+
+  const filteredMinistries = useMemo(() =>
+    ministries.filter(m => m.name.toLowerCase().includes(searchTerm.toLowerCase())),
+    [ministries, searchTerm]
+  );
+
+  const handleDelete = async () => {
+    if (!ministryToDelete) return;
+    try {
+      const res = await fetch(`/api/ministry?id=${ministryToDelete.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete ministry');
+      toast.success('Ministry deleted successfully');
+      onDelete();
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+    setMinistryToDelete(null);
+  };
+
+  return (
+    <Card className="shadow-xl border-gray-200/80 rounded-2xl">
+      <CardHeader className="border-b">
+        <div className="flex justify-between items-center">
+          <CardTitle>Existing Ministries</CardTitle>
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Input placeholder="Search ministries..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
+          </div>
         </div>
-        <Button
-          onClick={() => {
-            setEditingMinistry(null);
-            setNewMinistry({
-              name: "",
-              description: "",
-              leaderId: "",
-              photo: "",
-            });
-            setSelectedFile(null);
-            setPreviewUrl(null);
-          }}
-          className="w-full md:w-auto"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add Ministry
-        </Button>
-      </div>
-
-      <Card className="mb-8 border border-gray-200 bg-white rounded-lg shadow-sm">
-        <CardHeader className="border-b border-gray-200">
-          <CardTitle className="text-xl font-semibold text-gray-800">
-            {editingMinistry ? "Edit Ministry" : "Create New Ministry"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <form
-            onSubmit={
-              editingMinistry ? handleUpdateMinistry : handleAddMinistry
-            }
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            <div className="space-y-2">
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Name
-              </label>
-              <Input
-                id="name"
-                type="text"
-                name="name"
-                placeholder="e.g. Youth Ministry"
-                value={
-                  editingMinistry ? editingMinistry.name : newMinistry.name
-                }
-                onChange={
-                  editingMinistry
-                    ? handleEditingMinistryChange
-                    : handleNewMinistryChange
-                }
-                required
-                className="focus:ring-primary focus:border-primary"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label
-                htmlFor="leaderId"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Leader
-              </label>
-              <Select
-                onValueChange={(value) => {
-                  if (editingMinistry) {
-                    setEditingMinistry((prev) =>
-                      prev ? { ...prev, leaderId: value } : null
-                    );
-                  } else {
-                    setNewMinistry((prev) => ({ ...prev, leaderId: value }));
-                  }
-                }}
-                value={
-                  editingMinistry
-                    ? editingMinistry.leaderId
-                    : newMinistry.leaderId
-                }
-              >
-                <SelectTrigger className="focus:ring-primary focus:border-primary">
-                  <SelectValue placeholder="Select Leader" />
-                </SelectTrigger>
-                <SelectContent>
-                  {users.map((user) => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {user.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="md:col-span-2 space-y-2">
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Description
-              </label>
-              <Textarea
-                id="description"
-                name="description"
-                placeholder="A brief description of the ministry."
-                value={
-                  editingMinistry
-                    ? editingMinistry.description || ""
-                    : newMinistry.description
-                }
-                onChange={
-                  editingMinistry
-                    ? handleEditingMinistryChange
-                    : handleNewMinistryChange
-                }
-                className="focus:ring-primary focus:border-primary min-h-[100px]"
-              />
-            </div>
-
-            <div className="md:col-span-2 space-y-4">
-              <div>
-                <label
-                  htmlFor="photo"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Ministry Photo
-                </label>
-                <div className="flex items-center gap-4">
-                  <label
-                    htmlFor="photo-upload"
-                    className={`flex flex-col items-center justify-center w-full px-4 py-6 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
-                      isDragging
-                        ? "border-primary bg-primary/10"
-                        : "border-gray-300 hover:border-primary hover:bg-gray-50"
-                    }`}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                  >
-                    <div className="flex flex-col items-center justify-center">
-                      <UploadCloud className="h-10 w-10 text-gray-400 mb-2" />
-                      <p className="text-sm text-gray-600">
-                        <span className="font-semibold text-primary">
-                          Click to upload
-                        </span>{" "}
-                        or drag and drop
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        PNG, JPG, GIF (Max. 5MB)
-                      </p>
-                    </div>
-                    <input
-                      id="photo-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-              </div>
-
-              {(previewUrl || editingMinistry?.photo) && (
-                <div className="mt-4 space-y-2">
-                  <h3 className="text-sm font-medium text-gray-700">
-                    Image Preview
-                  </h3>
-                  <div className="relative group">
-                    <div className="relative w-full h-64 rounded-lg overflow-hidden border border-gray-200">
-                      <img
-                        src={previewUrl || editingMinistry?.photo}
-                        alt="Ministry preview"
-                        className="w-full h-full object-contain bg-gray-50"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-white/90 backdrop-blur-sm hover:bg-white"
-                        onClick={cancelImageSelection}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Remove
-                      </Button>
-                      <label
-                        htmlFor="photo-upload"
-                        className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium bg-white/90 backdrop-blur-sm rounded-md border border-gray-200 hover:bg-white cursor-pointer"
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Change
-                      </label>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    {selectedFile?.name || "Current ministry image"}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="md:col-span-2 flex justify-end gap-2 pt-2">
-              {editingMinistry && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setEditingMinistry(null);
-                    setSelectedFile(null);
-                    setPreviewUrl(null);
-                  }}
-                >
-                  Cancel
-                </Button>
-              )}
-              <Button
-                type="submit"
-                disabled={formLoading}
-                className="min-w-[150px]"
-              >
-                {formLoading && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                {editingMinistry ? "Update Ministry" : "Create Ministry"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      <Card className="border border-gray-200 bg-white rounded-lg shadow-sm">
-        <CardHeader className="border-b border-gray-200">
-          <CardTitle className="text-xl font-semibold text-gray-800">
-            Existing Ministries
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {ministries.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table className="min-w-full divide-y divide-gray-200">
-                <TableHeader className="bg-gray-50">
-                  <TableRow>
-                    <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Photo
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Name
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Description
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Leader
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      View
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody className="bg-white divide-y divide-gray-200">
-                  {ministries.map((m) => (
-                    <TableRow key={m.id} className="hover:bg-gray-50">
-                      <TableCell className="px-6 py-4 whitespace-nowrap">
-                        {m.photo ? (
-                          <img
-                            src={m.photo}
-                            alt={m.name}
-                            className="w-12 h-12 object-cover rounded-md"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center">
-                            <Church className="h-6 w-6 text-gray-400" />
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap">
-                        <Link
-                          href={`/admin/ministries/${m.id}`}
-                          className="font-medium text-primary hover:text-primary/90 hover:underline"
-                        >
-                          {m.name}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
-                        {m.description || "No description"}
-                      </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
-                          {m.leader?.name || "N/A"}
-                        </span>
-                      </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap">
-                        <Link href={`/admin/ministries/${m.id}`}>
-                          <Button size="sm" variant="outline">
-                            View
-                          </Button>
-                        </Link>
-                      </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-right space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setEditingMinistry(m);
-                            setSelectedFile(null);
-                            setPreviewUrl(null);
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => setMinistryToDelete(m)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <div className="mx-auto h-24 w-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <Church className="h-12 w-12 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900">
-                No ministries yet
-              </h3>
-              <p className="mt-2 text-sm text-gray-500">
-                Use the form above to create your first ministry.
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card className="mb-8 border border-gray-200 bg-white rounded-lg shadow-sm">
-        <CardHeader className="border-b border-gray-200">
-          <CardTitle className="text-xl font-semibold text-gray-800">
-            Pending Ministry Join Requests
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {pendingJoinRequests.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table className="min-w-full divide-y divide-gray-200">
-                <TableHeader className="bg-gray-50">
-                  <TableRow>
-                    <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      User
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Ministry
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody className="bg-white divide-y divide-gray-200">
-                  {pendingJoinRequests.map((request) => (
-                    <TableRow key={request.id} className="hover:bg-gray-50">
-                      <TableCell className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {request.user.name}
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="hidden md:block">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Ministry</TableHead>
+                <TableHead>Leader</TableHead>
+                <TableHead>Members</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredMinistries.map(m => (
+                <TableRow key={m.id}>
+                  <TableCell className="font-medium">
+                    <Link href={`/admin/ministries/${m.id}`} className="flex items-center gap-3 hover:underline">
+                      <img src={m.photo || '/images/default-2.png'} alt={m.name} className="w-10 h-10 rounded-lg object-cover"/>
+                      {m.name}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{m.leader?.name || 'N/A'}</TableCell>
+                  <TableCell>{m.members?.length || 0}</TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button variant="outline" size="icon" onClick={() => onEdit(m)}><Edit className="h-4 w-4"/></Button>
+                    <Button variant="destructive" size="icon" onClick={() => setMinistryToDelete(m)}><Trash2 className="h-4 w-4"/></Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="md:hidden p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {filteredMinistries.map(m => (
+                <Card key={m.id} className="overflow-hidden">
+                    <CardHeader className="flex flex-row items-center gap-4 p-4">
+                        <img src={m.photo || '/images/default-2.png'} alt={m.name} className="w-16 h-16 rounded-lg object-cover"/>
+                        <div>
+                            <Link href={`/admin/ministries/${m.id}`}><CardTitle className="hover:underline">{m.name}</CardTitle></Link>
+                            <p className="text-sm text-gray-600">Leader: {m.leader?.name || 'N/A'}</p>
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {request.user.email}
+                    </CardHeader>
+                    <CardContent className="p-4 flex justify-between items-center">
+                        <div className="flex items-center gap-2 text-sm"><UsersIcon className="h-4 w-4"/> {m.members?.length || 0} members</div>
+                        <div className="space-x-2">
+                            <Button variant="outline" size="icon" onClick={() => onEdit(m)}><Edit className="h-4 w-4"/></Button>
+                            <Button variant="destructive" size="icon" onClick={() => setMinistryToDelete(m)}><Trash2 className="h-4 w-4"/></Button>
                         </div>
-                      </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {request.ministry.name}
-                        </div>
-                      </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                          {request.status}
-                        </span>
-                      </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-green-600 hover:bg-green-50"
-                          onClick={() => handleApproveRequest(request.id)}
-                        >
-                          <CheckCircle className="h-4 w-4 mr-1" /> Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-red-600 hover:bg-red-50"
-                          onClick={() => handleRejectRequest(request.id)}
-                        >
-                          <XCircle className="h-4 w-4 mr-1" /> Reject
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <div className="mx-auto h-24 w-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <HandHeart className="h-12 w-12 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900">
-                No pending join requests
-              </h3>
-              <p className="mt-2 text-sm text-gray-500">
-                All clear! No new requests to review at the moment.
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Dialog
-        open={!!ministryToDelete}
-        onOpenChange={() => setMinistryToDelete(null)}
-      >
-        <DialogContent className="sm:max-w-[425px] rounded-lg">
+                    </CardContent>
+                </Card>
+            ))}
+        </div>
+      </CardContent>
+      <Dialog open={!!ministryToDelete} onOpenChange={() => setMinistryToDelete(null)}>
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-gray-900">
-              Delete Ministry
-            </DialogTitle>
-            <DialogDescription className="text-gray-600">
-              Are you sure you want to delete the "{ministryToDelete?.name}"
-              ministry? This action cannot be undone.
-            </DialogDescription>
+            <DialogTitle>Are you sure?</DialogTitle>
+            <DialogDescription>This will permanently delete the {ministryToDelete?.name} ministry.</DialogDescription>
           </DialogHeader>
-          <DialogFooter className="mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setMinistryToDelete(null)}
-              className="px-6"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                if (ministryToDelete) {
-                  handleDeleteMinistry(ministryToDelete.id);
-                }
-              }}
-              disabled={deleteLoading}
-              className="px-6"
-            >
-              {deleteLoading && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Delete
-            </Button>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMinistryToDelete(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDelete}>Delete</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </Card>
+  );
+};
+
+// Join Requests Component
+const JoinRequests = ({ requests, onUpdate }) => {
+  const handleRequest = async (id: string, status: 'APPROVED' | 'REJECTED') => {
+    try {
+      const res = await fetch(`/api/ministry-join-requests?id=${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error(`Failed to ${status.toLowerCase()} request`);
+      toast.success(`Request ${status.toLowerCase()} successfully.`);
+      onUpdate();
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
+  return (
+    <Card className="shadow-xl border-gray-200/80 rounded-2xl">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2"><HandHeart/> Pending Join Requests</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {requests.length > 0 ? requests.map(req => (
+          <div key={req.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div>
+              <p className="font-semibold">{req.user.name}</p>
+              <p className="text-sm text-gray-600">wants to join {req.ministry.name}</p>
+            </div>
+            <div className="space-x-2">
+              <Button size="icon" variant="outline" className="text-green-600" onClick={() => handleRequest(req.id, 'APPROVED')}><CheckCircle className="h-4 w-4"/></Button>
+              <Button size="icon" variant="outline" className="text-red-600" onClick={() => handleRequest(req.id, 'REJECTED')}><XCircle className="h-4 w-4"/></Button>
+            </div>
+          </div>
+        )) : <p className="text-center text-gray-500 py-8">No pending requests.</p>}
+      </CardContent>
+    </Card>
   );
 };
 

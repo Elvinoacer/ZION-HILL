@@ -4,6 +4,20 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CertificateFrequency, BibleStudyCourse } from "@/generated/prisma";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FiArrowLeft,
+  FiSave,
+  FiCalendar,
+  FiBook,
+  FiAward,
+  FiAlertCircle,
+  FiCheckCircle,
+  FiX,
+  FiInfo,
+  FiClock,
+  FiCopy,
+} from "react-icons/fi";
 
 export default function NewCoursePage() {
   const [title, setTitle] = useState("");
@@ -14,6 +28,7 @@ export default function NewCoursePage() {
   const [endDate, setEndDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -45,6 +60,14 @@ export default function NewCoursePage() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setSuccess(false);
+
+    // Validate dates
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      setError("End date must be after start date.");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch("/api/bible-study/course", {
@@ -60,8 +83,11 @@ export default function NewCoursePage() {
       });
 
       if (res.ok) {
+        setSuccess(true);
         const newCourse = await res.json();
-        router.push(`/admin/bible-study/${newCourse.id}`);
+        setTimeout(() => {
+          router.push(`/admin/bible-study/${newCourse.id}`);
+        }, 1500);
       } else {
         const errorData = await res.json();
         setError(
@@ -75,85 +101,97 @@ export default function NewCoursePage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex items-center mb-10">
-          <Link
-            href="/admin/bible-study"
-            className="mr-4 p-2 rounded-full hover:bg-white/50 transition-all duration-300 shadow-sm bg-white"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-indigo-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-          </Link>
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500">
-              {searchParams.get("duplicate")
-                ? "Duplicate Course"
-                : "Create New Course"}
-            </h1>
-            <p className="mt-2 text-lg text-gray-600">
-              {searchParams.get("duplicate")
-                ? "Customize the duplicated course details below"
-                : "Design your new Bible study program with our intuitive builder"}
-            </p>
-          </div>
-        </div>
+  const isDuplicateMode = searchParams.get("duplicate");
 
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-950 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        {/* Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <div className="flex items-center mb-6">
+            <Link
+              href="/admin/bible-study"
+              className="mr-4 p-2 rounded-full hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300 shadow-sm bg-white dark:bg-gray-800 flex items-center justify-center"
+            >
+              <FiArrowLeft className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+            </Link>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+                {isDuplicateMode ? "Duplicate Course" : "Create New Course"}
+              </h1>
+              <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
+                {isDuplicateMode
+                  ? "Customize the duplicated course details below"
+                  : "Design your new Bible study program with our intuitive builder"}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg mb-6 flex items-start"
+            >
+              <div className="flex-shrink-0">
+                <FiAlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700 dark:text-red-300">
+                  {error}
+                </p>
+              </div>
+              <button onClick={() => setError(null)} className="ml-auto">
+                <FiX className="h-4 w-4 text-red-500" />
+              </button>
+            </motion.div>
+          )}
+
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="bg-green-50 dark:bg-green-900/30 border-l-4 border-green-500 p-4 rounded-lg mb-6 flex items-start"
+            >
+              <div className="flex-shrink-0">
+                <FiCheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-green-700 dark:text-green-300">
+                  Course created successfully! Redirecting...
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700/60 overflow-hidden"
+        >
           <div className="p-1 bg-gradient-to-r from-indigo-500 to-blue-600"></div>
 
-          <div className="p-8">
+          <div className="p-6 md:p-8">
             <form onSubmit={handleSubmit} className="space-y-8">
-              {error && (
-                <div className="rounded-xl bg-red-50/90 border border-red-200 p-6 backdrop-blur-sm">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0">
-                      <svg
-                        className="h-6 w-6 text-red-500"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div className="ml-4">
-                      <h3 className="text-lg font-medium text-red-800">
-                        Oops! Something went wrong
-                      </h3>
-                      <div className="mt-2 text-red-700">
-                        <p>{error}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                 <div className="md:col-span-2">
                   <div className="relative">
                     <label
                       htmlFor="title"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center"
                     >
-                      Course Title <span className="text-red-500">*</span>
+                      <FiBook className="mr-2 text-indigo-500" />
+                      Course Title <span className="text-red-500 ml-1">*</span>
                     </label>
                     <div className="relative rounded-md shadow-sm">
                       <input
@@ -161,25 +199,10 @@ export default function NewCoursePage() {
                         id="title"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg py-3 px-4 border transition-all duration-200"
+                        className="block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg py-3 px-4 border transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         placeholder="e.g. Foundations of Faith"
                         required
                       />
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <svg
-                          className="h-5 w-5 text-gray-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                          />
-                        </svg>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -187,8 +210,9 @@ export default function NewCoursePage() {
                 <div className="md:col-span-2">
                   <label
                     htmlFor="description"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center"
                   >
+                    <FiInfo className="mr-2 text-indigo-500" />
                     Course Description
                   </label>
                   <textarea
@@ -196,10 +220,10 @@ export default function NewCoursePage() {
                     rows={5}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 border transition-all duration-200"
+                    className="block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 border transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     placeholder="Describe what students will learn in this course..."
                   />
-                  <p className="mt-2 text-sm text-gray-500">
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                     This will be visible to potential participants
                   </p>
                 </div>
@@ -207,8 +231,9 @@ export default function NewCoursePage() {
                 <div className="space-y-1">
                   <label
                     htmlFor="certificateFrequency"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
                   >
+                    <FiAward className="mr-2 text-indigo-500" />
                     Certificate Frequency
                   </label>
                   <div className="relative">
@@ -220,7 +245,7 @@ export default function NewCoursePage() {
                           e.target.value as CertificateFrequency
                         )
                       }
-                      className="appearance-none block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 border transition-all duration-200 bg-white"
+                      className="appearance-none block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 border transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       {Object.values(CertificateFrequency).map((freq) => (
                         <option key={freq} value={freq}>
@@ -229,7 +254,7 @@ export default function NewCoursePage() {
                         </option>
                       ))}
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700 dark:text-gray-300">
                       <svg
                         className="h-5 w-5"
                         fill="none"
@@ -245,7 +270,7 @@ export default function NewCoursePage() {
                       </svg>
                     </div>
                   </div>
-                  <p className="mt-2 text-sm text-gray-500">
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                     How often participants receive certificates
                   </p>
                 </div>
@@ -254,9 +279,10 @@ export default function NewCoursePage() {
                   <div className="space-y-1">
                     <label
                       htmlFor="startDate"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
                     >
-                      Start Date <span className="text-red-500">*</span>
+                      <FiCalendar className="mr-2 text-indigo-500" />
+                      Start Date <span className="text-red-500 ml-1">*</span>
                     </label>
                     <div className="relative rounded-md shadow-sm">
                       <input
@@ -264,11 +290,11 @@ export default function NewCoursePage() {
                         id="startDate"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 border transition-all duration-200"
+                        className="block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 border transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         required
                       />
                     </div>
-                    <p className="mt-2 text-sm text-gray-500">
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                       When the course begins
                     </p>
                   </div>
@@ -276,9 +302,10 @@ export default function NewCoursePage() {
                   <div className="space-y-1">
                     <label
                       htmlFor="endDate"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
                     >
-                      End Date <span className="text-red-500">*</span>
+                      <FiClock className="mr-2 text-indigo-500" />
+                      End Date <span className="text-red-500 ml-1">*</span>
                     </label>
                     <div className="relative rounded-md shadow-sm">
                       <input
@@ -286,78 +313,106 @@ export default function NewCoursePage() {
                         id="endDate"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 border transition-all duration-200"
+                        className="block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 border transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         required
                       />
                     </div>
-                    <p className="mt-2 text-sm text-gray-500">
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                       When the course concludes
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-4 pt-6">
+              <div className="flex flex-col-reverse sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={() => router.push("/admin/bible-study")}
-                  className="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
+                  className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="inline-flex items-center px-8 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200"
+                  className="inline-flex items-center justify-center px-8 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   {isLoading ? (
                     <>
-                      <svg
-                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
+                      <div className="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
                       Processing...
                     </>
                   ) : (
                     <>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="-ml-1 mr-2 h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      {searchParams.get("duplicate")
-                        ? "Duplicate Course"
-                        : "Create Course"}
+                      {isDuplicateMode ? (
+                        <>
+                          <FiCopy className="mr-2" />
+                          Duplicate Course
+                        </>
+                      ) : (
+                        <>
+                          <FiSave className="mr-2" />
+                          Create Course
+                        </>
+                      )}
                     </>
                   )}
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </motion.div>
+
+        {/* Help Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-8 bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border border-blue-200 dark:border-blue-800/50"
+        >
+          <h3 className="font-medium text-blue-800 dark:text-blue-300 mb-3 flex items-center">
+            <FiInfo className="mr-2" />
+            Course Creation Tips
+          </h3>
+          <ul className="space-y-2 text-sm text-blue-700 dark:text-blue-400">
+            <li className="flex items-start">
+              <div className="bg-blue-200 dark:bg-blue-700/50 rounded-full p-1 mr-2 mt-0.5">
+                <FiCheckCircle className="h-3 w-3 text-blue-700 dark:text-blue-300" />
+              </div>
+              <span>
+                Choose a clear, descriptive title that reflects the course
+                content
+              </span>
+            </li>
+            <li className="flex items-start">
+              <div className="bg-blue-200 dark:bg-blue-700/50 rounded-full p-1 mr-2 mt-0.5">
+                <FiCheckCircle className="h-3 w-3 text-blue-700 dark:text-blue-300" />
+              </div>
+              <span>
+                Provide a detailed description to help participants understand
+                what they'll learn
+              </span>
+            </li>
+            <li className="flex items-start">
+              <div className="bg-blue-200 dark:bg-blue-700/50 rounded-full p-1 mr-2 mt-0.5">
+                <FiCheckCircle className="h-3 w-3 text-blue-700 dark:text-blue-300" />
+              </div>
+              <span>
+                Select appropriate certificate frequency based on course length
+                and structure
+              </span>
+            </li>
+            <li className="flex items-start">
+              <div className="bg-blue-200 dark:bg-blue-700/50 rounded-full p-1 mr-2 mt-0.5">
+                <FiCheckCircle className="h-3 w-3 text-blue-700 dark:text-blue-300" />
+              </div>
+              <span>
+                Set realistic start and end dates that give participants enough
+                time to complete the course
+              </span>
+            </li>
+          </ul>
+        </motion.div>
       </div>
     </div>
   );

@@ -13,17 +13,18 @@ import TechSupportSystem from "@/components/admin/digitalhub/TechSupportSystem";
 const theme = {
   primary: "bg-blue-600",
   primaryHover: "hover:bg-blue-700",
-  secondary: "bg-gray-200",
-  secondaryHover: "hover:bg-gray-300",
-  textPrimary: "text-gray-900",
-  textSecondary: "text-gray-600",
-  accentBlue: "bg-blue-100",
-  accentGreen: "bg-green-100",
-  accentPurple: "bg-purple-100",
+  secondary: "bg-gray-700", // Changed from gray-200
+  secondaryHover: "hover:bg-gray-600", // Changed from gray-300
+  textPrimary: "text-white", // Changed from gray-900
+  textSecondary: "text-gray-300", // Changed from gray-600
+  accentBlue: "bg-blue-900/30", // Changed from blue-100
+  accentGreen: "bg-green-900/30", // Changed from green-100
+  accentPurple: "bg-purple-900/30", // Changed from purple-100
 };
 
 export default function DigitalHubDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Added for mobile responsiveness
   const [activeSection, setActiveSection] = useState("streaming");
 
   const sections = [
@@ -36,115 +37,118 @@ export default function DigitalHubDashboard() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="relative flex min-h-screen bg-gradient-to-br from-gray-100 to-blue-100">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="stars"></div>
-        </div>
-        <style jsx>{`
-          .stars {
-            background: transparent;
-            height: 100%;
-            width: 100%;
-            position: absolute;
-            overflow: hidden;
-          }
-          .stars::before,
-          .stars::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='white' opacity='0.2'/%3E%3Ccircle cx='50' cy='50' r='1.5' fill='white' opacity='0.3'/%3E%3Ccircle cx='100' cy='20' r='1' fill='white' opacity='0.2'/%3E%3C/svg%3E");
-            animation: twinkle 15s infinite linear;
-          }
-          .stars::after {
-            animation-delay: -7.5s;
-          }
-          @keyframes twinkle {
-            0% {
-              opacity: 0.2;
-              transform: translateY(0);
-            }
-            50% {
-              opacity: 0.5;
-            }
-            100% {
-              opacity: 0.2;
-              transform: translateY(-10px);
-            }
-          }
-        `}</style>
+      <div className="relative flex min-h-screen bg-gray-900 text-gray-200"> {/* Changed background */}
+        {/* Removed stars CSS */}
+
+        {/* Mobile overlay */}
+        {isMobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black/60 z-30 md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          ></div>
+        )}
 
         {/* Sidebar */}
-        <motion.div
-          className={`${
-            sidebarCollapsed ? "w-16" : "w-64"
-          } bg-white shadow-md transition-all duration-300`}
-          initial={{ x: -20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
+        <motion.aside
+          className={`fixed top-0 left-0 h-full z-40 bg-gray-800 shadow-2xl border-r border-gray-700/50 flex flex-col transition-transform duration-300 ease-in-out md:relative md:translate-x-0
+            ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+          `}
+          initial={false}
+          animate={{ width: sidebarCollapsed ? 80 : 256 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="p-4 flex justify-between items-center">
+          <div className="p-4 flex justify-between items-center border-b border-gray-700/50 h-16">
             {!sidebarCollapsed && (
-              <h1 className={`${theme.textPrimary} text-xl font-semibold`}>
+              <h1 className={`${theme.textPrimary} text-xl font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent whitespace-nowrap`}>
                 Digital Hub
               </h1>
             )}
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="p-2 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-200"
+              className="hidden md:block p-2 rounded-full hover:bg-gray-700/80 transition-colors"
               aria-label={
                 sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
               }
             >
-              {sidebarCollapsed ? (
-                <Menu className="h-5 w-5" />
-              ) : (
-                <X className="h-5 w-5" />
-              )}
+              <Menu className="h-5 w-5 text-blue-400" />
+            </button>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="md:hidden p-2 rounded-full hover:bg-gray-700/80 transition-colors"
+            >
+              <X className="h-5 w-5 text-blue-400" />
             </button>
           </div>
-          <nav className="mt-4">
+          <nav className="mt-4 flex-1 overflow-y-auto p-2">
             {sections.map((section) => (
               <motion.button
                 key={section.id}
-                className={`w-full flex items-center p-4 text-left ${
-                  activeSection === section.id
-                    ? `${theme.primary} text-white`
-                    : `${theme.secondary} ${theme.textSecondary} ${theme.secondaryHover}`
-                }`}
-                onClick={() => setActiveSection(section.id)}
+                className={`w-full flex items-center rounded-lg px-4 py-3 mb-2 transition-all duration-200 text-left
+                  ${
+                    activeSection === section.id
+                      ? "bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg"
+                      : "text-gray-300 hover:bg-gray-700/50"
+                  }
+                  ${sidebarCollapsed ? "justify-center" : ""}
+                `}
+                onClick={() => {
+                  setActiveSection(section.id);
+                  if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+                }}
                 whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
                 aria-current={activeSection === section.id ? "page" : undefined}
               >
-                <section.icon className="h-5 w-5 mr-2" aria-hidden="true" />
-                {!sidebarCollapsed && section.label}
+                <section.icon
+                  className={`h-5 w-5 transition-all ${
+                    sidebarCollapsed ? "mx-auto" : "mr-3"
+                  } ${
+                    activeSection === section.id ? "text-white" : "text-blue-300"
+                  }`}
+                  aria-hidden="true"
+                />
+                {!sidebarCollapsed && (
+                  <span className="font-medium">{section.label}</span>
+                )}
               </motion.button>
             ))}
           </nav>
-        </motion.div>
+        </motion.aside>
 
         {/* Main Content */}
-        <div className="flex-1 p-6">
-          <h1 id="dashboard-heading" className="sr-only">
-            Digital Infrastructure and Content Production Hub
-          </h1>
-          <motion.div
-            className="bg-white rounded-xl shadow-md p-6 bg-blue-50/50"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            role="main"
-            aria-labelledby="dashboard-heading"
-          >
-            {activeSection === "streaming" && <StreamControlCenter />}
-            {activeSection === "production" && <MediaProduction />}
-            {activeSection === "assets" && <DigitalAssetManagement />}
-            {activeSection === "website" && <WebsiteMaintenance />}
-            {activeSection === "support" && <TechSupportSystem />}
-          </motion.div>
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <header className="md:hidden flex items-center justify-between p-4 bg-gray-800/70 backdrop-blur-sm border-b border-gray-700/50 h-16">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-2 rounded-md text-gray-300 hover:bg-gray-700"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+            <h2 className="text-lg font-semibold text-white">
+              {sections.find((s) => s.id === activeSection)?.label}
+            </h2>
+            <div className="w-8"></div>
+          </header>
+
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+            <h1 id="dashboard-heading" className="sr-only">
+              Digital Infrastructure and Content Production Hub
+            </h1>
+            <motion.div
+              className="bg-gray-800 rounded-xl shadow-2xl p-6 border border-gray-700/50"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              role="main"
+              aria-labelledby="dashboard-heading"
+            >
+              {activeSection === "streaming" && <StreamControlCenter />}
+              {activeSection === "production" && <MediaProduction />}
+              {activeSection === "assets" && <DigitalAssetManagement />}
+              {activeSection === "website" && <WebsiteMaintenance />}
+              {activeSection === "support" && <TechSupportSystem />}
+            </motion.div>
+          </main>
         </div>
       </div>
     </DndProvider>

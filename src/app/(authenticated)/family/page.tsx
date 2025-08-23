@@ -91,11 +91,13 @@ const FamilyPage = () => {
     setError(null);
     if (!newFamilyName.trim()) {
       setError("Family name cannot be empty.");
+      toast.error("Family name cannot be empty.");
       return;
     }
 
     if (!session?.user.id) {
       toast.warning("Unauthorized request, please login!");
+      return;
     }
 
     try {
@@ -126,6 +128,7 @@ const FamilyPage = () => {
     setError(null);
     if (!selectedFamilyId || !selectedUserId) {
       setError("Please select both a family and a user.");
+      toast.error("Please select both a family and a user.");
       return;
     }
 
@@ -179,19 +182,19 @@ const FamilyPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6">
-        <div className="max-w-6xl mx-auto">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="mb-8"
           >
-            <Skeleton className="h-10 w-64 mb-4" />
-            <Skeleton className="h-6 w-96" />
+            <Skeleton className="h-10 w-64 mb-4 rounded-lg" />
+            <Skeleton className="h-6 w-96 rounded-lg" />
           </motion.div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-64 rounded-xl" />
+              <Skeleton key={i} className="h-64 rounded-2xl shadow-lg" />
             ))}
           </div>
         </div>
@@ -201,17 +204,31 @@ const FamilyPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 p-4 sm:p-6 lg:p-8 flex items-center justify-center">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full text-center"
+          transition={{ duration: 0.5 }}
+          className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center"
         >
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">Error</h1>
-          <p className="text-lg text-red-500 mb-6">{error}</p>
+          <div className="inline-flex items-center justify-center bg-red-100 p-4 rounded-full mb-4">
+            <svg
+              className="h-6 w-6 text-red-600"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Error</h1>
+          <p className="text-sm text-red-600 mb-6">{error}</p>
           <Button
             onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"
+            className="bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
           >
             Try Again
           </Button>
@@ -221,33 +238,38 @@ const FamilyPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
             Family Management
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-base sm:text-lg text-gray-600">
             Manage family units and their members with ease
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Create New Family */}
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="bg-gradient-to-br from-white to-blue-50 border border-blue-100 shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-blue-700">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+          >
+            <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-t-2xl">
+                <CardTitle className="flex items-center space-x-2 text-indigo-700 text-lg sm:text-xl font-bold">
                   <Home className="h-5 w-5" />
                   <span>Create New Family</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <form onSubmit={handleCreateFamily} className="space-y-4">
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
@@ -259,11 +281,12 @@ const FamilyPage = () => {
                       value={newFamilyName}
                       onChange={(e) => setNewFamilyName(e.target.value)}
                       required
+                      className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                     />
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                    className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
                   >
                     <Plus className="mr-2 h-4 w-4" />
                     Create Family
@@ -274,15 +297,20 @@ const FamilyPage = () => {
           </motion.div>
 
           {/* Add Member to Family */}
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="bg-gradient-to-br from-white to-purple-50 border border-purple-100 shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-purple-700">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+          >
+            <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-t-2xl">
+                <CardTitle className="flex items-center space-x-2 text-purple-700 text-lg sm:text-xl font-bold">
                   <UserPlus className="h-5 w-5" />
                   <span>Add Family Member</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <form onSubmit={handleAddFamilyMember} className="space-y-4">
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
@@ -292,12 +320,16 @@ const FamilyPage = () => {
                       onValueChange={setSelectedFamilyId}
                       value={selectedFamilyId}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-purple-500 focus:ring-2 focus:ring-purple-200">
                         <SelectValue placeholder="Select a family" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-lg bg-white shadow-lg">
                         {families.map((family) => (
-                          <SelectItem key={family.id} value={family.id}>
+                          <SelectItem
+                            key={family.id}
+                            value={family.id}
+                            className="text-sm sm:text-base"
+                          >
                             {family.name}
                           </SelectItem>
                         ))}
@@ -312,16 +344,20 @@ const FamilyPage = () => {
                       onValueChange={setSelectedUserId}
                       value={selectedUserId}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-purple-500 focus:ring-2 focus:ring-purple-200">
                         <SelectValue placeholder="Select a user" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-lg bg-white shadow-lg">
                         {users.map((user) => (
-                          <SelectItem key={user.id} value={user.id}>
+                          <SelectItem
+                            key={user.id}
+                            value={user.id}
+                            className="text-sm sm:text-base"
+                          >
                             <div className="flex items-center space-x-2">
                               <Avatar className="h-6 w-6">
                                 <AvatarImage src={user.photo} />
-                                <AvatarFallback>
+                                <AvatarFallback className="bg-purple-100 text-purple-600">
                                   {user.name.charAt(0)}
                                 </AvatarFallback>
                               </Avatar>
@@ -336,7 +372,7 @@ const FamilyPage = () => {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
                   >
                     <UserPlus className="mr-2 h-4 w-4" />
                     Add Member
@@ -351,17 +387,17 @@ const FamilyPage = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.2 }}
           className="mt-8"
         >
-          <Card className="bg-gradient-to-br from-white to-indigo-50 border border-indigo-100 shadow-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-indigo-700">
+          <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-t-2xl">
+              <CardTitle className="flex items-center space-x-2 text-indigo-700 text-lg sm:text-xl font-bold">
                 <Users className="h-5 w-5" />
                 <span>Your Family Units</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               {families.length > 0 ? (
                 <div className="space-y-6">
                   <AnimatePresence>
@@ -371,11 +407,12 @@ const FamilyPage = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
-                        className="p-4 rounded-lg bg-white shadow-xs border border-gray-100"
+                        transition={{ duration: 0.3 }}
+                        className="p-4 rounded-lg bg-gray-50 shadow-sm border border-gray-100"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                           <div>
-                            <h3 className="text-lg font-semibold text-gray-800">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
                               {family.name}
                             </h3>
                             <p className="text-sm text-gray-500">
@@ -383,10 +420,15 @@ const FamilyPage = () => {
                               {family.createdBy.id === session?.user.id
                                 ? "you"
                                 : family.createdBy.name}{" "}
-                              on {intlFormat(family.createdAt)}
+                              on{" "}
+                              {intlFormat(new Date(family.createdAt), {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
                             </p>
                           </div>
-                          <div className="text-sm px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
+                          <div className="text-sm px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-medium">
                             {family.members.length} member
                             {family.members.length !== 1 ? "s" : ""}
                           </div>
@@ -396,21 +438,25 @@ const FamilyPage = () => {
                             {family.members.map((member) => (
                               <motion.li
                                 key={member.id}
-                                whileHover={{ x: 5 }}
-                                className="flex items-center justify-between p-3 rounded-md bg-gray-50"
+                                whileHover={{
+                                  x: 5,
+                                  backgroundColor: "#f9fafb",
+                                }}
+                                transition={{ duration: 0.2 }}
+                                className="flex items-center justify-between p-3 rounded-lg bg-white border border-gray-100 shadow-sm"
                               >
                                 <div className="flex items-center space-x-3">
-                                  <Avatar>
+                                  <Avatar className="h-10 w-10">
                                     <AvatarImage src={member.photo} />
-                                    <AvatarFallback>
+                                    <AvatarFallback className="bg-indigo-100 text-indigo-600">
                                       {member.name.charAt(0)}
                                     </AvatarFallback>
                                   </Avatar>
                                   <div>
-                                    <p className="font-medium text-gray-700">
+                                    <p className="font-medium text-gray-700 text-sm sm:text-base">
                                       {member.name}
                                     </p>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-xs sm:text-sm text-gray-500">
                                       {member.email}
                                     </p>
                                   </div>
@@ -427,6 +473,7 @@ const FamilyPage = () => {
                                       family.id
                                     )
                                   }
+                                  className="rounded-lg bg-red-600 hover:bg-red-700 text-white transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   <UserMinus className="h-4 w-4 mr-1" />
                                   Remove
@@ -435,7 +482,7 @@ const FamilyPage = () => {
                             ))}
                           </ul>
                         ) : (
-                          <div className="p-4 rounded-lg bg-gray-50 text-center text-gray-500">
+                          <div className="p-4 rounded-lg bg-gray-50 text-center text-gray-500 text-sm">
                             No members in this family yet
                           </div>
                         )}
@@ -445,7 +492,8 @@ const FamilyPage = () => {
                 </div>
               ) : (
                 <div className="p-8 text-center">
-                  <p className="text-gray-500">
+                  <Users className="mx-auto h-16 w-16 text-gray-300 mb-4" />
+                  <p className="text-gray-500 text-sm sm:text-base">
                     No family units found.
                     {!session?.user.id && (
                       <span className="text-yellow-600">
@@ -464,17 +512,17 @@ const FamilyPage = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.3 }}
           className="mt-8"
         >
-          <Card className="bg-gradient-to-br from-white to-teal-50 border border-teal-100 shadow-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-teal-700">
+          <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardHeader className="bg-gradient-to-r from-teal-50 to-blue-50 rounded-t-2xl">
+              <CardTitle className="flex items-center space-x-2 text-teal-700 text-lg sm:text-xl font-bold">
                 <Users className="h-5 w-5" />
                 <span>All Family Units</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               {allFamilies.length > 0 ? (
                 <div className="space-y-6">
                   <AnimatePresence>
@@ -484,11 +532,12 @@ const FamilyPage = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
-                        className="p-4 rounded-lg bg-white shadow-xs border border-gray-100"
+                        transition={{ duration: 0.3 }}
+                        className="p-4 rounded-lg bg-gray-50 shadow-sm border border-gray-100"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                           <div>
-                            <h3 className="text-lg font-semibold text-gray-800">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
                               {family.name}
                             </h3>
                             <p className="text-sm text-gray-500">
@@ -496,10 +545,15 @@ const FamilyPage = () => {
                               {family.createdBy.id === session?.user.id
                                 ? "you"
                                 : family.createdBy.name}{" "}
-                              on {intlFormat(family.createdAt)}
+                              on{" "}
+                              {intlFormat(new Date(family.createdAt), {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
                             </p>
                           </div>
-                          <div className="text-sm px-3 py-1 rounded-full bg-teal-100 text-teal-700">
+                          <div className="text-sm px-3 py-1 rounded-full bg-teal-100 text-teal-700 font-medium">
                             {family.members.length} member
                             {family.members.length !== 1 ? "s" : ""}
                           </div>
@@ -509,21 +563,25 @@ const FamilyPage = () => {
                             {family.members.map((member) => (
                               <motion.li
                                 key={member.id}
-                                whileHover={{ x: 5 }}
-                                className="flex items-center justify-between p-3 rounded-md bg-gray-50"
+                                whileHover={{
+                                  x: 5,
+                                  backgroundColor: "#f9fafb",
+                                }}
+                                transition={{ duration: 0.2 }}
+                                className="flex items-center justify-between p-3 rounded-lg bg-white border border-gray-100 shadow-sm"
                               >
                                 <div className="flex items-center space-x-3">
-                                  <Avatar>
+                                  <Avatar className="h-10 w-10">
                                     <AvatarImage src={member.photo} />
-                                    <AvatarFallback>
+                                    <AvatarFallback className="bg-teal-100 text-teal-600">
                                       {member.name.charAt(0)}
                                     </AvatarFallback>
                                   </Avatar>
                                   <div>
-                                    <p className="font-medium text-gray-700">
+                                    <p className="font-medium text-gray-700 text-sm sm:text-base">
                                       {member.name}
                                     </p>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-xs sm:text-sm text-gray-500">
                                       {member.email}
                                     </p>
                                   </div>
@@ -540,6 +598,7 @@ const FamilyPage = () => {
                                       family.id
                                     )
                                   }
+                                  className="rounded-lg bg-red-600 hover:bg-red-700 text-white transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   <UserMinus className="h-4 w-4 mr-1" />
                                   Remove
@@ -548,7 +607,7 @@ const FamilyPage = () => {
                             ))}
                           </ul>
                         ) : (
-                          <div className="p-4 rounded-lg bg-gray-50 text-center text-gray-500">
+                          <div className="p-4 rounded-lg bg-gray-50 text-center text-gray-500 text-sm">
                             No members in this family yet
                           </div>
                         )}
@@ -558,7 +617,10 @@ const FamilyPage = () => {
                 </div>
               ) : (
                 <div className="p-8 text-center">
-                  <p className="text-gray-500">No family units found.</p>
+                  <Users className="mx-auto h-16 w-16 text-gray-300 mb-4" />
+                  <p className="text-gray-500 text-sm sm:text-base">
+                    No family units found.
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -570,3 +632,32 @@ const FamilyPage = () => {
 };
 
 export default FamilyPage;
+
+<style jsx>{`
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+  }
+`}</style>;

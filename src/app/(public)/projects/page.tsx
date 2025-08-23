@@ -83,23 +83,23 @@ const ProjectsPage = () => {
 
   if (loading && projects.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-        <div className="container mx-auto py-12 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 sm:p-6 animate-fade-in">
+        <div className="container mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="text-center mb-12"
           >
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
               Our Community Projects
             </h1>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
+            <p className="text-lg text-gray-300 max-w-3xl mx-auto mb-6">
               Join us in making a difference. Here are the projects we are
               passionately working on to serve our community and spread His love.
             </p>
             <div className="flex justify-center">
-              <div className="h-2 w-24 bg-blue-500 rounded-full"></div>
+              <div className="h-2 w-24 bg-blue-400 rounded-full"></div>
             </div>
           </motion.div>
 
@@ -110,18 +110,18 @@ const ProjectsPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-white rounded-xl shadow-md overflow-hidden"
+                className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 shadow-lg rounded-xl overflow-hidden"
               >
-                <div className="h-56 bg-gray-200 animate-pulse"></div>
+                <div className="h-56 bg-gray-700 animate-pulse"></div>
                 <div className="p-6 space-y-4">
-                  <div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
-                  <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
-                  <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse"></div>
-                  <div className="h-2 bg-gray-200 rounded-full w-full animate-pulse"></div>
+                  <div className="h-6 bg-gray-700 rounded w-3/4 animate-pulse"></div>
+                  <div className="h-4 bg-gray-700 rounded w-full animate-pulse"></div>
+                  <div className="h-4 bg-gray-700 rounded w-5/6 animate-pulse"></div>
+                  <div className="h-4 bg-gray-700 rounded w-2/3 animate-pulse"></div>
+                  <div className="h-2 bg-gray-700 rounded-full w-full animate-pulse"></div>
                   <div className="flex gap-4 pt-4">
-                    <div className="h-10 bg-gray-200 rounded w-full animate-pulse"></div>
-                    <div className="h-10 bg-gray-200 rounded w-full animate-pulse"></div>
+                    <div className="h-10 bg-gray-700 rounded w-full animate-pulse"></div>
+                    <div className="h-10 bg-gray-700 rounded w-full animate-pulse"></div>
                   </div>
                 </div>
               </motion.div>
@@ -134,14 +134,14 @@ const ProjectsPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center">
-        <div className="text-center p-8 max-w-2xl">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 sm:p-6 flex items-center justify-center animate-fade-in">
+        <div className="text-center p-8 max-w-2xl bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700/30">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="inline-block mb-6"
           >
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-8 w-8 text-red-500"
@@ -158,13 +158,13 @@ const ProjectsPage = () => {
               </svg>
             </div>
           </motion.div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl font-bold text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
             Something went wrong
           </h1>
-          <p className="text-lg text-gray-600 mb-6">{error}</p>
+          <p className="text-lg text-gray-400 mb-6">{error}</p>
           <Button
             onClick={() => window.location.reload()}
-            className="bg-blue-600 hover:bg-blue-700 px-6 py-3"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-6 py-3 shadow-md hover:shadow-lg transition-all duration-300"
           >
             Try Again
           </Button>
@@ -174,23 +174,23 @@ const ProjectsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <div className="container mx-auto py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 sm:p-6 animate-fade-in">
+      <div className="container mx-auto max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
               Our Community Projects
             </h1>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
+            <p className="text-lg text-gray-300 max-w-3xl mx-auto mb-6">
               Join us in making a difference. Here are the projects we are
               passionately working on to serve our community and spread His love.
             </p>
           <div className="flex justify-center">
-            <div className="h-2 w-24 bg-blue-500 rounded-full"></div>
+            <div className="h-2 w-24 bg-blue-400 rounded-full"></div>
           </div>
         </motion.div>
 
@@ -200,9 +200,9 @@ const ProjectsPage = () => {
             animate={{ opacity: 1 }}
             className="flex justify-center mb-8"
           >
-            <div className="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full">
+            <div className="inline-flex items-center px-4 py-2 bg-gray-800/50 border border-gray-700/30 rounded-full">
               <svg
-                className="animate-spin -ml-1 mr-2 h-5 w-5 text-blue-600"
+                className="animate-spin -ml-1 mr-2 h-5 w-5 text-blue-400"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -221,7 +221,7 @@ const ProjectsPage = () => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              <span className="text-blue-700 font-medium">
+              <span className="text-gray-300 font-medium">
                 Loading more projects...
               </span>
             </div>
@@ -253,7 +253,7 @@ const ProjectsPage = () => {
                     transition={{ duration: 0.3 }}
                     whileHover={{ y: -5 }}
                   >
-                    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out border border-gray-100 rounded-xl h-full flex flex-col">
+                    <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out rounded-xl h-full flex flex-col">
                       <CardHeader className="p-0 relative">
                         <div className="relative w-full h-56">
                           <Image
@@ -265,17 +265,17 @@ const ProjectsPage = () => {
                           />
                         </div>
                         {project.category && (
-                          <div className="absolute top-4 right-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                          <div className="absolute top-4 right-4 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
                             {project.category}
                           </div>
                         )}
                       </CardHeader>
                       <CardContent className="p-6 flex-grow flex flex-col">
                         <div className="flex-grow">
-                          <CardTitle className="text-2xl font-bold mb-3 text-gray-800">
+                          <CardTitle className="text-2xl font-bold mb-3 text-white">
                             {project.title}
                           </CardTitle>
-                          <p className="text-gray-600 mb-4 line-clamp-3">
+                          <p className="text-gray-300 mb-4 line-clamp-3">
                             {project.description}
                           </p>
 
@@ -283,13 +283,13 @@ const ProjectsPage = () => {
                             project.fundraisingGoal > 0 && (
                               <div className="mb-4">
                                 <div className="flex justify-between items-center mb-1">
-                                  <span className="text-sm font-medium text-gray-700">
+                                  <span className="text-sm font-medium text-gray-400">
                                     KES
                                     {project.fundraisingProgress?.toLocaleString()}{" "}
                                     / KES
                                     {project.fundraisingGoal.toLocaleString()}
                                   </span>
-                                  <span className="text-sm font-bold text-blue-600">
+                                  <span className="text-sm font-bold text-blue-400">
                                     {Math.round(
                                       ((project.fundraisingProgress || 0) /
                                         project.fundraisingGoal) *
@@ -304,8 +304,8 @@ const ProjectsPage = () => {
                                       project.fundraisingGoal) *
                                     100
                                   }
-                                  className="h-2 bg-gray-200"
-                                  indicatorClassName="bg-gradient-to-r from-blue-500 to-blue-600"
+                                  className="h-2 bg-gray-700"
+                                  indicatorClassName="bg-gradient-to-r from-blue-400 to-purple-500"
                                 />
                               </div>
                             )}
@@ -317,7 +317,7 @@ const ProjectsPage = () => {
                               href={`/donations?plan=${donationPlan.id}`}
                               passHref
                             >
-                              <Button className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md transition-all duration-300 transform hover:scale-105">
+                              <Button className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-md transition-all duration-300 transform hover:scale-105">
                                 Donate Now
                               </Button>
                             </Link>
@@ -329,7 +329,7 @@ const ProjectsPage = () => {
                             >
                               <Button
                                 variant="outline"
-                                className="flex-1 border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-all duration-300"
+                                className="flex-1 border-blue-500 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300 transition-all duration-300"
                               >
                                 Volunteer
                               </Button>
@@ -345,12 +345,12 @@ const ProjectsPage = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="col-span-full text-center py-12"
+                className="col-span-full text-center py-12 bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/30 shadow-lg"
               >
-                <div className="inline-block p-6 bg-white rounded-xl shadow-sm">
+                <div className="inline-block p-6 bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/30 shadow-lg">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-16 w-16 text-gray-400 mx-auto mb-4"
+                    className="h-16 w-16 text-gray-500 mx-auto mb-4"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -362,10 +362,10 @@ const ProjectsPage = () => {
                       d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  <h3 className="text-xl font-medium text-gray-800 mb-2">
+                  <h3 className="text-xl font-medium text-white mb-2">
                     No projects available
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-gray-400">
                     Check back later for new community initiatives.
                   </p>
                 </div>
@@ -385,7 +385,7 @@ const ProjectsPage = () => {
               onClick={handlePrevPage}
               disabled={loading || pagination.currentPage === 1}
               variant="outline"
-              className="border-gray-300 hover:bg-gray-50 px-6 py-2 rounded-lg transition-all"
+              className="border-gray-700 text-gray-300 hover:bg-gray-700/50 px-6 py-2 rounded-lg transition-all"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -425,8 +425,8 @@ const ProjectsPage = () => {
                       onClick={() => setCurrentPage(pageNum)}
                       className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
                         pagination.currentPage === pageNum
-                          ? "bg-blue-600 text-white"
-                          : "text-gray-700 hover:bg-gray-100"
+                          ? "bg-blue-500 text-white"
+                          : "text-gray-300 hover:bg-gray-700/50"
                       }`}
                     >
                       {pageNum}
@@ -436,7 +436,7 @@ const ProjectsPage = () => {
               )}
               {pagination.totalPages > 5 &&
                 pagination.currentPage < pagination.totalPages - 2 && (
-                  <span className="text-gray-500">...</span>
+                  <span className="text-gray-400">...</span>
                 )}
             </div>
             <Button
@@ -445,7 +445,7 @@ const ProjectsPage = () => {
                 loading || pagination.currentPage === pagination.totalPages
               }
               variant="outline"
-              className="border-gray-300 hover:bg-gray-50 px-6 py-2 rounded-lg transition-all"
+              className="border-gray-700 text-gray-300 hover:bg-gray-700/50 px-6 py-2 rounded-lg transition-all"
             >
               Next
               <svg

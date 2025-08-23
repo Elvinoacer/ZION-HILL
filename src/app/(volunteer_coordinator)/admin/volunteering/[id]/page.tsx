@@ -48,17 +48,26 @@ const VolunteeringOpportunityPage = () => {
 
   if (loading)
     return (
-      <div className="container mx-auto py-8 space-y-6">
-        <Skeleton className="h-10 w-32" />
+      <div className="min-h-screen bg-gray-900 text-gray-200 p-4 sm:p-6 lg:p-8 space-y-6">
+        {" "}
+        {/* Dark theme background and responsive padding */}
+        <Skeleton className="h-10 w-32 bg-gray-700" />{" "}
+        {/* Dark theme skeleton */}
         <div className="space-y-4">
-          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-8 w-3/4 bg-gray-700" />{" "}
+          {/* Dark theme skeleton */}
           <div className="grid gap-4 md:grid-cols-2">
-            <Skeleton className="h-64 w-full" />
+            <Skeleton className="h-64 w-full bg-gray-800" />{" "}
+            {/* Dark theme skeleton */}
             <div className="space-y-4">
-              <Skeleton className="h-8 w-1/2" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-8 w-1/2 bg-gray-700" />{" "}
+              {/* Dark theme skeleton */}
+              <Skeleton className="h-4 w-full bg-gray-700" />{" "}
+              {/* Dark theme skeleton */}
+              <Skeleton className="h-4 w-3/4 bg-gray-700" />{" "}
+              {/* Dark theme skeleton */}
+              <Skeleton className="h-4 w-1/2 bg-gray-700" />{" "}
+              {/* Dark theme skeleton */}
             </div>
           </div>
         </div>
@@ -67,11 +76,23 @@ const VolunteeringOpportunityPage = () => {
 
   if (error)
     return (
-      <div className="container mx-auto py-8 text-center">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative max-w-2xl mx-auto">
-          <h2 className="font-bold text-xl mb-2">Error Loading Opportunity</h2>
-          <p>{error}</p>
-          <Button className="mt-4" onClick={() => window.location.reload()}>
+      <div className="min-h-screen bg-gray-900 text-gray-200 p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+        {" "}
+        {/* Dark theme background and responsive padding */}
+        <div className="bg-red-900/30 border border-red-700/50 rounded-xl p-6 max-w-md mx-auto text-center text-white shadow-lg">
+          {" "}
+          {/* Dark theme error box */}
+          <h2 className="font-bold text-xl sm:text-2xl text-red-400 mb-2">
+            Error Loading Opportunity
+          </h2>{" "}
+          {/* Dark theme text */}
+          <p className="text-red-300 mb-6">{error}</p> {/* Dark theme text */}
+          <Button
+            className="mt-4 bg-red-800/50 hover:bg-red-800/80 text-red-200 font-semibold py-2 px-4 rounded-lg border border-red-700 transition-colors"
+            onClick={() => window.location.reload()}
+          >
+            {" "}
+            {/* Dark theme button */}
             Retry
           </Button>
         </div>
@@ -80,12 +101,25 @@ const VolunteeringOpportunityPage = () => {
 
   if (!opportunity)
     return (
-      <div className="container mx-auto py-8 text-center">
-        <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative max-w-2xl mx-auto">
-          <h2 className="font-bold text-xl mb-2">Opportunity Not Found</h2>
-          <p>The requested volunteering opportunity could not be found.</p>
+      <div className="min-h-screen bg-gray-900 text-gray-200 p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+        {" "}
+        {/* Dark theme background and responsive padding */}
+        <div className="bg-blue-900/30 border border-blue-700/50 rounded-xl p-6 max-w-md mx-auto text-center text-white shadow-lg">
+          {" "}
+          {/* Dark theme not found box */}
+          <h2 className="font-bold text-xl sm:text-2xl text-blue-400 mb-2">
+            Opportunity Not Found
+          </h2>{" "}
+          {/* Dark theme text */}
+          <p className="text-blue-300 mb-6">
+            The requested volunteering opportunity could not be found.
+          </p>{" "}
+          {/* Dark theme text */}
           <Link href="/admin/projects">
-            <Button className="mt-4">Back to Projects</Button>
+            <Button className="mt-4 bg-blue-700 hover:bg-blue-800 text-white">
+              Back to Projects
+            </Button>{" "}
+            {/* Dark theme button */}
           </Link>
         </div>
       </div>
@@ -96,11 +130,16 @@ const VolunteeringOpportunityPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto py-8 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen bg-gray-900 text-gray-200 p-4 sm:p-6 lg:p-8" /* Dark theme background and responsive padding */
     >
       <div className="mb-6">
         <Link href="/admin/projects">
-          <Button variant="outline" className="gap-2">
+          <Button
+            variant="outline"
+            className="gap-2 text-blue-400 hover:bg-blue-900/30 hover:text-blue-300 border-blue-700/50"
+          >
+            {" "}
+            {/* Dark theme button */}
             <ArrowLeft className="h-4 w-4" />
             Back to Projects
           </Button>
@@ -112,44 +151,61 @@ const VolunteeringOpportunityPage = () => {
         animate={{ y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <Card className="overflow-hidden shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+        <Card className="overflow-hidden shadow-lg bg-gray-800 border border-gray-700/50">
+          {" "}
+          {/* Dark theme card */}
+          <CardHeader className="bg-gradient-to-r from-blue-700 to-purple-800 text-white">
+            {" "}
+            {/* Dark theme gradient */}
             <CardTitle className="text-2xl md:text-3xl font-bold">
               {opportunity.title}
             </CardTitle>
           </CardHeader>
-
           <CardContent className="p-6">
             <div className="grid gap-8 md:grid-cols-3">
               <div className="md:col-span-2 space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Description</h3>
-                  <p className="text-gray-700 whitespace-pre-line">
+                  <h3 className="text-lg font-semibold mb-2 text-white">
+                    Description
+                  </h3>{" "}
+                  {/* Dark theme text */}
+                  <p className="text-gray-300 whitespace-pre-line">
+                    {" "}
+                    {/* Dark theme text */}
                     {opportunity.description}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {opportunity.location && (
-                    <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                      <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div className="flex items-start gap-3 bg-gray-700/50 p-3 rounded-lg border border-gray-600">
+                      {" "}
+                      {/* Dark theme info box */}
+                      <MapPin className="h-5 w-5 text-blue-400 mt-0.5" />{" "}
+                      {/* Dark theme icon */}
                       <div>
-                        <h4 className="text-sm font-medium text-gray-500">
+                        <h4 className="text-sm font-medium text-gray-400">
                           Location
                         </h4>
-                        <p className="text-gray-900">{opportunity.location}</p>
+                        <p className="text-white">{opportunity.location}</p>{" "}
+                        {/* Dark theme text */}
                       </div>
                     </div>
                   )}
 
                   {opportunity.date && (
-                    <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                      <Calendar className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div className="flex items-start gap-3 bg-gray-700/50 p-3 rounded-lg border border-gray-600">
+                      {" "}
+                      {/* Dark theme info box */}
+                      <Calendar className="h-5 w-5 text-blue-400 mt-0.5" />{" "}
+                      {/* Dark theme icon */}
                       <div>
-                        <h4 className="text-sm font-medium text-gray-500">
+                        <h4 className="text-sm font-medium text-gray-400">
                           Date
                         </h4>
-                        <p className="text-gray-900">
+                        <p className="text-white">
+                          {" "}
+                          {/* Dark theme text */}
                           {new Date(opportunity.date).toLocaleDateString()}
                         </p>
                       </div>
@@ -157,25 +213,34 @@ const VolunteeringOpportunityPage = () => {
                   )}
 
                   {opportunity.duration && (
-                    <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                      <Clock className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div className="flex items-start gap-3 bg-gray-700/50 p-3 rounded-lg border border-gray-600">
+                      {" "}
+                      {/* Dark theme info box */}
+                      <Clock className="h-5 w-5 text-blue-400 mt-0.5" />{" "}
+                      {/* Dark theme icon */}
                       <div>
-                        <h4 className="text-sm font-medium text-gray-500">
+                        <h4 className="text-sm font-medium text-gray-400">
                           Duration
                         </h4>
-                        <p className="text-gray-900">{opportunity.duration}</p>
+                        <p className="text-white">{opportunity.duration}</p>{" "}
+                        {/* Dark theme text */}
                       </div>
                     </div>
                   )}
 
                   {opportunity.skillsRequired && (
-                    <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                      <Users className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div className="flex items-start gap-3 bg-gray-700/50 p-3 rounded-lg border border-gray-600">
+                      {" "}
+                      {/* Dark theme info box */}
+                      <Users className="h-5 w-5 text-blue-400 mt-0.5" />{" "}
+                      {/* Dark theme icon */}
                       <div>
-                        <h4 className="text-sm font-medium text-gray-500">
+                        <h4 className="text-sm font-medium text-gray-400">
                           Skills Required
                         </h4>
-                        <p className="text-gray-900">
+                        <p className="text-white">
+                          {" "}
+                          {/* Dark theme text */}
                           {opportunity.skillsRequired}
                         </p>
                       </div>
@@ -185,12 +250,16 @@ const VolunteeringOpportunityPage = () => {
               </div>
 
               <div className="space-y-6">
-                <div className="bg-gray-50 p-4 rounded-lg border">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Users className="h-5 w-5" />
+                <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
+                  {" "}
+                  {/* Dark theme background and border */}
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-white">
+                    {" "}
+                    {/* Dark theme text */}
+                    <Users className="h-5 w-5 text-blue-400" />{" "}
+                    {/* Dark theme icon */}
                     <span>Applicants ({opportunity.applications.length})</span>
                   </h3>
-
                   {opportunity.applications.length > 0 ? (
                     <ul className="space-y-3">
                       {opportunity.applications.map((app) => (
@@ -199,31 +268,40 @@ const VolunteeringOpportunityPage = () => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ duration: 0.3 }}
-                          className="p-3 border rounded-lg hover:bg-gray-100 transition-colors"
+                          className="p-3 border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors bg-gray-800" /* Dark theme background and border */
                         >
                           <div className="flex items-center gap-3 mb-2">
-                            <div className="bg-blue-100 p-2 rounded-full">
-                              <User className="h-4 w-4 text-blue-600" />
+                            <div className="bg-blue-900/30 p-2 rounded-full">
+                              {" "}
+                              {/* Dark theme background */}
+                              <User className="h-4 w-4 text-blue-400" />{" "}
+                              {/* Dark theme icon */}
                             </div>
-                            <span className="font-medium">
+                            <span className="font-medium text-white">
+                              {" "}
+                              {/* Dark theme text */}
                               {app.applicant.name}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-2 text-sm text-gray-300">
+                            {" "}
+                            {/* Dark theme text */}
                             <Mail className="h-4 w-4" />
                             <a
                               href={`mailto:${app.applicant.email}`}
-                              className="hover:text-blue-600 hover:underline"
+                              className="hover:text-blue-400 hover:underline" /* Dark theme link */
                             >
                               {app.applicant.email}
                             </a>
                           </div>
                           {app.applicant.phone && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+                            <div className="flex items-center gap-2 text-sm text-gray-300 mt-1">
+                              {" "}
+                              {/* Dark theme text */}
                               <Phone className="h-4 w-4" />
                               <a
                                 href={`tel:${app.applicant.phone}`}
-                                className="hover:text-blue-600 hover:underline"
+                                className="hover:text-blue-400 hover:underline" /* Dark theme link */
                               >
                                 {app.applicant.phone}
                               </a>
@@ -246,5 +324,4 @@ const VolunteeringOpportunityPage = () => {
     </motion.div>
   );
 };
-
 export default VolunteeringOpportunityPage;

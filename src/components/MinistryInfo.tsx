@@ -1,26 +1,61 @@
+"use client";
+
+import { motion } from "framer-motion";
 import {
-  LineChart,
+  BarChart2,
+  BookOpen,
+  Calendar,
+  PencilLine,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  Wand2,
+} from "lucide-react";
+import { useSession } from "next-auth/react";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  CartesianGrid,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
-import { motion } from "framer-motion";
-import { BookOpen, Users, Calendar, BarChart2, X } from "lucide-react";
-import { useState, useEffect } from "react"; // Import useEffect
-import Image from "next/image";
-import {
-  Ministry,
-  User,
-  MinistryMember,
-  Group,
-  Event,
-} from "@/generated/prisma";
 
+// shadcn/ui components (assumes your project has these installed)
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
+// Types — adjust imports to your actual paths
+import {
+  Event,
+  Group,
+  Ministry,
+  MinistryMember,
+  User,
+} from "@/generated/prisma";
 import { useMinistryStore } from "@/store";
-import { useSession } from "next-auth/react";
 
 interface MinistryInfoProps {
   ministry: Ministry & {
@@ -31,21 +66,53 @@ interface MinistryInfoProps {
   };
 }
 
+// Lightweight skeleton shimmer
+const Skeleton = ({ className = "" }: { className?: string }) => (
+  <div
+    className={`animate-pulse rounded-xl bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 ${className}`}
+  />
+);
+
+// Custom tooltip for the chart
+function GrowthTooltip({ active, payload, label }: any) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-xl border bg-white/95 px-3 py-2 shadow-sm">
+        <p className="text-xs text-slate-500">{label}</p>
+        <p className="text-sm font-semibold text-slate-800">
+          Members: {payload[0].value}
+        </p>
+      </div>
+    );
+  }
+  return null;
+}
+
 export default function MinistryInfo({ ministry }: MinistryInfoProps) {
   const { data: session } = useSession();
   const { updateMinistry } = useMinistryStore();
+
+  // Edit state
   const [showEditModal, setShowEditModal] = useState(false);
   const [editData, setEditData] = useState({
-    name: ministry.name,
-    description: ministry.description || "",
-    leaderId: ministry.leaderId || "",
+    name: ministry?.name ?? "",
+    description: ministry?.description ?? "",
+    leaderId: ministry?.leaderId ?? "",
   });
 
+  // Growth data state
   const [fetchedGrowthData, setFetchedGrowthData] = useState<any[]>([]);
   const [isGrowthDataLoading, setIsGrowthDataLoading] = useState(true);
   const [growthDataError, setGrowthDataError] = useState<string | null>(null);
 
+  const isLeader = useMemo(() => {
+    return Boolean(
+      ministry?.leader?.id && session?.user?.id === ministry.leader?.id
+    );
+  }, [ministry?.leader?.id, session?.user?.id]);
+
   useEffect(() => {
+    let isMounted = true;
     const fetchGrowthData = async () => {
       if (!ministry?.id) return;
       setIsGrowthDataLoading(true);
@@ -54,248 +121,312 @@ export default function MinistryInfo({ ministry }: MinistryInfoProps) {
         const response = await fetch(
           `/api/ministries/${ministry.id}/growth-data`
         );
-        if (!response.ok) {
-          throw new Error("Failed to fetch growth data");
-        }
+        if (!response.ok) throw new Error("Failed to fetch growth data");
         const data = await response.json();
-        setFetchedGrowthData(data);
+        if (isMounted) setFetchedGrowthData(Array.isArray(data) ? data : []);
       } catch (err: any) {
-        setGrowthDataError(err.message);
+        if (isMounted) setGrowthDataError(err.message ?? "Unknown error");
       } finally {
-        setIsGrowthDataLoading(false);
+        if (isMounted) setIsGrowthDataLoading(false);
       }
     };
-
     fetchGrowthData();
+    return () => {
+      isMounted = false;
+    };
   }, [ministry?.id]);
 
-  console.log("Ministry Info:", ministry);
-
-  const stats = [
-    {
-      icon: <Users className="h-5 w-5" aria-hidden="true" />,
-      label: "Members",
-      value: ministry.members.length || 0,
-    },
-    {
-      icon: <BookOpen className="h-5 w-5" aria-hidden="true" />,
-      label: "Active Groups",
-      value: ministry.groups.length || 0, // Use ministry.groups.length
-    },
-    {
-      icon: <Calendar className="h-5 w-5" aria-hidden="true" />,
-      label: "Upcoming Events",
-      value: ministry.events.length || 0, // Use ministry.events.length
-    },
-  ];
+  const stats = useMemo(
+    () => [
+      {
+        icon: Users,
+        label: "Members",
+        value: ministry?.members?.length ?? 0,
+        hint: "Total registered members",
+      },
+      {
+        icon: BookOpen,
+        label: "Active Groups",
+        value: ministry?.groups?.length ?? 0,
+        hint: "Small groups & teams",
+      },
+      {
+        icon: Calendar,
+        label: "Upcoming Events",
+        value: ministry?.events?.length ?? 0,
+        hint: "Scheduled activities",
+      },
+    ],
+    [
+      ministry?.members?.length,
+      ministry?.groups?.length,
+      ministry?.events?.length,
+    ]
+  );
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await updateMinistry(ministry.id, editData);
-      alert("Ministry updated successfully!");
       setShowEditModal(false);
     } catch (error) {
       console.error("Error updating ministry:", error);
-      alert("Failed to update ministry.");
     }
   };
 
+  if (!ministry) {
+    return (
+      <Card className="border-0 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+        <CardContent className="p-8">
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="h-6 w-6 text-slate-400" />
+            <p className="text-slate-600">No ministry data available.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <motion.div
-      className="bg-gradient-to-br from-white to-blue-50 rounded-xl p-6 shadow-lg"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      role="region"
-      aria-labelledby="ministry-info-heading"
-    >
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h3
-            id="ministry-info-heading"
-            className="text-xl font-semibold text-gray-800"
-          >
-            {ministry.name}
-          </h3>
-          <p className="text-gray-600 flex items-center">
-            {ministry.leader?.photo && (
-              <Image
-                src={ministry.leader.photo}
-                alt={`${ministry.leader.name}'s photo`}
-                width={24}
-                height={24}
-                className="rounded-full ml-2 mr-1"
-              />
-            )}
-            Led by &nbsp;
-            <span className="font-medium text-gray-800">
-              {ministry.leader?.name || "N/A"}
-            </span>
-          </p>
-        </div>
-        {ministry?.leader?.id && ministry.leader.id === session?.user.id && (
-          <button
-            onClick={() => setShowEditModal(true)}
-            className="text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-            aria-label="Edit ministry details"
-          >
-            Edit Ministry
-          </button>
-        )}
+    <div className="relative">
+      {/* Decorative gradient blobs */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -top-10 -right-16 h-56 w-56 rounded-full bg-gradient-to-br from-blue-200/60 to-indigo-200/60 blur-3xl" />
+        <div className="absolute -bottom-10 -left-16 h-56 w-56 rounded-full bg-gradient-to-br from-emerald-200/60 to-teal-200/60 blur-3xl" />
       </div>
 
-      <p className="text-gray-700 mb-6">{ministry.description}</p>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {stats.map((stat, index) => (
-          <motion.div
-            key={index}
-            whileHover={{ y: -3 }}
-            className="bg-gradient-to-b from-gray-50 to-gray-100 p-4 rounded-lg text-center"
-            role="group"
-            aria-label={`${stat.label}: ${stat.value}`}
-          >
-            <div className="flex justify-center text-blue-600 mb-2">
-              {stat.icon}
-            </div>
-            <div className="text-2xl font-bold text-gray-800">{stat.value}</div>
-            <div className="text-sm text-gray-600">{stat.label}</div>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="border-t border-gray-200 pt-4">
-        <h4 className="font-semibold mb-3 flex items-center text-gray-800">
-          <BarChart2 className="mr-2 h-5 w-5" aria-hidden="true" /> Ministry
-          Growth
-        </h4>
-        <div className="h-40 w-full">
-          {" "}
-          {/* Adjusted height and width */}
-          {isGrowthDataLoading ? (
-            <div className="flex items-center justify-center h-full text-gray-500">
-              Loading growth data...
-            </div>
-          ) : growthDataError ? (
-            <div className="flex items-center justify-center h-full text-red-500">
-              Error loading chart: {growthDataError}
-            </div>
-          ) : fetchedGrowthData.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-gray-500">
-              No growth data available.
-            </div>
-          ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={fetchedGrowthData}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="members"
-                  stroke="#8884d8"
-                  activeDot={{ r: 8 }}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
+        aria-labelledby="ministry-info-heading"
+        className="rounded-2xl border border-slate-200/60 bg-white/80 p-5 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/70 md:p-7"
+      >
+        {/* Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 items-center gap-4">
+            <Avatar className="h-12 w-12 ring-2 ring-slate-200">
+              {ministry?.leader?.photo ? (
+                <AvatarImage
+                  src={ministry.leader.photo}
+                  alt={`${ministry?.leader?.name ?? "Leader"} photo`}
                 />
-              </LineChart>
-            </ResponsiveContainer>
+              ) : (
+                <AvatarFallback>
+                  {ministry?.leader?.name?.slice(0, 2)?.toUpperCase() ?? "NA"}
+                </AvatarFallback>
+              )}
+            </Avatar>
+            <div className="min-w-0">
+              <h3
+                id="ministry-info-heading"
+                className="truncate text-lg font-semibold tracking-tight text-slate-800 md:text-xl"
+              >
+                {ministry.name}
+              </h3>
+              <p className="mt-0.5 flex flex-wrap items-center gap-2 text-sm text-slate-600">
+                <span className="inline-flex items-center gap-1">
+                  <Sparkles className="h-4 w-4" aria-hidden />
+                  Led by{" "}
+                  <span className="font-medium text-slate-800">
+                    {ministry?.leader?.name ?? "N/A"}
+                  </span>
+                </span>
+                <Badge variant="secondary" className="rounded-full">
+                  Ministry
+                </Badge>
+              </p>
+            </div>
+          </div>
+
+          {isLeader && (
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+                <DialogTrigger asChild>
+                  <Button variant="default" className="rounded-xl">
+                    <PencilLine className="mr-2 h-4 w-4" /> Edit
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Edit ministry</DialogTitle>
+                    <DialogDescription>
+                      Update basic information. Changes are saved for everyone.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleEditSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Name</Label>
+                      <Input
+                        id="name"
+                        value={editData.name}
+                        onChange={(e) =>
+                          setEditData((s) => ({ ...s, name: e.target.value }))
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Description</Label>
+                      <Textarea
+                        id="description"
+                        rows={4}
+                        value={editData.description}
+                        onChange={(e) =>
+                          setEditData((s) => ({
+                            ...s,
+                            description: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="leaderId">Leader ID</Label>
+                      <Input
+                        id="leaderId"
+                        value={editData.leaderId}
+                        onChange={(e) =>
+                          setEditData((s) => ({
+                            ...s,
+                            leaderId: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="rounded-xl"
+                        onClick={() => setShowEditModal(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button type="submit" className="rounded-xl">
+                        Save changes
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
           )}
         </div>
-      </div>
 
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <motion.div
-            className="bg-white p-6 rounded-lg shadow-xl relative w-full max-w-md mx-auto"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <button
-              onClick={() => setShowEditModal(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+        {/* Description */}
+        {ministry.description ? (
+          <p className="mt-4 text-sm leading-6 text-slate-700 md:text-base">
+            {ministry.description}
+          </p>
+        ) : (
+          <p className="mt-4 text-sm italic text-slate-500">
+            No description provided.
+          </p>
+        )}
+
+        {/* Stats */}
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {stats.map((s, i) => (
+            <motion.div
+              key={s.label}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.05 * i }}
             >
-              <X className="h-6 w-6" />
-            </button>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Edit Ministry
-            </h2>
-            <form onSubmit={handleEditSubmit} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={editData.name}
-                  onChange={(e) =>
-                    setEditData({ ...editData, name: e.target.value })
-                  }
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                  required
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={editData.description}
-                  onChange={(e) =>
-                    setEditData({ ...editData, description: e.target.value })
-                  }
-                  rows={3}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                ></textarea>
-              </div>
-              <div>
-                <label
-                  htmlFor="leaderId"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Leader ID
-                </label>
-                <input
-                  type="text"
-                  id="leaderId"
-                  name="leaderId"
-                  value={editData.leaderId}
-                  onChange={(e) =>
-                    setEditData({ ...editData, leaderId: e.target.value })
-                  }
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-              >
-                Save Changes
-              </button>
-            </form>
-          </motion.div>
+              <Card className="group h-full border-slate-200/70 bg-gradient-to-b from-white to-slate-50/70 transition-colors">
+                <CardContent className="flex items-center gap-3 p-4">
+                  <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+                    <s.icon className="h-5 w-5 text-blue-600" aria-hidden />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">
+                      {s.label}
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="truncate text-2xl font-bold text-slate-800">
+                        {s.value}
+                      </span>
+                      <span className="truncate text-xs text-slate-500">
+                        {s.hint}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
         </div>
-      )}
-    </motion.div>
+
+        {/* Growth Chart */}
+        <Card className="mt-6 border-slate-200/70 bg-white/80">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base font-semibold text-slate-800 md:text-lg">
+              <BarChart2 className="h-5 w-5" aria-hidden /> Ministry Growth
+            </CardTitle>
+            <CardDescription>Monthly member count</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-48 w-full md:h-64">
+              {isGrowthDataLoading ? (
+                <Skeleton className="h-full w-full" />
+              ) : growthDataError ? (
+                <div className="flex h-full items-center justify-center rounded-xl border border-red-200 bg-red-50/60 text-sm text-red-700">
+                  {growthDataError}
+                </div>
+              ) : (fetchedGrowthData?.length ?? 0) === 0 ? (
+                <div className="flex h-full flex-col items-center justify-center rounded-xl border border-slate-200/70 bg-slate-50/60 p-4 text-center">
+                  <Wand2 className="mb-2 h-5 w-5 text-slate-400" />
+                  <p className="text-sm text-slate-600">
+                    No growth data available yet.
+                  </p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={fetchedGrowthData}
+                    margin={{ top: 8, right: 16, left: 4, bottom: 8 }}
+                  >
+                    <defs>
+                      <linearGradient id="gradLine" x1="0" y1="0" x2="0" y2="1">
+                        <stop
+                          offset="0%"
+                          stopColor="#2563eb"
+                          stopOpacity={0.9}
+                        />
+                        <stop
+                          offset="100%"
+                          stopColor="#2563eb"
+                          stopOpacity={0.2}
+                        />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 12, fill: "#475569" }}
+                      tickMargin={8}
+                      axisLine={{ stroke: "#e2e8f0" }}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 12, fill: "#475569" }}
+                      axisLine={{ stroke: "#e2e8f0" }}
+                    />
+                    <Tooltip content={<GrowthTooltip />} />
+                    <Line
+                      type="monotone"
+                      dataKey="members"
+                      stroke="#2563eb"
+                      strokeWidth={2.5}
+                      dot={{ r: 2.5, strokeWidth: 1.5, stroke: "#2563eb" }}
+                      activeDot={{ r: 5 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.section>
+    </div>
   );
 }
