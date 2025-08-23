@@ -19,7 +19,7 @@ const CHURCH_NAME = "Grace Community Church";
 const CHURCH_TAGLINE = "Growing in faith, serving in love, shining God's light";
 const CHURCH_DESCRIPTION =
   "Join our vibrant Christian community for worship, fellowship, and spiritual growth. Experience meaningful connections and transformative faith at Grace Community Church.";
-const BASE_URL = "https://yourchurchdomain.com"; // Replace with your actual domain
+const BASE_URL = "https://church-web-v2.vercel.app"; // Replace with your actual domain
 const PREVIEW_IMAGE_URL = `${BASE_URL}/images/church-image.png`; // Create this image (1200x630px recommended)
 
 export const metadata: Metadata = {
