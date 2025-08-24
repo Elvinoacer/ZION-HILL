@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     await pusherServer.trigger("chat-channel", "new-message", newMessage);
 
     // Trigger FCM notification
-    await fetch(`${process.env.NEXT_PUBLIC_URL}/api/fcm/send`, {
+    await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/fcm/send`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
