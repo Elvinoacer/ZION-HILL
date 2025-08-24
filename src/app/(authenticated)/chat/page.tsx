@@ -149,8 +149,12 @@ const ChatPage = () => {
         if (messaging) {
           const permission = await Notification.requestPermission();
           if (permission === "granted") {
+            const swRegistration = await navigator.serviceWorker.register(
+              "/firebase-messaging-sw.js"
+            );
             const token = await getToken(messaging, {
               vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+              serviceWorkerRegistration: swRegistration,
             });
             if (token && session?.user?.id) {
               await axios.post("/api/fcm/subscribe", {
