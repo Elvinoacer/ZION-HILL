@@ -16,7 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useRef, useState } from "react";
-import io from "socket.io-client";
+import { pusherClient } from "@/lib/pusher";
+import axios from "axios";
 
 interface Message {
   id: string;
@@ -27,8 +28,6 @@ interface Message {
   linkPreview?: any;
   createdAt: string;
 }
-
-const socket = io();
 
 const publicVapidKey =
   "BA5G7-42oUYg0AGcJ48b-S4TYEzCHqftMCwmwXinF-CUQHY11uGFZTwnNVy3EpMm4u6nsnyegwlmeGt8dIDrtkc";
@@ -154,7 +153,9 @@ const ChatPage = () => {
     fetchMessages();
     fetchTotalMembers();
 
-    socket.on("receiveMessage", (message: Message) => {
+    const channel = pusherClient.subscribe("chat-channel");
+
+    channel.bind("new-message", (message: Message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
       if (document.hidden && message.senderId !== session?.user?.id) {
         showNativeNotification(message);
@@ -214,7 +215,7 @@ const ChatPage = () => {
     }
 
     return () => {
-      socket.off("receiveMessage");
+      pusherClient.unsubscribe("chat-channel");
     };
   }, [session]);
 
@@ -281,11 +282,9 @@ const ChatPage = () => {
         messageContent = `${newMessage} ${fileUrl}`.trim();
       }
 
-      socket.emit("sendMessage", {
-        senderId: session.user.id,
+      await axios.post("/api/pusher", {
         content: messageContent,
-        imageUrl: null,
-        linkPreview: linkPreview,
+        senderId: session.user.id,
       });
 
       setNewMessage("");
