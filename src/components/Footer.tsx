@@ -110,6 +110,7 @@ const Footer = () => {
                 { href: "/livestream-integration", label: "Livestream" },
                 { href: "/newsletter-subscriptions", label: "Newsletter" },
                 { href: "/institutions", label: "Institutions" },
+                { href: "/platform-documentation", label: "Documentation" },
               ].map((link, index) => (
                 <li key={index}>
                   <Link
