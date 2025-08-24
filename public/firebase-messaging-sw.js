@@ -2,12 +2,12 @@ import { initializeApp } from "firebase/app";
 import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyBfcjHJFCZLX0PISRpbyHFzAi-RkQHUbzE",
+  authDomain: "church-web-app-43176.firebaseapp.com",
+  projectId: "church-web-app-43176",
+  storageBucket: "church-web-app-43176.firebasestorage.app",
+  messagingSenderId: "628247436525",
+  appId: "1:628247436525:web:08872611b2d91c533e00e4",
 };
 
 initializeApp(firebaseConfig);
