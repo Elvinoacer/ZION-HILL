@@ -202,11 +202,9 @@ const ChatPage = () => {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                endpoint: subscription.endpoint,
-                expirationTime: subscription.expirationTime,
-                keys: subscription.toJSON().keys,
-                userId: session.user.id,
-              }),
+              subscription: subscription.toJSON(),
+              userId: session.user.id,
+            }),
             });
           }
         })
