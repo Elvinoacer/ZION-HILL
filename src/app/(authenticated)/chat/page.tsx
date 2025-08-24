@@ -1,5 +1,7 @@
 "use client";
 
+import { app, messaging } from "@/lib/firebase";
+import { getToken } from "firebase/messaging";
 import ChatMessage from "@/components/ChatMessage";
 import {
   AlertDialog,
@@ -27,24 +29,6 @@ interface Message {
   imageUrl?: string;
   linkPreview?: any;
   createdAt: string;
-}
-
-const publicVapidKey =
-  "BA5G7-42oUYg0AGcJ48b-S4TYEzCHqftMCwmwXinF-CUQHY11uGFZTwnNVy3EpMm4u6nsnyegwlmeGt8dIDrtkc";
-
-function urlBase64ToUint8Array(base64String: string) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding)
-    .replace(/\-/g, "+")
-    .replace(/_/g, "/");
-
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray;
 }
 
 const ChatPage = () => {
@@ -157,25 +141,17 @@ const ChatPage = () => {
 
     channel.bind("new-message", (message: Message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
-      if (document.hidden && message.senderId !== session?.user?.id) {
-        showNativeNotification(message);
-      }
     });
 
-    import { app, messaging } from "@/lib/firebase";
-import { getToken } from "firebase/messaging";
-
-  useEffect(() => {
     if (typeof window !== "undefined" && "serviceWorker" in navigator) {
       const requestPermission = async () => {
         try {
           const permission = await Notification.requestPermission();
           if (permission === "granted") {
             const token = await getToken(messaging, {
-              vapidKey:
-                process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+              vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
             });
-            if (token) {
+            if (token && session?.user?.id) {
               await axios.post("/api/fcm/subscribe", {
                 token,
                 userId: session.user.id,
@@ -189,7 +165,6 @@ import { getToken } from "firebase/messaging";
 
       requestPermission();
     }
-  }, [session]);
 
     return () => {
       pusherClient.unsubscribe("chat-channel");
@@ -199,15 +174,6 @@ import { getToken } from "firebase/messaging";
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  const showNativeNotification = (message: Message) => {
-    if (Notification.permission === "granted") {
-      new Notification(`New Message from ${message.sender.name}`, {
-        body: message.content,
-        icon: "/next.svg",
-      });
-    }
-  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -356,7 +322,6 @@ import { getToken } from "firebase/messaging";
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-blue-50 to-indigo-50">
-      {/* Header */}
       {/* Header */}
       <header className="bg-white shadow-sm p-3 md:p-4 border-b border-gray-200 z-10">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
