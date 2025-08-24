@@ -82,6 +82,7 @@ model User {
   postFeedbacks             PostFeedback[]
   prayerRequest             PrayerRequest[]
   pushSubscriptions         PushSubscription[]
+  fcmTokens                 FcmToken[]
   sermons                   Sermon[]
   sessions                  Session[]
   assignedTickets           Ticket[]                  @relation("AssignedTickets")
@@ -699,14 +700,22 @@ model Message {
   sender      User        @relation("SentMessages", fields: [senderId], references: [id])
 }
 
+model FcmToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
 model PushSubscription {
   id        String   @id @default(cuid())
-  userId    String
   endpoint  String   @unique
   p256dh    String
   auth      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
 }
 
 model ForumTopic {

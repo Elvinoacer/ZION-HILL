@@ -162,58 +162,34 @@ const ChatPage = () => {
       }
     });
 
-    if ("serviceWorker" in navigator && "PushManager" in window) {
-      console.log("Service Worker and Push is supported");
-      navigator.serviceWorker
-        .register("/service-worker.js")
-        .then((registration) => {
-          console.log("Service Worker Registered", registration);
-          return registration.pushManager.getSubscription();
-        })
-        .then((subscription) => {
-          if (subscription) {
-            console.log("Already subscribed", subscription);
-            return subscription;
-          } else {
-            console.log("Not subscribed, requesting permission...");
-            return Notification.requestPermission().then((permission) => {
-              if (permission === "granted") {
-                console.log("Notification permission granted.");
-                return navigator.serviceWorker.ready.then((registration) => {
-                  return registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey:
-                      urlBase64ToUint8Array(publicVapidKey),
-                  });
-                });
-              } else {
-                console.warn("Notification permission denied.");
-                return null;
-              }
+    import { app, messaging } from "@/lib/firebase";
+import { getToken } from "firebase/messaging";
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      const requestPermission = async () => {
+        try {
+          const permission = await Notification.requestPermission();
+          if (permission === "granted") {
+            const token = await getToken(messaging, {
+              vapidKey:
+                process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
             });
+            if (token) {
+              await axios.post("/api/fcm/subscribe", {
+                token,
+                userId: session.user.id,
+              });
+            }
           }
-        })
-        .then((subscription) => {
-          if (subscription && session?.user?.id) {
-            console.log("Sending subscription to server...", subscription);
-            return fetch("/api/subscribe", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-              subscription: subscription.toJSON(),
-              userId: session.user.id,
-            }),
-            });
-          }
-        })
-        .catch((e) => {
-          console.error("Service Worker Error", e);
-        });
-    } else {
-      console.warn("Service Worker and Push is not supported");
+        } catch (error) {
+          console.error("Error getting permission or token", error);
+        }
+      };
+
+      requestPermission();
     }
+  }, [session]);
 
     return () => {
       pusherClient.unsubscribe("chat-channel");
