@@ -1,3 +1,11 @@
+self.addEventListener('install', (event) => {
+  event.waitUntil(self.skipWaiting()); // Activate worker immediately
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim()); // Become available to all pages
+});
+
 self.addEventListener("push", function (event) {
   const data = event.data.json();
   const title = data.title || "New Message";

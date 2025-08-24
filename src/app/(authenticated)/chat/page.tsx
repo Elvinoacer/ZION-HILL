@@ -157,9 +157,7 @@ const ChatPage = () => {
 
     channel.bind("new-message", (message: Message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
-      if (document.hidden && message.senderId !== session?.user?.id) {
-        showNativeNotification(message);
-      }
+      
     });
 
     if ("serviceWorker" in navigator && "PushManager" in window) {
