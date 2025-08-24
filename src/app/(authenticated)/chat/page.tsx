@@ -49,6 +49,34 @@ const ChatPage = () => {
   const [showGuidelines, setShowGuidelines] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const requestPermission = async () => {
+    try {
+      const messaging = await getFirebaseMessaging();
+      if (messaging) {
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          const swRegistration = await navigator.serviceWorker.register(
+            "/firebase-messaging-sw.js"
+          );
+          const token = await getToken(messaging, {
+            vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+            serviceWorkerRegistration: swRegistration,
+          });
+          if (token && session?.user?.id) {
+            await axios.post("/api/fcm/subscribe", {
+              token,
+              userId: session.user.id,
+            });
+            alert("Notifications enabled!");
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error getting permission or token", error);
+      alert("Error enabling notifications. Please check the console.");
+    }
+  };
+
   // Auto-resize textarea based on content
   useEffect(() => {
     if (textareaRef.current) {
@@ -142,34 +170,6 @@ const ChatPage = () => {
     channel.bind("new-message", (message: Message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
     });
-
-    const requestPermission = async () => {
-      try {
-        const messaging = await getFirebaseMessaging();
-        if (messaging) {
-          const permission = await Notification.requestPermission();
-          if (permission === "granted") {
-            const swRegistration = await navigator.serviceWorker.register(
-              "/firebase-messaging-sw.js"
-            );
-            const token = await getToken(messaging, {
-              vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
-              serviceWorkerRegistration: swRegistration,
-            });
-            if (token && session?.user?.id) {
-              await axios.post("/api/fcm/subscribe", {
-                token,
-                userId: session.user.id,
-              });
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Error getting permission or token", error);
-      }
-    };
-
-    requestPermission();
 
     return () => {
       pusherClient.unsubscribe("chat-channel");
@@ -334,6 +334,14 @@ const ChatPage = () => {
             Community Chat
           </h1>
           <div className="flex items-center space-x-2 md:space-x-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={requestPermission}
+              className="hidden xs:inline-flex text-xs md:text-sm"
+            >
+              Enable Notifications
+            </Button>
             <Button
               variant="outline"
               size="sm"
