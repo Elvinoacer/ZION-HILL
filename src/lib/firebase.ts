@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getMessaging } from "firebase/messaging";
+import { getMessaging, isSupported } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,6 +12,11 @@ const firebaseConfig = {
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-const messaging = getMessaging(app);
+const getFirebaseMessaging = async () => {
+  if (typeof window !== 'undefined' && (await isSupported())) {
+    return getMessaging(app);
+  }
+  return null;
+};
 
-export { app, messaging };
+export { app, getFirebaseMessaging };

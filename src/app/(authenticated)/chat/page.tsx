@@ -1,6 +1,6 @@
 "use client";
 
-import { app, messaging } from "@/lib/firebase";
+import { getFirebaseMessaging } from "@/lib/firebase";
 import { getToken } from "firebase/messaging";
 import ChatMessage from "@/components/ChatMessage";
 import {
@@ -143,9 +143,10 @@ const ChatPage = () => {
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
-    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
-      const requestPermission = async () => {
-        try {
+    const requestPermission = async () => {
+      try {
+        const messaging = await getFirebaseMessaging();
+        if (messaging) {
           const permission = await Notification.requestPermission();
           if (permission === "granted") {
             const token = await getToken(messaging, {
@@ -158,13 +159,13 @@ const ChatPage = () => {
               });
             }
           }
-        } catch (error) {
-          console.error("Error getting permission or token", error);
         }
-      };
+      } catch (error) {
+        console.error("Error getting permission or token", error);
+      }
+    };
 
-      requestPermission();
-    }
+    requestPermission();
 
     return () => {
       pusherClient.unsubscribe("chat-channel");
