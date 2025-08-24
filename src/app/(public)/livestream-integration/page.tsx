@@ -206,13 +206,11 @@ const LiveStreamPage = () => {
         </div>
 
         <div
-          className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl mb-6 group relative cursor-pointer hover:ring-2 hover:ring-red-500 hover:ring-offset-2 hover:ring-offset-gray-900 transition-all duration-300"
+          className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl mb-6 group relative transition-all duration-300"
           onClick={handlePlay}
         >
           <LiveStreamViewer streamUrl={streamData.streamUrl} />
-          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <span className="text-white text-xl font-bold">Click to Play</span>
-          </div>
+          
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

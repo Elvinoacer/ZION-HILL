@@ -75,6 +75,47 @@ export async function GET(request: NextRequest) {
         date: "desc",
       },
     });
+
+    // Get all unique song IDs from all the worship sets
+    const songIds = worshipSets.flatMap(ws => ws.arrangedSongs);
+    const uniqueSongIds = [...new Set(songIds)];
+
+    if (uniqueSongIds.length > 0) {
+        // Fetch all the song details in one go
+        const songs = await prisma.song.findMany({
+            where: {
+                id: {
+                    in: uniqueSongIds,
+                },
+            },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        image: true,
+                    }
+                },
+                likesByUsers: {
+                    select: {
+                        userId: true,
+                    }
+                }
+            }
+        });
+
+        // Create a map for quick lookup
+        const songMap = new Map(songs.map(song => [song.id, song]));
+
+        // Replace the song IDs with the actual song objects
+        const populatedWorshipSets = worshipSets.map(ws => ({
+            ...ws,
+            arrangedSongs: ws.arrangedSongs.map(songId => songMap.get(songId)).filter(Boolean), // filter(Boolean) removes any undefined if a song wasn't found
+        }));
+        
+        return NextResponse.json(populatedWorshipSets);
+    }
+
+
     return NextResponse.json(worshipSets);
   } catch (error: any) {
     console.error("Error fetching worship sets:", error.message);

@@ -2,8 +2,17 @@ import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import { Video, VideoOff, AlertTriangle, PlayCircle } from "lucide-react";
+import { Video, VideoOff, AlertTriangle, PlayCircle, Wifi, WifiOff } from "lucide-react";
 import ReactPlayer from "react-player";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 const StreamManagement = () => {
   const [isStreaming, setIsStreaming] = useState(false);
@@ -323,107 +332,129 @@ const StreamManagement = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-6 p-4 rounded-lg bg-gradient-to-br from-red-50 to-orange-50 border border-red-100"
+      className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start"
     >
-      <h4 className="font-semibold text-lg text-gray-700 flex items-center space-x-2">
-        {isStreaming ? (
-          <Video className="h-5 w-5 text-red-600" />
-        ) : (
-          <VideoOff className="h-5 w-5 text-gray-600" />
-        )}
-        <span>Media Player Control</span>
-      </h4>
-
-      {!isStreaming && (
-        <div className="space-y-2">
-          <Input
-            type="text"
-            placeholder="Enter any video/audio/stream URL (e.g., YouTube, Instagram, HLS)"
-            value={inputUrl}
-            onChange={(e) => setInputUrl(e.target.value)}
-            className="w-full"
-          />
-          <Button onClick={handleSetUrl} className="w-full">
-            Set URL
-          </Button>
-        </div>
-      )}
-
-      {streamUrl && (
-        <p className="text-sm text-gray-600">
-          Detected: {mediaType.charAt(0).toUpperCase() + mediaType.slice(1)}{" "}
-          from {platform}
-        </p>
-      )}
-
-      {isStreaming && (
-        <div
-          className="player-wrapper"
-          style={{
-            position: "relative",
-            paddingTop: mediaType === "audio" ? "50px" : "56.25%",
-            overflow: "hidden",
-          }}
-        >
-          {renderEmbed()}
-          {!isPlaying && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <Button onClick={() => setIsPlaying(true)} size="lg">
-                <PlayCircle className="h-8 w-8 mr-2" />
-                Play Preview
-              </Button>
+      <div className="lg:col-span-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {isStreaming ? <Wifi className="text-green-500"/> : <WifiOff className="text-red-500"/>}
+              Live Stream Player
+            </CardTitle>
+            <CardDescription>
+              The player below shows the current live stream. Use the controls to start, stop, or change the stream URL.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div 
+              className="player-wrapper rounded-lg overflow-hidden bg-black relative"
+              style={{ 
+                paddingTop: mediaType === 'audio' ? '120px' : '56.25%',
+              }}
+            >
+              {isStreaming ? (
+                renderEmbed()
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-black">
+                  <VideoOff size={48} className="text-gray-500"/>
+                  <p className="mt-4 text-lg font-semibold">Stream is Offline</p>
+                  <p className="text-sm text-gray-400">Enter a URL and start the stream to begin.</p>
+                </div>
+              )}
+              {isStreaming && !isPlaying && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                  <Button onClick={() => setIsPlaying(true)} size="lg" variant="outline">
+                    <PlayCircle className="h-8 w-8 mr-2" />
+                    Play Preview
+                  </Button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
-
-      {error && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="p-3 rounded-lg bg-yellow-50 text-yellow-600 border border-yellow-200 flex items-center space-x-2"
-        >
-          <AlertTriangle className="h-4 w-4" />
-          <span>{error}</span>
-        </motion.div>
-      )}
-
-      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-        {!isStreaming ? (
-          <Button
-            onClick={handleStartStream}
-            disabled={loading || !streamUrl}
-            className="flex-1 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
-          >
-            {loading ? "Starting..." : "Start Playback"}
-          </Button>
-        ) : (
-          <Button
-            onClick={handleStopStream}
-            disabled={loading}
-            variant="destructive"
-            className="flex-1"
-          >
-            {loading ? "Stopping..." : "Stop Playback"}
-          </Button>
-        )}
+          </CardContent>
+        </Card>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isStreaming ? 1 : 0 }}
-        className={`p-3 rounded-lg ${
-          isStreaming
-            ? "bg-green-50 text-green-600 border border-green-200"
-            : "hidden"
-        }`}
-      >
-        <p className="flex items-center space-x-2">
-          <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-          <span>Playback is active</span>
-        </p>
-        <p className="text-sm text-gray-600 mt-2">Current Viewers: {viewerCount}</p>
-      </motion.div>
+      <div className="lg:col-span-1 space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Stream Controls</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {!isStreaming && (
+              <div className="space-y-3">
+                <p className="text-sm font-medium">Stream URL</p>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Enter video/stream URL"
+                    value={inputUrl}
+                    onChange={(e) => setInputUrl(e.target.value)}
+                    className="flex-grow"
+                  />
+                  <Button onClick={handleSetUrl} className="flex-shrink-0">
+                    Set URL
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {streamUrl && (
+              <div>
+                <p className="text-sm font-medium mb-2">Detected Platform</p>
+                <Badge variant={platform === 'Unknown' ? 'destructive' : 'secondary'}>
+                  {mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} from {platform}
+                </Badge>
+              </div>
+            )}
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="p-3 rounded-lg bg-yellow-50 text-yellow-600 border border-yellow-200 flex items-center space-x-2"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                <span className="text-sm">{error}</span>
+              </motion.div>
+            )}
+          </CardContent>
+          <CardFooter className="flex flex-col gap-3">
+            {!isStreaming ? (
+              <Button
+                onClick={handleStartStream}
+                disabled={loading || !streamUrl}
+                className="w-full bg-green-600 hover:bg-green-700"
+              >
+                {loading ? "Starting..." : "Start Stream"}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleStopStream}
+                disabled={loading}
+                variant="destructive"
+                className="w-full"
+              >
+                {loading ? "Stopping..." : "Stop Stream"}
+              </Button>
+            )}
+             <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isStreaming ? 1 : 0 }}
+                className={`w-full p-3 rounded-lg ${
+                  isStreaming
+                    ? "bg-green-50 text-green-700 border border-green-200"
+                    : "hidden"
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                  <span className="font-semibold text-sm">Playback is active</span>
+                </div>
+                <p className="text-xs text-gray-600 mt-2">Current Viewers: {viewerCount}</p>
+              </motion.div>
+          </CardFooter>
+        </Card>
+      </div>
     </motion.div>
   );
 };

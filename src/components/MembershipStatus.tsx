@@ -14,7 +14,6 @@ export default function MembershipStatus() {
     currentUser,
   } = useUserStore();
 
-  const [showModal, setShowModal] = useState(false);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -22,14 +21,6 @@ export default function MembershipStatus() {
       fetchMembershipStatus(session.user.id);
     }
   }, [fetchMembershipStatus, session]);
-
-  const handleViewDetailsClick = () => {
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
 
   if (loading)
     return <div className="text-center py-8">Loading membership status...</div>;
@@ -83,35 +74,12 @@ export default function MembershipStatus() {
         requirements, are not currently available.
       </p>
 
-      <button
-        onClick={handleViewDetailsClick}
-        className="mt-6 text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium flex items-center"
-      >
-        View Membership Details
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 ml-1"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </button>
+      
 
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <MembershipDetailsModal
-            userId={session?.user.id || ""}
-            onClose={handleCloseModal}
-          />
-        </div>
-      )}
+      
+    
+
+      
     </motion.div>
   );
 }

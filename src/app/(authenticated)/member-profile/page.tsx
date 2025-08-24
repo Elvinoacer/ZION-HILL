@@ -1,24 +1,15 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { format } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
+import { Calendar, CheckCircle2, DollarSign, User, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Loader2, Save, X, User, Calendar, DollarSign } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
-import { format } from "date-fns";
 
 interface UserProfile {
   id: string;
@@ -35,7 +26,14 @@ interface UserProfile {
     amount: number;
     description?: string;
   }[];
-  shifts: { id: string; time: string; eventId: string; checkedIn: boolean }[];
+  shifts: {
+    id: string;
+    time: string;
+    eventId: string;
+    checkedIn: boolean;
+    conflictCheck: boolean;
+    replacementPool: string[];
+  }[];
 }
 
 const MemberProfilePage = () => {
@@ -273,38 +271,20 @@ const MemberProfilePage = () => {
                 <>
                   <div className="flex items-center space-x-4 mb-6">
                     <Avatar className="h-16 w-16">
-                      <AvatarImage src={profile.photo} />
+                      <AvatarImage src={profile?.photo} />
                       <AvatarFallback className="bg-indigo-100 text-indigo-600 text-lg">
-                        {profile.name.charAt(0)}
+                        {profile?.name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
-                        {profile.name}
+                        {profile?.name}
                       </h3>
-                      <p className="text-sm text-gray-500">{profile.email}</p>
+                      <p className="text-sm text-gray-500">{profile?.email}</p>
                     </div>
                   </div>
-                  {isEditing && (
-                    <div className="mb-6">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium text-gray-600">
-                          Profile Completion
-                        </span>
-                        <span className="text-sm font-medium text-indigo-600">
-                          {formProgress}%
-                        </span>
-                      </div>
-                      <Progress
-                        value={formProgress}
-                        className="h-2 bg-gray-100"
-                      />
-                    </div>
-                  )}
-                  <form
-                    onSubmit={handleUpdateProfile}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                  >
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label
                         htmlFor="name"
@@ -316,9 +296,8 @@ const MemberProfilePage = () => {
                         type="text"
                         id="name"
                         name="name"
-                        value={profile.name}
-                        onChange={handleProfileChange}
-                        disabled={!isEditing}
+                        value={profile?.name || ""}
+                        disabled={true}
                         className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                       />
                     </div>
@@ -333,9 +312,8 @@ const MemberProfilePage = () => {
                         type="email"
                         id="email"
                         name="email"
-                        value={profile.email}
-                        onChange={handleProfileChange}
-                        disabled={!isEditing}
+                        value={profile?.email || ""}
+                        disabled={true}
                         className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                       />
                     </div>
@@ -350,9 +328,8 @@ const MemberProfilePage = () => {
                         type="text"
                         id="phone"
                         name="phone"
-                        value={profile.phone || ""}
-                        onChange={handleProfileChange}
-                        disabled={!isEditing}
+                        value={profile?.phone || ""}
+                        disabled={true}
                         className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                       />
                     </div>
@@ -367,9 +344,8 @@ const MemberProfilePage = () => {
                         type="text"
                         id="address"
                         name="address"
-                        value={profile.address || ""}
-                        onChange={handleProfileChange}
-                        disabled={!isEditing}
+                        value={profile?.address || ""}
+                        disabled={true}
                         className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                       />
                     </div>
@@ -384,9 +360,8 @@ const MemberProfilePage = () => {
                         type="text"
                         id="membersince"
                         name="membersince"
-                        value={profile.membersince || ""}
-                        onChange={handleProfileChange}
-                        disabled={!isEditing}
+                        value={profile?.membersince || ""}
+                        disabled={true}
                         className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                       />
                     </div>
@@ -401,9 +376,8 @@ const MemberProfilePage = () => {
                         type="text"
                         id="birthdate"
                         name="birthdate"
-                        value={profile.birthdate || ""}
-                        onChange={handleProfileChange}
-                        disabled={!isEditing}
+                        value={profile?.birthdate || ""}
+                        disabled={true}
                         placeholder="YYYY-MM-DD"
                         className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                       />
@@ -419,46 +393,21 @@ const MemberProfilePage = () => {
                         type="text"
                         id="photo"
                         name="photo"
-                        value={profile.photo || ""}
-                        onChange={handleProfileChange}
-                        disabled={!isEditing}
+                        value={profile?.photo || ""}
+                        disabled={true}
                         className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                       />
                     </div>
                     <div className="md:col-span-2 flex space-x-2 mt-4">
-                      {!isEditing ? (
-                        <Button
-                          onClick={() => setIsEditing(true)}
-                          className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
-                        >
-                          <User className="mr-2 h-4 w-4" />
-                          Edit Profile
-                        </Button>
-                      ) : (
-                        <>
-                          <Button
-                            type="submit"
-                            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
-                          >
-                            <Save className="mr-2 h-4 w-4" />
-                            Save Changes
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => {
-                              setIsEditing(false);
-                              fetchProfile();
-                            }}
-                            className="border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg shadow-md transition-transform transform hover:scale-105"
-                          >
-                            <X className="mr-2 h-4 w-4" />
-                            Cancel
-                          </Button>
-                        </>
-                      )}
+                      <Button
+                        onClick={() => router.push("/profile")}
+                        className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        View Full Profile
+                      </Button>
                     </div>
-                  </form>
+                  </div>
                 </>
               ) : (
                 <p className="text-gray-500 text-sm">
@@ -578,32 +527,6 @@ const MemberProfilePage = () => {
             </CardContent>
           </Card>
         </motion.div>
-
-        <AnimatePresence>
-          {isModalOpen && (
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-              <DialogContent className="sm:max-w-md rounded-2xl bg-white shadow-xl">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center space-x-2 text-lg sm:text-xl font-bold text-gray-800">
-                    <CheckCircle2 className="h-6 w-6 text-green-600" />
-                    <span>Profile Updated</span>
-                  </DialogTitle>
-                  <DialogDescription className="text-sm sm:text-base text-gray-600">
-                    Your profile has been successfully updated.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button
-                    onClick={() => setIsModalOpen(false)}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
-                  >
-                    Close
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          )}
-        </AnimatePresence>
       </div>
 
       <style jsx>{`

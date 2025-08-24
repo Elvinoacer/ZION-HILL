@@ -27,6 +27,7 @@ interface Transaction {
   amount: number;
   date: string;
   description?: string;
+  reconciliationStatus?: string;
 }
 
 interface BibleStudy {
@@ -126,7 +127,9 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       }
 
       if (donationsResult.status === "fulfilled") {
-        update.givingHistory = donationsResult.value;
+        update.givingHistory = donationsResult.value.filter(
+          (transaction: Transaction) => transaction.reconciliationStatus === "FULFILLED"
+        );
       }
 
       if (bibleStudyResult.status === "fulfilled") {

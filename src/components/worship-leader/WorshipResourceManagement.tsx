@@ -2,23 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  FileText,
-  Music,
-  Image,
-  File,
-  Link as LinkIcon,
-  Edit,
-  Trash2,
-} from "lucide-react";
+import { FileText, Music, Image, File, Link as LinkIcon, Edit, Trash2, Video } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -28,12 +14,14 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
+import { AssetType } from "@/generated/prisma";
+
 interface WorshipResource {
   id: string;
   url: string;
   title: string;
   serviceId: string;
-  type: string;
+  assetType: AssetType; // Changed from 'type' to 'assetType'
   createdAt: string;
 }
 
@@ -41,33 +29,39 @@ interface WorshipResourceManagementProps {
   selectedServiceId: string | null;
 }
 
-const getFileIcon = (type: string) => {
-  if (type.includes("image")) return <Image className="h-5 w-5" />;
-  if (type.includes("audio")) return <Music className="h-5 w-5" />;
-  if (type.includes("pdf")) return <FileText className="h-5 w-5" />;
-  if (type.toUpperCase() === "LINK") return <LinkIcon className="h-5 w-5" />;
-  return <File className="h-5 w-5" />;
+const getFileIcon = (assetType: AssetType) => {
+  switch (assetType) {
+    case AssetType.IMAGE:
+      return <Image className="h-5 w-5" />;
+    case AssetType.AUDIO:
+      return <Music className="h-5 w-5" />;
+    case AssetType.DOCUMENT:
+      return <FileText className="h-5 w-5" />;
+    case AssetType.VIDEO:
+      return <Video className="h-5 w-5" />;
+    case AssetType.RESOURCE: // For generic links or other resources
+      return <LinkIcon className="h-5 w-5" />;
+    default:
+      return <File className="h-5 w-5" />;
+  }
 };
 
-const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
-  selectedServiceId,
-}) => {
+const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({ selectedServiceId }) => {
   const [resources, setResources] = useState<WorshipResource[]>([]);
   const [newResourceTitle, setNewResourceTitle] = useState("");
   const [newResourceFile, setNewResourceFile] = useState<File | null>(null);
   const [newResourceUrl, setNewResourceUrl] = useState(""); // For URL-based resources
-  const [newResourceType, setNewResourceType] = useState("LINK"); // Default type
+  const [newResourceType, setNewResourceType] = useState<AssetType>(AssetType.RESOURCE); // Default type
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const [showCreateResourceModal, setShowCreateResourceModal] = useState(false);
-  const [editingResource, setEditingResource] =
-    useState<WorshipResource | null>(null);
+  const [editingResource, setEditingResource] = useState<WorshipResource | null>(null);
   const [showEditResourceModal, setShowEditResourceModal] = useState(false);
   const [editedResourceTitle, setEditedResourceTitle] = useState("");
   const [editedResourceUrl, setEditedResourceUrl] = useState("");
-  const [editedResourceType, setEditedResourceType] = useState("");
+  const [editedResourceType, setEditedResourceType] = useState<AssetType>(AssetType.RESOURCE);
 
   const fetchResources = async (serviceId: string) => {
     setLoading(true);
@@ -136,7 +130,7 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
       setNewResourceTitle("");
       setNewResourceFile(null);
       setNewResourceUrl("");
-      setNewResourceType("LINK");
+      setNewResourceType(AssetType.RESOURCE);
       setShowCreateResourceModal(false); // Close modal after adding
       fetchResources(selectedServiceId);
     } catch (err: any) {
@@ -150,7 +144,7 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
     setEditingResource(resource);
     setEditedResourceTitle(resource.title);
     setEditedResourceUrl(resource.url);
-    setEditedResourceType(resource.type);
+    setEditedResourceType(resource.assetType);
     setShowEditResourceModal(true);
   };
 
@@ -162,20 +156,17 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
     setError(null);
 
     try {
-      const res = await fetch(
-        `/api/worship-resources?id=${editingResource.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: editedResourceTitle,
-            url: editedResourceUrl,
-            type: editedResourceType,
-          }),
-        }
-      );
+      const res = await fetch(`/api/worship-resources?id=${editingResource.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: editedResourceTitle,
+          url: editedResourceUrl,
+          type: editedResourceType,
+        }),
+      });
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -250,15 +241,8 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
         </motion.div>
       )}
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="space-y-4"
-      >
-        <h4 className="font-semibold text-lg text-gray-700">
-          Service Resources
-        </h4>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="space-y-4">
+        <h4 className="font-semibold text-lg text-gray-700">Service Resources</h4>
         {loading ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
@@ -285,11 +269,11 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
                     damping: 20,
                     hover: { duration: 0.2 },
                   }}
-                  className="flex items-center justify-between p-5 rounded-xl bg-white shadow-sm border border-gray-200 cursor-pointer transition-all duration-200 hover:border-indigo-100"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-5 rounded-xl bg-white shadow-sm border border-gray-200 cursor-pointer transition-all duration-200 hover:border-indigo-100"
                 >
-                  <div className="flex items-center space-x-4 flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 flex-1 min-w-0">
                     <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 text-indigo-600 flex-shrink-0 shadow-inner">
-                      {getFileIcon(resource.type)}
+                      {getFileIcon(resource.assetType)}
                     </div>
                     <div className="overflow-hidden">
                       <a
@@ -302,19 +286,16 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
                       </a>
                       <p className="text-sm text-gray-500 mt-1">
                         Uploaded{" "}
-                        {new Date(resource.createdAt).toLocaleDateString(
-                          "en-US",
-                          {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          }
-                        )}
+                        {new Date(resource.createdAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3">
+                  <div className="flex flex-row sm:flex-row mt-3 sm:mt-0 space-x-3">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -337,29 +318,20 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
             </AnimatePresence>
           </ul>
         ) : (
-          <div className="p-4 rounded-lg bg-gray-50 text-center text-gray-500">
-            No resources for this service
-          </div>
+          <div className="p-4 rounded-lg bg-gray-50 text-center text-gray-500">No resources for this service</div>
         )}
       </motion.div>
 
       {/* Create Resource Modal */}
-      <Dialog
-        open={showCreateResourceModal}
-        onOpenChange={setShowCreateResourceModal}
-      >
-        <DialogContent className="sm:max-w-[425px]">
+      <Dialog open={showCreateResourceModal} onOpenChange={setShowCreateResourceModal}>
+        <DialogContent className="w-full max-w-sm md:max-w-md lg:max-w-lg">
           <DialogHeader>
             <DialogTitle>Add New Resource</DialogTitle>
-            <DialogDescription>
-              Add a new resource for this service.
-            </DialogDescription>
+            <DialogDescription>Add a new resource for this service.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddResource} className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Title
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Title</label>
               <Input
                 type="text"
                 placeholder="Resource Title"
@@ -369,11 +341,9 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
               />
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Resource Type
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Resource Type</label>
               <Select
-                onValueChange={setNewResourceType}
+                onValueChange={(value) => setNewResourceType(value as AssetType)}
                 value={newResourceType}
                 required
               >
@@ -381,19 +351,17 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
                   <SelectValue placeholder="Select resource type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="LINK">Link</SelectItem>
-                  <SelectItem value="PDF">PDF</SelectItem>
-                  <SelectItem value="IMAGE">Image</SelectItem>
-                  <SelectItem value="VIDEO">Video</SelectItem>
-                  <SelectItem value="AUDIO">Audio</SelectItem>
+                  <SelectItem value={AssetType.RESOURCE}>Link</SelectItem>
+                  <SelectItem value={AssetType.DOCUMENT}>PDF</SelectItem>
+                  <SelectItem value={AssetType.IMAGE}>Image</SelectItem>
+                  <SelectItem value={AssetType.VIDEO}>Video</SelectItem>
+                  <SelectItem value={AssetType.AUDIO}>Audio</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             {newResourceType === "LINK" ? (
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  URL
-                </label>
+                <label className="block text-sm font-medium text-gray-700">URL</label>
                 <Input
                   type="url"
                   placeholder="https://example.com/resource"
@@ -404,16 +372,10 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
               </div>
             ) : (
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  File
-                </label>
+                <label className="block text-sm font-medium text-gray-700">File</label>
                 <Input
                   type="file"
-                  onChange={(e) =>
-                    setNewResourceFile(
-                      e.target.files ? e.target.files[0] : null
-                    )
-                  }
+                  onChange={(e) => setNewResourceFile(e.target.files ? e.target.files[0] : null)}
                   required
                 />
               </div>
@@ -428,22 +390,15 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
       </Dialog>
 
       {/* Edit Resource Modal */}
-      <Dialog
-        open={showEditResourceModal}
-        onOpenChange={setShowEditResourceModal}
-      >
-        <DialogContent className="sm:max-w-[425px]">
+      <Dialog open={showEditResourceModal} onOpenChange={setShowEditResourceModal}>
+        <DialogContent className="w-full max-w-sm md:max-w-md lg:max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit Resource</DialogTitle>
-            <DialogDescription>
-              Edit the details of this resource.
-            </DialogDescription>
+            <DialogDescription>Edit the details of this resource.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdateResource} className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Title
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Title</label>
               <Input
                 type="text"
                 placeholder="Resource Title"
@@ -453,11 +408,9 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
               />
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Resource Type
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Resource Type</label>
               <Select
-                onValueChange={setEditedResourceType}
+                onValueChange={(value) => setEditedResourceType(value as AssetType)}
                 value={editedResourceType}
                 required
               >
@@ -465,18 +418,16 @@ const WorshipResourceManagement: React.FC<WorshipResourceManagementProps> = ({
                   <SelectValue placeholder="Select resource type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="LINK">Link</SelectItem>
-                  <SelectItem value="PDF">PDF</SelectItem>
-                  <SelectItem value="IMAGE">Image</SelectItem>
-                  <SelectItem value="VIDEO">Video</SelectItem>
-                  <SelectItem value="AUDIO">Audio</SelectItem>
+                  <SelectItem value={AssetType.RESOURCE}>Link</SelectItem>
+                  <SelectItem value={AssetType.DOCUMENT}>PDF</SelectItem>
+                  <SelectItem value={AssetType.IMAGE}>Image</SelectItem>
+                  <SelectItem value={AssetType.VIDEO}>Video</SelectItem>
+                  <SelectItem value={AssetType.AUDIO}>Audio</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                URL
-              </label>
+              <label className="block text-sm font-medium text-gray-700">URL</label>
               <Input
                 type="url"
                 placeholder="https://example.com/resource"

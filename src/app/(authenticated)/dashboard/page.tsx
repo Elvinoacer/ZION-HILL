@@ -302,7 +302,7 @@ const DashboardPage = () => {
                       Recent Contributions
                     </h3>
                     <span className="text-sm font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
-                      Total: $
+                      Total: KES
                       {givingHistory
                         .reduce((sum, item) => sum + item.amount, 0)
                         .toFixed(2)}
@@ -323,7 +323,7 @@ const DashboardPage = () => {
                           </p>
                         </div>
                         <span className="font-semibold text-emerald-600">
-                          ${transaction.amount.toFixed(2)}
+                          KES {transaction.amount.toFixed(2)}
                         </span>
                       </li>
                     ))}
@@ -378,17 +378,21 @@ const DashboardPage = () => {
                       ></div>
                     </div>
                   </div>
-                  <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
-                    Continue Study
-                  </Button>
+                  <Link href="/bible-study">
+                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
+                      Continue Study
+                    </Button>
+                  </Link>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 space-y-4">
                   <Icons.bookOpenCheck className="h-8 w-8 text-gray-300" />
                   <p className="text-gray-400 text-sm">No active study</p>
-                  <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
-                    Start a Study
-                  </Button>
+                  <Link href="/bible-study">
+                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
+                      Start a Study
+                    </Button>
+                  </Link>
                 </div>
               )}
             </CardContent>
