@@ -163,6 +163,7 @@ const ChatPage = () => {
     });
 
     if ("serviceWorker" in navigator && "PushManager" in window) {
+      console.log("Service Worker and Push is supported");
       navigator.serviceWorker
         .register("/service-worker.js")
         .then((registration) => {
@@ -172,46 +173,48 @@ const ChatPage = () => {
         .then((subscription) => {
           if (subscription) {
             console.log("Already subscribed", subscription);
+            return subscription;
           } else {
-            Notification.requestPermission().then((permission) => {
+            console.log("Not subscribed, requesting permission...");
+            return Notification.requestPermission().then((permission) => {
               if (permission === "granted") {
-                navigator.serviceWorker.ready.then((registration) => {
-                  registration.pushManager
-                    .subscribe({
-                      userVisibleOnly: true,
-                      applicationServerKey:
-                        urlBase64ToUint8Array(publicVapidKey),
-                    })
-                    .then((newSubscription) => {
-                      console.log("New Push Subscription", newSubscription);
-                      if (session?.user?.id) {
-                        fetch("/api/subscribe", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({
-                            endpoint: newSubscription.endpoint,
-                            expirationTime: newSubscription.expirationTime,
-                            keys: newSubscription.toJSON().keys,
-                            userId: session.user.id,
-                          }),
-                        });
-                      }
-                    })
-                    .catch((e) => {
-                      console.error("Failed to subscribe the user: ", e);
-                    });
+                console.log("Notification permission granted.");
+                return navigator.serviceWorker.ready.then((registration) => {
+                  return registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey:
+                      urlBase64ToUint8Array(publicVapidKey),
+                  });
                 });
               } else {
                 console.warn("Notification permission denied.");
+                return null;
               }
+            });
+          }
+        })
+        .then((subscription) => {
+          if (subscription && session?.user?.id) {
+            console.log("Sending subscription to server...", subscription);
+            return fetch("/api/subscribe", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                endpoint: subscription.endpoint,
+                expirationTime: subscription.expirationTime,
+                keys: subscription.toJSON().keys,
+                userId: session.user.id,
+              }),
             });
           }
         })
         .catch((e) => {
           console.error("Service Worker Error", e);
         });
+    } else {
+      console.warn("Service Worker and Push is not supported");
     }
 
     return () => {
