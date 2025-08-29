@@ -238,7 +238,7 @@ const SidebarContent = ({ setSidebarOpen }) => {
     {
       name: "Admin Command Center",
       icon: <FaUserShield />,
-      path: "/admin",
+      path: "/admin/institutions",
       requiredRoles: ["ADMIN"],
     },
     {
@@ -262,32 +262,32 @@ const SidebarContent = ({ setSidebarOpen }) => {
     {
       name: "Discipleship Hub Dashboard",
       icon: <FaBookOpen />,
-      path: "/discipleship_leader/DiscipleshipHubDashboard",
+      path: "discipleship_leader/admin",
       requiredRoles: ["DISCIPLESHIP_LEADER"],
     },
     {
       name: "Event Manager Dashboard",
       icon: <FaCalendarAlt />,
-      path: "/events_manager/events-manager/eventdashboard",
+      path: "/events_manager/events-manager",
       requiredRoles: ["EVENTS_MANAGER"],
     },
     {
       name: "Finance Administrator Dashboard",
       icon: <FaFileInvoiceDollar />,
-      path: "/finance_administrator",
+      path: "/finance_administrator/finance-administrator",
       requiredRoles: ["FINANCE_ADMINISTRATOR"],
     },
     {
       name: "Outreach Director Dashboard",
       icon: <FaHandshake />,
-      path: "/outreach_director",
+      path: "/outreach_director/outreach-director",
       requiredRoles: ["OUTREACH_DIRECTOR"],
     },
 
     {
       name: "Secretary Dashboard",
       icon: <FaFileInvoiceDollar />,
-      path: "/secretary",
+      path: "/secretary/secretary",
       requiredRoles: ["SECRETARY"],
     },
     {
