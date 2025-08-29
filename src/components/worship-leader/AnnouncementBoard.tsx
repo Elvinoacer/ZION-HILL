@@ -11,9 +11,16 @@ interface Announcement {
   title: string;
   content: string;
   createdAt: string;
+  ministryId?: string; // Added ministryId
 }
 
-const AnnouncementBoard = () => {
+interface AnnouncementBoardProps {
+  ministryId?: string; // Added ministryId prop
+  isViewOnly?: boolean; // Added isViewOnly prop
+}
+
+const AnnouncementBoard = ({ ministryId, isViewOnly }: AnnouncementBoardProps) => {
+  console.log("AnnouncementBoard - isViewOnly:", isViewOnly);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [newAnnouncement, setNewAnnouncement] = useState("");
   const [newAnnouncementTitle, setNewAnnouncementTitle] = useState("");
@@ -23,7 +30,8 @@ const AnnouncementBoard = () => {
 
   const fetchAnnouncements = async () => {
     try {
-      const res = await fetch("/api/announcements");
+      const url = ministryId ? `/api/announcements?ministryId=${ministryId}` : "/api/announcements";
+      const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch announcements");
       const data = await res.json();
       setAnnouncements(data);
@@ -36,7 +44,7 @@ const AnnouncementBoard = () => {
 
   useEffect(() => {
     fetchAnnouncements();
-  }, []);
+  }, [ministryId]); // Added ministryId to dependency array
 
   const handleAddAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +58,7 @@ const AnnouncementBoard = () => {
         body: JSON.stringify({
           title: newAnnouncementTitle,
           content: newAnnouncement,
+          ministryId, // Include ministryId in the payload
         }),
       });
 
@@ -70,39 +79,41 @@ const AnnouncementBoard = () => {
 
   return (
     <div className="space-y-6">
-      <motion.form
-        onSubmit={handleAddAnnouncement}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="space-y-4 p-4 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100"
-      >
-        <h4 className="font-semibold text-lg text-gray-700 flex items-center space-x-2">
-          <MessageSquare className="h-5 w-5 text-amber-600" />
-          <span>New Announcement</span>
-        </h4>
-        <Input
-          type="text"
-          placeholder="Announcement Title"
-          value={newAnnouncementTitle}
-          onChange={(e) => setNewAnnouncementTitle(e.target.value)}
-          required
-          className="mb-4"
-        />
-        <Textarea
-          placeholder="Share updates with your team..."
-          value={newAnnouncement}
-          onChange={(e) => setNewAnnouncement(e.target.value)}
-          required
-          className="min-h-[100px]"
-        />
-        <Button
-          type="submit"
-          disabled={posting}
-          className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+      {isViewOnly ? null : (
+        <motion.form
+          onSubmit={handleAddAnnouncement}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="space-y-4 p-4 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100"
         >
-          {posting ? "Posting..." : "Post Announcement"}
-        </Button>
-      </motion.form>
+          <h4 className="font-semibold text-lg text-gray-700 flex items-center space-x-2">
+            <MessageSquare className="h-5 w-5 text-amber-600" />
+            <span>New Announcement</span>
+          </h4>
+          <Input
+            type="text"
+            placeholder="Announcement Title"
+            value={newAnnouncementTitle}
+            onChange={(e) => setNewAnnouncementTitle(e.target.value)}
+            required
+            className="mb-4"
+          />
+          <Textarea
+            placeholder="Share updates with your team..."
+            value={newAnnouncement}
+            onChange={(e) => setNewAnnouncement(e.target.value)}
+            required
+            className="min-h-[100px]"
+          />
+          <Button
+            type="submit"
+            disabled={posting}
+            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+          >
+            {posting ? "Posting..." : "Post Announcement"}
+          </Button>
+        </motion.form>
+      )}
 
       {error && (
         <motion.div

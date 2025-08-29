@@ -53,20 +53,13 @@ export async function PUT(
 
     // Handle status change logic
     let updatedAssignedPeople = application.opportunity.assignedPeople;
-    let updatedIsAssigned =
-      application.opportunity.assignedPeople >=
-      application.opportunity.requiredPeople;
 
     if (status === "APPROVED" && application.status !== "APPROVED") {
       // Only increment if changing to APPROVED from a non-approved status
       updatedAssignedPeople += 1;
-      if (updatedAssignedPeople >= application.opportunity.requiredPeople) {
-        updatedIsAssigned = true;
-      }
     } else if (status !== "APPROVED" && application.status === "APPROVED") {
       // Only decrement if changing from APPROVED to a non-approved status
       updatedAssignedPeople = Math.max(0, updatedAssignedPeople - 1);
-      updatedIsAssigned = false; // If someone is unapproved, it's no longer fully assigned
     }
 
     const updatedApplication = await prisma.volunteeringApplication.update({
@@ -82,7 +75,6 @@ export async function PUT(
       where: { id: application.opportunityId },
       data: {
         assignedPeople: updatedAssignedPeople,
-        isAssigned: updatedIsAssigned,
       },
     });
 
@@ -147,7 +139,6 @@ export async function DELETE(
           assignedPeople: {
             decrement: 1,
           },
-          isAssigned: false, // If an approved application is deleted, it's no longer fully assigned
         },
       });
     }

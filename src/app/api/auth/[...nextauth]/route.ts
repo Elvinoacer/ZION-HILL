@@ -23,10 +23,15 @@ export const authOptions = {
           where: { email: credentials.email },
         });
 
-        if (
-          user &&
-          (await bcrypt.compare(credentials.password, user.password))
-        ) {
+        if (!user) {
+          throw new Error("No user found with this email.");
+        }
+
+        if (!user.emailVerified) {
+          throw new Error("Email not verified. Please check your inbox.");
+        }
+
+        if (user && (await bcrypt.compare(credentials.password, user.password))) {
           return user;
         }
 

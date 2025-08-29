@@ -13,8 +13,8 @@ export async function POST(request: Request) {
     where: { email: session.user.email },
     select: { id: true },
   });
-  if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  if (!user || !user.id) { // Ensure user and user.id exist
+    return NextResponse.json({ error: "Sender user not found or ID missing" }, { status: 404 });
   }
 
   const { recipientId, content, worshipMinistryId } = await request.json();
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   try {
     const message = await prisma.worshipMessage.create({
       data: {
-        senderId: user?.id,
+        senderId: user.id, // Use user.id directly, it's guaranteed to exist now
         recipientId,
         content,
         worshipMinistryId,

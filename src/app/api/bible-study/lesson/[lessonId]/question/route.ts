@@ -47,3 +47,40 @@ export async function POST(
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
+
+export async function GET(
+  req: Request,
+  { params }: { params: { lessonId: string } }
+) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user || !session.user.email) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  // Optional: Add role-based authorization if needed
+  // const user = await prisma.user.findUnique({
+  //   where: { email: session.user.email },
+  // });
+  // if (!user || !user.roles.includes(RoleName.ADMIN)) {
+  //   return new NextResponse("Forbidden", { status: 403 });
+  // }
+
+  try {
+    const { lessonId } = await params; // MODIFIED LINE HERE
+
+    const questions = await prisma.lessonQuestion.findMany({
+      where: {
+        lessonId: lessonId,
+      },
+      orderBy: {
+        createdAt: "asc", // Order questions by creation time
+      },
+    });
+
+    return NextResponse.json({ questions }, { status: 200 });
+  } catch (error) {
+    console.error("[BIBLE_STUDY_QUESTION_GET]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}

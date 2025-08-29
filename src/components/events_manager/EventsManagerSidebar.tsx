@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { LayoutDashboard, Calendar, Inbox, Home } from "lucide-react";
+import {
+  LayoutDashboard,
+  Calendar,
+  Inbox,
+  Home,
+  DollarSign,
+} from "lucide-react";
 
 interface EventsManagerSidebarProps {
   isOpen: boolean;
@@ -31,7 +37,7 @@ const EventsManagerSidebar = ({
           <ul>
             <li>
               <Link
-                href="/events-manager"
+                href="/events_manager/events-manager"
                 className="flex items-center p-4 hover:bg-purple-700"
                 onClick={onClose}
               >
@@ -41,7 +47,7 @@ const EventsManagerSidebar = ({
             </li>
             <li>
               <Link
-                href="/events-manager/dashboard"
+                href="/events_manager/events-manager/dashboard"
                 className="flex items-center p-4 hover:bg-purple-700"
                 onClick={onClose}
               >
@@ -49,24 +55,45 @@ const EventsManagerSidebar = ({
                 Cards Overview
               </Link>
             </li>
+            
             <li>
               <Link
-                href="/events-manager/eventdashboard"
-                className="flex items-center p-4 hover:bg-purple-700"
-                onClick={onClose}
-              >
-                <Calendar className="mr-3" />
-                Event Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/events-manager/inbox"
+                href="/events_manager/events-manager/inbox"
                 className="flex items-center p-4 hover:bg-purple-700"
                 onClick={onClose}
               >
                 <Inbox className="mr-3" />
                 Inbox
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/events_manager/sponsors"
+                className="flex items-center p-4 hover:bg-purple-700"
+                onClick={onClose}
+              >
+                <DollarSign className="mr-3" />
+                Sponsors
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/events_manager/events"
+                className="flex items-center p-4 hover:bg-purple-700"
+                onClick={onClose}
+              >
+                <Calendar className="mr-3" />
+                Events
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/events_manager/preaching-calendar"
+                className="flex items-center p-4 hover:bg-purple-700"
+                onClick={onClose}
+              >
+                <Calendar className="mr-3" />
+                Preaching Calendar
               </Link>
             </li>
           </ul>

@@ -28,7 +28,7 @@ const DiscipleshipSidebar = ({ isOpen, onClose }: DiscipleshipSidebarProps) => {
           <ul>
             <li>
               <Link
-                href="/admin"
+                href="/discipleship_leader/admin"
                 className="flex items-center p-4 hover:bg-emerald-700"
                 onClick={onClose}
               >
@@ -38,7 +38,7 @@ const DiscipleshipSidebar = ({ isOpen, onClose }: DiscipleshipSidebarProps) => {
             </li>
             <li>
               <Link
-                href="/admin/new"
+                href="/discipleship_leader/admin/new"
                 className="flex items-center p-4 hover:bg-emerald-700"
                 onClick={onClose}
               >
@@ -48,7 +48,7 @@ const DiscipleshipSidebar = ({ isOpen, onClose }: DiscipleshipSidebarProps) => {
             </li>
             <li>
               <Link
-                href="/courses/discipleship/theme-of-the-week/manage"
+                href="/discipleship_leader/courses/discipleship/theme-of-the-week/manage"
                 className="flex items-center p-4 hover:bg-emerald-700"
                 onClick={onClose}
               >
@@ -58,7 +58,7 @@ const DiscipleshipSidebar = ({ isOpen, onClose }: DiscipleshipSidebarProps) => {
             </li>
             <li>
               <Link
-                href="/courses/discipleship/theme-of-the-week/create"
+                href="/discipleship_leader/courses/discipleship/theme-of-the-week/create"
                 className="flex items-center p-4 hover:bg-emerald-700"
                 onClick={onClose}
               >
@@ -66,26 +66,8 @@ const DiscipleshipSidebar = ({ isOpen, onClose }: DiscipleshipSidebarProps) => {
                 New Theme
               </Link>
             </li>
-            <li>
-              <Link
-                href="/discipleship-leader"
-                className="flex items-center p-4 hover:bg-emerald-700"
-                onClick={onClose}
-              >
-                <LayoutDashboard className="mr-3" />
-                Discipleship Leader Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/DiscipleshipHubDashboard"
-                className="flex items-center p-4 hover:bg-emerald-700"
-                onClick={onClose}
-              >
-                <LayoutDashboard className="mr-3" />
-                (Future Dashboard)
-              </Link>
-            </li>
+            
+            
           </ul>
         </nav>
       </div>

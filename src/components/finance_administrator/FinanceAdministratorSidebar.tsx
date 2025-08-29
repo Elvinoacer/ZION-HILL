@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { PiggyBank, DollarSign, PieChart, FileText, CreditCard, HandHeart, ListPlus, Settings, User, Search } from 'lucide-react';
 import { useFinanceDashboardStore } from '@/store/financeDashboardStore';
-import { useRouter } from 'next/navigation';
+
 
 const theme = {
   primary: "bg-indigo-600",
@@ -21,7 +21,7 @@ const sections = [
     color: "text-blue-500",
   },
   {
-    id: "financial",
+    id: "financials",
     label: "Financial Oversight",
     icon: PieChart,
     color: "text-green-500",
@@ -59,7 +59,7 @@ const sections = [
 ];
 
 const FinanceAdministratorSidebar = () => {
-  const router = useRouter();
+  
   const { 
     sidebarCollapsed, 
     mobileMenuOpen, 

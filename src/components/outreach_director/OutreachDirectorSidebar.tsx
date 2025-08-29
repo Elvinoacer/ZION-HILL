@@ -4,15 +4,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useOutreachDirectorStore } from "@/store/outreachDirectorStore";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { Compass, LayoutDashboard, Menu, X } from "lucide-react";
 
 const navItems = [
-  { href: "/outreach", label: "Outreach Programs", icon: Compass },
   {
-    href: "/outreach-director",
-    label: "(Future Director Dashboard)",
+    href: "/outreach_director/outreach",
+    label: "Outreach Programs",
+    icon: Compass,
+  },
+  {
+    href: "/outreach_director/outreach-director",
+    label: "Dashboard",
     icon: LayoutDashboard,
   },
 ];
@@ -23,36 +27,35 @@ export default function OutreachDirectorSidebar() {
     sidebarCollapsed,
     mobileMenuOpen,
     closeMobileMenu,
-    toggleMobileMenu,
   } = useOutreachDirectorStore();
 
   return (
     <>
       {/* Mobile Sidebar (Sheet) */}
-      <Sheet open={mobileMenuOpen} onOpenChange={toggleMobileMenu}>
-        <SheetContent side="left" className="w-64 p-0 pt-16 bg-gray-800">
-          {" "}
-          {/* Added bg-gray-800 */}
-          <nav className="flex flex-col p-4 space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center px-3 py-2 rounded-md text-sm font-medium",
-                  pathname === item.href
-                    ? "bg-primary text-primary-foreground"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white" // Adjusted colors
-                )}
-                onClick={closeMobileMenu} // Close on selection for mobile
-              >
-                <item.icon className="h-6 w-6 mr-3" /> {/* Render icon */}
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </SheetContent>
-      </Sheet>
+      <SheetContent side="left" className="w-64 p-0 pt-16 bg-gray-800">
+        <SheetTitle className="sr-only">Menu</SheetTitle>
+        <SheetDescription className="sr-only">Outreach Director sidebar menu</SheetDescription>
+        {" "}
+        {/* Added bg-gray-800 */}
+        <nav className="flex flex-col p-4 space-y-1">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center px-3 py-2 rounded-md text-sm font-medium",
+                pathname === item.href
+                  ? "bg-primary text-primary-foreground"
+                  : "text-gray-300 hover:bg-gray-700 hover:text-white" // Adjusted colors
+              )}
+              onClick={closeMobileMenu} // Close on selection for mobile
+            >
+              <item.icon className="h-6 w-6 mr-3" /> {/* Render icon */}
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </SheetContent>
 
       {/* Desktop Sidebar */}
       <aside

@@ -112,6 +112,7 @@ export async function POST(
             recipientName: user.name,
             briefDescription: `For the successful completion of the course: ${lesson.course.title}`,
             cloudinaryUrl: "", // Placeholder, will be generated on download
+            certificateType: "Course Completion", // Added certificateType
           },
         });
       }

@@ -55,6 +55,7 @@ model User {
   photo          String?
   password       String?
   isActive       Boolean    @default(true)
+  profileComplete Boolean @default(false)
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   familyId       String?
@@ -177,6 +178,8 @@ model LessonQuestion {
   text               String
   options            String[]
   correctAnswerIndex Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
 
 model BibleStudyEnrollment {
@@ -252,6 +255,7 @@ model Ministry {
   members              MinistryMember[]
   budgets              MinistryBudget[]
   ministryJoinRequests MinistryJoinRequest[] // Add this line
+  announcements        Announcement[] // Added for announcements
 }
 
 model MinistryBudget {
@@ -316,6 +320,7 @@ model Event {
   latitude            Float?
   longitude           Float?
   time                String?
+  capacity            String?
   ministryId          String?
   groupId             String?
   createdAt           DateTime             @default(now())
@@ -354,11 +359,13 @@ model WorshipResource {
 }
 
 model Announcement {
-  id        String   @id @default(cuid())
-  title     String
-  content   String
-  tags      String[] @default([])
-  createdAt DateTime @default(now())
+  id         String    @id @default(cuid())
+  title      String
+  content    String
+  tags       String[]  @default([])
+  createdAt  DateTime  @default(now())
+  ministryId String? // Added ministryId
+  ministry   Ministry? @relation(fields: [ministryId], references: [id])
 }
 
 model SongProposal {
@@ -437,12 +444,13 @@ model Financials {
 }
 
 model Sponsor {
-  id      String @id @default(cuid())
-  name    String
-  amount  Float
-  logoUrl String
-  eventId String
-  event   Event  @relation(fields: [eventId], references: [id])
+  id           String  @id @default(cuid())
+  name         String
+  amount       Float
+  logoUrl      String? // Make optional
+  eventId      String? // Make optional
+  event        Event?  @relation(fields: [eventId], references: [id])
+  contactEmail String? // Add this field
 }
 
 model NewsletterSubscriber {

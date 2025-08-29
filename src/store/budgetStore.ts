@@ -284,6 +284,7 @@ interface BudgetState {
   updateBudget: (
     ministryId: string,
     newAllocatedBudget: number,
+    newSpentAmount: number,
     budgetRecordId: string | null,
     fiscalYear: number
   ) => Promise<void>;
@@ -340,6 +341,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
   updateBudget: async (
     ministryId,
     newAllocatedBudget,
+    newSpentAmount,
     budgetRecordId,
     fiscalYear
   ) => {
@@ -357,7 +359,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
           body: JSON.stringify({
             budgetRecordId,
             allocatedAmount: newAllocatedBudget,
-            // spentAmount and status can also be updated if needed
+            spentAmount: newSpentAmount,
           }),
         });
 
@@ -375,6 +377,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
           body: JSON.stringify({
             ministryId,
             allocatedAmount: newAllocatedBudget,
+            spentAmount: newSpentAmount,
             fiscalYear,
           }),
         });
@@ -392,6 +395,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
             ? {
                 ...mb,
                 allocatedBudget: newAllocatedBudget,
+                spent: newSpentAmount,
                 budgetRecordId: updatedBudgetRecord.id, // Update with the new record ID
               }
             : mb

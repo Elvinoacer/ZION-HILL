@@ -47,19 +47,21 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    let {
+    let ministryId = body.ministryId;
+    const {
       title,
       type,
       date,
       location,
       tags,
-      ministryId,
+
       groupId,
       description,
       imageUrl,
       latitude,
       longitude,
       time,
+      capacity,
     } = body;
 
     console.log("Received POST body for event creation:", body);
@@ -88,7 +90,9 @@ export async function POST(req: NextRequest) {
       if (worshipMinistry) {
         ministryId = worshipMinistry.id;
       } else {
-        console.warn("Worship ministry not found. Service will be created without a ministryId.");
+        console.warn(
+          "Worship ministry not found. Service will be created without a ministryId."
+        );
       }
     }
 
@@ -127,6 +131,7 @@ export async function POST(req: NextRequest) {
         latitude,
         longitude,
         time, // Add time
+        capacity: capacity ? JSON.stringify(capacity) : "",
       },
     });
 
@@ -155,6 +160,7 @@ export async function PUT(req: NextRequest) {
       groupId,
       description,
       imageUrl,
+      capacity,
     } = body;
 
     if (!id) {
@@ -163,6 +169,7 @@ export async function PUT(req: NextRequest) {
         { status: 400 }
       );
     }
+    console.log("Received PUT body for event update:", body);
 
     // Basic validation
     if (!title || !type || !date) {
@@ -192,6 +199,7 @@ export async function PUT(req: NextRequest) {
         groupId,
         description,
         imageUrl,
+        capacity: capacity ? JSON.stringify(capacity) : "",
       },
     });
 

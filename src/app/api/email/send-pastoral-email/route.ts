@@ -1,23 +1,23 @@
 import { NextResponse } from 'next/server';
-import { sendEmail } from '@/lib/email'; // Assuming you have an email sending utility
+import { sendMail } from '@/lib/email';
 
 export async function POST(req: Request) {
   try {
-    const { email, subject, message } = await req.json();
+    const { recipient, subject, message } = await req.json();
 
-    if (!email || !subject || !message) {
-      return new NextResponse('Missing required fields', { status: 400 });
+    if (!recipient || !subject || !message) {
+      return new NextResponse('Recipient, subject, and message are required', { status: 400 });
     }
 
-    await sendEmail({
-      to: email,
-      subject: `A message from your Pastor: ${subject}`,
+    await sendMail({
+      to: recipient,
+      subject: subject,
       html: `<p>${message}</p>`,
     });
 
-    return new NextResponse('Email sent', { status: 200 });
+    return new NextResponse('Email sent successfully', { status: 200 });
   } catch (error) {
-    console.error('[PASTORAL_EMAIL_ERROR]', error);
+    console.error('[SEND_PASTORAL_EMAIL_ERROR]', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

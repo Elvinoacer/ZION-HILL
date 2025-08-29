@@ -9,15 +9,16 @@ import { LayoutDashboard, Users } from "lucide-react";
 
 const navItems = [
   {
-    href: "/VolunteerHubDashboard",
+    href: "/volunteer_coordinator/VolunteerHubDashboard",
     label: "Volunteer Hub Dashboard",
     icon: Users,
   },
   {
-    href: "/volunteer-coordinator",
-    label: "(Future Dashboard)",
+    href: "/volunteer_coordinator/volunteer-coordinator",
+    label: "Dashboard",
     icon: LayoutDashboard,
   },
+  
 ];
 
 export default function VolunteerCoordinatorSidebar() {

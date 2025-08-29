@@ -10,6 +10,9 @@ export async function GET() {
     return NextResponse.json(roles);
   } catch (error) {
     console.error("Error fetching roles:", error);
-    return NextResponse.json({ error: "Error fetching roles" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error fetching roles" },
+      { status: 500 }
+    );
   }
 }

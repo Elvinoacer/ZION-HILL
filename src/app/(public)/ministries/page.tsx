@@ -14,7 +14,7 @@ interface Ministry {
   description: string;
   photo?: string;
   leader?: { name: string };
-  _count?: { members: number };
+  members?: any[];
 }
 
 const MinistriesPageContent = () => {
@@ -103,7 +103,7 @@ const MinistriesPageContent = () => {
                 </p>
                 <div className="flex items-center text-gray-400 text-sm">
                   <Users className="h-4 w-4 mr-2 text-blue-400" />
-                  <span>{ministry._count?.members || 0} Members</span>
+                  <span>{ministry.members?.length || 0} Members</span>
                 </div>
                 <Link href={`/ministries/${ministry.id}`} passHref>
                   <Button className="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg">

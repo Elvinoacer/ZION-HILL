@@ -7,6 +7,7 @@ export async function GET() {
     const donations = await prisma.transaction.findMany({
       where: {
         type: 'DONATION',
+        reconciliationStatus: 'APPROVED',
       },
       orderBy: {
         date: 'desc',

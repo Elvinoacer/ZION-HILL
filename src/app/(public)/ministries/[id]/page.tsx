@@ -22,7 +22,7 @@ interface Ministry {
   description: string;
   photo?: string;
   leader?: { name: string };
-  _count?: { members: number };
+  members?: any[];
   events?: Array<{
     id: string;
     title: string;
@@ -167,7 +167,7 @@ const MinistryDetailPageContent = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex items-center text-gray-400">
               <Users className="h-5 w-5 mr-2 text-blue-400" />
-              <span>{ministry._count?.members || 0} Members</span>
+              <span>{ministry.members?.length || 0} Members</span>
             </div>
             {/* Add more ministry details here if available, e.g., mission, vision */}
           </div>

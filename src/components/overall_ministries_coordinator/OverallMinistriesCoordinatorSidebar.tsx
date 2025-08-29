@@ -8,12 +8,8 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { LayoutDashboard, Users } from "lucide-react";
 
 const navItems = [
-  { href: "/admin/ministries", label: "Manage Ministries", icon: Users },
-  {
-    href: "/ministry-coordinator",
-    label: "(Future Coordinator Dashboard)",
-    icon: LayoutDashboard,
-  },
+  { href: "/overall_ministries_coordinator/admin/ministries", label: "Manage Ministries", icon: Users },
+  
 ];
 
 export default function OverallMinistriesCoordinatorSidebar() {

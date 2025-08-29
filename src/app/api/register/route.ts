@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
+import { sendMail } from '@/lib/email';
+import crypto from 'crypto';
 
 export async function POST(request: Request) {
   try {
@@ -10,30 +12,44 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Name, email, and password are required' }, { status: 400 });
     }
 
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json({ error: 'User with this email already exists' }, { status: 409 });
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create the user in the database
     const newUser = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        // You might want to assign a default role here, e.g., 'MEMBER'
-        roles: ['MEMBER'], // Assign 'MEMBER' enum directly as an array
+        roles: ['MEMBER'],
+        isActive: false,
+        profileComplete: false,
       },
     });
 
-    // Do not return the password in the response
-    const { password: _, ...userWithoutPassword } = newUser;
+    const token = crypto.randomBytes(32).toString('hex');
+    const verificationToken = await prisma.verificationToken.create({
+      data: {
+        identifier: email,
+        token,
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+      },
+    });
 
-    return NextResponse.json(userWithoutPassword, { status: 201 });
+    console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
+    const verificationUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify-email?token=${token}`;
+
+    await sendMail({
+      from: process.env.EMAIL_FROM!,
+      to: email,
+      subject: 'Verify your email address',
+      html: `<p>Please click this link to verify your email address: <a href="${verificationUrl}">${verificationUrl}</a></p>`,
+    });
+
+    return NextResponse.json({ message: 'Registration successful. Please check your email to verify your account.' }, { status: 201 });
   } catch (error: any) {
     console.error('Registration error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

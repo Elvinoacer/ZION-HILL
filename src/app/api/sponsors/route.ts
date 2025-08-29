@@ -1,12 +1,15 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {
   try {
     const sponsors = await prisma.sponsor.findMany();
     return NextResponse.json(sponsors);
   } catch (error) {
-    return NextResponse.json({ error: 'Error fetching sponsors' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error fetching sponsors" },
+      { status: 500 }
+    );
   }
 }
 
@@ -16,17 +19,23 @@ export async function POST(request: Request) {
     const newSponsor = await prisma.sponsor.create({ data: body });
     return NextResponse.json(newSponsor, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Error creating sponsor' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error creating sponsor" },
+      { status: 500 }
+    );
   }
 }
 
 export async function PUT(request: Request) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
+  const id = searchParams.get("id");
   const body = await request.json();
 
   if (!id) {
-    return NextResponse.json({ error: 'Sponsor ID is required' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Sponsor ID is required" },
+      { status: 400 }
+    );
   }
 
   try {
@@ -36,22 +45,31 @@ export async function PUT(request: Request) {
     });
     return NextResponse.json(updatedSponsor);
   } catch (error) {
-    return NextResponse.json({ error: 'Error updating sponsor' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error updating sponsor" },
+      { status: 500 }
+    );
   }
 }
 
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
+  const id = searchParams.get("id");
 
   if (!id) {
-    return NextResponse.json({ error: 'Sponsor ID is required' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Sponsor ID is required" },
+      { status: 400 }
+    );
   }
 
   try {
     await prisma.sponsor.delete({ where: { id } });
-    return NextResponse.json({ message: 'Sponsor deleted successfully' });
+    return NextResponse.json({ message: "Sponsor deleted successfully" });
   } catch (error) {
-    return NextResponse.json({ error: 'Error deleting sponsor' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error deleting sponsor" },
+      { status: 500 }
+    );
   }
 }

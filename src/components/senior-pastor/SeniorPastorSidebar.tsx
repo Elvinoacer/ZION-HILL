@@ -16,22 +16,42 @@ import {
 
 const navItems = [
   {
-    href: "/senior-pastor",
+    href: "/senior_pastor/senior-pastor",
     label: "Senior Pastor Dashboard",
     icon: LayoutDashboard,
   },
-  { href: "/admin-dashboard", label: "Admin Dashboard", icon: Settings },
-  { href: "/baptism-candidates", label: "Baptism Candidates", icon: Users },
+  { href: "/senior_pastor/admin-dashboard", label: "Admin Dashboard", icon: Settings },
+  { href: "/senior_pastor/baptism-candidates", label: "Baptism Candidates", icon: Users },
   {
-    href: "/certificate-generator",
+    href: "/senior_pastor/certificate-generator",
     label: "Certificate Generator",
     icon: FileText,
   },
-  { href: "/certificates-view", label: "View Certificates", icon: Award },
+  { href: "/senior_pastor/certificates-view", label: "View Certificates", icon: Award },
   {
-    href: "/pastoralcare/dashboard",
+    href: "/senior_pastor/pastoralcare/dashboard",
     label: "Pastoral Care Dashboard",
     icon: HeartPulse,
+  },
+  {
+    href: "/senior_pastor/pastoral-care",
+    label: "Pastoral Care",
+    icon: HeartPulse,
+  },
+  {
+    href: "/senior_pastor/prayer-requests",
+    label: "Prayer Requests",
+    icon: HeartPulse,
+  },
+  {
+    href: "/senior_pastor/role-management",
+    label: "Role Management",
+    icon: Users,
+  },
+  {
+    href: "/senior_pastor/users",
+    label: "Users",
+    icon: Users,
   },
 ];
 

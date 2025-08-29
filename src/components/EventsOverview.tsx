@@ -4,28 +4,46 @@ import { Event } from "@/generated/prisma";
 import { useEventStore } from "@/store/eventStore";
 import { motion } from "framer-motion";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   CalendarDays,
   Check,
   ChevronRight,
   Clock,
+  Edit,
   MapPin,
   Plus,
+  Trash2,
   X,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import CreateEventModal from "./CreateEventModal";
 import Link from "next/link";
 
 interface EventsOverviewProps {
   events: Event[];
   currentUserId: string | undefined;
+  onEdit: (event: Event) => void;
+  onDelete: (id: string) => void;
 }
 
 export default function EventsOverview({
   events,
   currentUserId,
+  onEdit,
+  onDelete,
 }: EventsOverviewProps) {
   const { rsvpToEvent, fetchEvents } = useEventStore();
   const [activeTab, setActiveTab] = useState<"upcoming" | "past" | "my">(
@@ -283,7 +301,7 @@ export default function EventsOverview({
                       <div className="mt-auto">
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-xs font-medium text-gray-600">
-                            {event.attendees || 0}/{event.capacity || 0}{" "}
+                            {event.participants.length || 0}/{event.capacity || 0}{" "}
                             attending
                           </span>
                           <span className="text-xs font-medium text-indigo-600">
@@ -310,37 +328,47 @@ export default function EventsOverview({
                         </div>
                         <div className="flex space-x-3">
                           <motion.button
-                            onClick={() => handleRSVP(event.id, true)}
-                            className={`flex-1 flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 ${
-                              event.rsvp
-                                ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-200/50 hover:shadow-green-200/70"
-                                : "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 hover:from-gray-200 hover:to-gray-300"
-                            }`}
-                            aria-label={`Confirm attendance for ${event.title}`}
+                            onClick={() => onEdit(event)}
+                            className="flex-1 flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white"
+                            aria-label={`Edit ${event.title}`}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                           >
-                            <Check
-                              className="mr-1.5 h-4 w-4"
-                              aria-hidden="true"
-                            />
-                            {event.rsvp ? "Attending" : "RSVP"}
+                            <Edit className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                            Edit
                           </motion.button>
-                          {!event.rsvp && (
-                            <motion.button
-                              onClick={() => handleRSVP(event.id, false)}
-                              className="flex-1 flex items-center justify-center px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 rounded-lg text-sm font-medium hover:from-gray-200 hover:to-gray-300 transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2"
-                              aria-label={`Decline attendance for ${event.title}`}
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                            >
-                              <X
-                                className="mr-1.5 h-4 w-4"
-                                aria-hidden="true"
-                              />
-                              Decline
-                            </motion.button>
-                          )}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <motion.button
+                                className="flex-1 flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 bg-gradient-to-r from-red-500 to-red-600 text-white"
+                                aria-label={`Delete ${event.title}`}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                              >
+                                <Trash2 className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                                Delete
+                              </motion.button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Are you sure you want to delete this event?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete your event and remove its data from our servers.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => onDelete(event.id)}
+                                  className="bg-red-600 hover:bg-red-700"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </div>
                     )}
@@ -353,16 +381,49 @@ export default function EventsOverview({
                               Attendance:
                             </span>{" "}
                             <span className="text-indigo-600">
-                              {event.attendees || 0}
+                              {event.participants.length || 0}
                             </span>
                           </div>
-                          <Link
-                            href={`events/${event.id}`}
-                            className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center transition-colors"
-                          >
-                            View Details{" "}
-                            <ChevronRight className="ml-1 h-4 w-4" />
-                          </Link>
+                          <div className="flex items-center space-x-2">
+                            <Link
+                              href={`/events_manager/events-manager/dashboard/${event.id}`}
+                              className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center transition-colors"
+                            >
+                              View Details{" "}
+                              <ChevronRight className="ml-1 h-4 w-4" />
+                            </Link>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  aria-label="Delete event"
+                                  className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Are you sure you want to delete this event?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete your event and remove its data from our servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => onDelete(event.id)}
+                                    className="bg-red-600 hover:bg-red-700"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -378,10 +439,46 @@ export default function EventsOverview({
                               {event.role || "Attendee"}
                             </span>
                           </div>
-                          <button className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center transition-colors">
-                            View Details{" "}
-                            <ChevronRight className="ml-1 h-4 w-4" />
-                          </button>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => onEdit(event)}
+                              className="text-blue-600 hover:text-blue-800 font-medium flex items-center transition-colors"
+                            >
+                              <Edit className="mr-1.5 h-4 w-4" />
+                              Edit
+                            </button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  aria-label="Delete event"
+                                  className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Are you sure you want to delete this event?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete your event and remove its data from our servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => onDelete(event.id)}
+                                    className="bg-red-600 hover:bg-red-700"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -397,7 +494,7 @@ export default function EventsOverview({
         isOpen={showCreateEventModal}
         onClose={() => setShowCreateEventModal(false)}
         onEventCreated={fetchEvents}
-        disabledDates={disabledDates}
+        onEventUpdated={fetchEvents}
       />
     </motion.section>
   );

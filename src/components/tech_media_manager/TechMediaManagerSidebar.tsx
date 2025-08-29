@@ -8,8 +8,8 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { LayoutDashboard, Monitor, Globe } from "lucide-react";
 
 const navItems = [
-  { href: "/DigitalHubDashboard", label: "Digital Hub Dashboard", icon: Monitor },
-  { href: "/tech-media-manager", label: "Tech & Media Manager", icon: LayoutDashboard },
+  { href: "/tech_media_manager/DigitalHubDashboard", label: "Digital Hub Dashboard", icon: Monitor },
+  { href: "/tech_media_manager", label: "Tech & Media Manager", icon: LayoutDashboard },
 ];
 
 export default function TechMediaManagerSidebar() {

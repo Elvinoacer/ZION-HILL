@@ -31,32 +31,32 @@ const CommunicationsSidebar = ({
           <ul>
             <li>
               <Link
-                href="/communications-officer"
+                href="/communications_officer/communications-officer"
                 className="flex items-center p-4 hover:bg-sky-700"
                 onClick={onClose}
               >
-                <Newspaper className="mr-3" />
-                Blog
+                <LayoutDashboard className="mr-3" />
+                Dashboard
               </Link>
             </li>
             <li>
               <Link
-                href="/admin/newsletter"
+                href="/communications_officer/communications-officer/create-blog-post"
+                className="flex items-center p-4 hover:bg-sky-700"
+                onClick={onClose}
+              >
+                <Newspaper className="mr-3" />
+                Create Blog Post
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/communications_officer/admin/newsletter"
                 className="flex items-center p-4 hover:bg-sky-700"
                 onClick={onClose}
               >
                 <Megaphone className="mr-3" />
                 Newsletter
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/BrandEngagementHubDashboard"
-                className="flex items-center p-4 hover:bg-sky-700"
-                onClick={onClose}
-              >
-                <LayoutDashboard className="mr-3" />
-                (Future Dash)
               </Link>
             </li>
           </ul>

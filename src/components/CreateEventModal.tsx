@@ -897,6 +897,7 @@ interface CreateEventModalProps {
   onEventCreated: () => void;
   editingEvent?: Event;
   onEventUpdated: () => void;
+  eventTypeToLock?: EventType;
 }
 
 export default function CreateEventModal({
@@ -906,11 +907,12 @@ export default function CreateEventModal({
   onEventCreated,
   editingEvent,
   onEventUpdated,
+  eventTypeToLock,
 }: CreateEventModalProps) {
   const { createEvent, updateEvent } = useEventStore();
   const [newEventData, setNewEventData] = useState({
     title: editingEvent?.title || "",
-    type: editingEvent?.type || ("SERVICE" as EventType),
+    type: editingEvent?.type || eventTypeToLock || ("SERVICE" as EventType),
     date: editingEvent?.date
       ? format(new Date(editingEvent.date), "yyyy-MM-dd")
       : "",
@@ -944,54 +946,86 @@ export default function CreateEventModal({
   const [activeTab, setActiveTab] = useState("details");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleClose = () => {
+    onClose();
+    // Reset form state when closing without saving
+    if (isEditMode) {
+      // If editing, keep the editing data until explicitly cleared
+      return;
+    }
+    // Reset form for new events
+    setNewEventData({
+      title: "",
+      type: "SERVICE",
+      date: "",
+      location: "",
+      description: "",
+      image: "",
+      time: "",
+      ministryId: ministryId || "",
+      capacity: 0,
+      latitude: null,
+      longitude: null,
+    });
+    setSelectedImage(null);
+    setImagePreview(null);
+    setSearchQuery("");
+    setMarkerPosition(null);
+    setActiveTab("details"); // Ensure tab is reset
+  };
+
   const isEditMode = editingEvent && editingEvent.id;
 
   useEffect(() => {
-    if (editingEvent) {
-      setNewEventData({
-        title: editingEvent.title || "",
-        type: editingEvent.type || "SERVICE",
-        date: editingEvent.date
-          ? format(new Date(editingEvent.date), "yyyy-MM-dd")
-          : "",
-        location: editingEvent.location || "",
-        description: editingEvent.description || "",
-        image: editingEvent.imageUrl || "",
-        time: editingEvent.time || "",
-        ministryId: ministryId || editingEvent.ministryId || "",
-        capacity: editingEvent.capacity || 0,
-        latitude: editingEvent.latitude || null,
-        longitude: editingEvent.longitude || null,
-      });
-      setImagePreview(editingEvent.imageUrl || null);
-      setSearchQuery(editingEvent.location || "");
-      setMarkerPosition(
-        editingEvent.latitude && editingEvent.longitude
-          ? { lat: editingEvent.latitude, lng: editingEvent.longitude }
-          : null
-      );
-    } else {
-      // Reset form for new event creation
-      setNewEventData({
-        title: "",
-        type: "SERVICE",
-        date: "",
-        location: "",
-        description: "",
-        image: "",
-        time: "",
-        ministryId: ministryId || "",
-        capacity: 0,
-        latitude: null,
-        longitude: null,
-      });
-      setSelectedImage(null);
-      setImagePreview(null);
-      setSearchQuery("");
-      setMarkerPosition(null);
-      setActiveTab("details");
+    if (isOpen) {
+      // Check if modal is open first
+      if (editingEvent) {
+        // Then check if an event is being edited
+        setNewEventData({
+          title: editingEvent.title || "",
+          type: editingEvent.type || "SERVICE",
+          date: editingEvent.date
+            ? format(new Date(editingEvent.date), "yyyy-MM-dd")
+            : "",
+          location: editingEvent.location || "",
+          description: editingEvent.description || "",
+          image: editingEvent.imageUrl || "",
+          time: editingEvent.time || "",
+          ministryId: ministryId || editingEvent.ministryId || "",
+          capacity: editingEvent.capacity || 0,
+          latitude: editingEvent.latitude || null,
+          longitude: editingEvent.longitude || null,
+        });
+        setImagePreview(editingEvent.imageUrl || null);
+        setSearchQuery(editingEvent.location || "");
+        setMarkerPosition(
+          editingEvent.latitude && editingEvent.longitude
+            ? { lat: editingEvent.latitude, lng: editingEvent.longitude }
+            : null
+        );
+      } else {
+        // Reset form for new event creation when modal opens without an editingEvent
+        setNewEventData({
+          title: "",
+          type: eventTypeToLock || "SERVICE",
+          date: "",
+          location: "",
+          description: "",
+          image: "",
+          time: "",
+          ministryId: ministryId || "",
+          capacity: 0,
+          latitude: null,
+          longitude: null,
+        });
+        setSelectedImage(null);
+        setImagePreview(null);
+        setSearchQuery("");
+        setMarkerPosition(null);
+        setActiveTab("details");
+      }
     }
-  }, [editingEvent, isOpen, ministryId]);
+  }, [editingEvent, isOpen, ministryId, eventTypeToLock]);
 
   useEffect(() => {
     if (selectedImage) {
@@ -1242,7 +1276,7 @@ export default function CreateEventModal({
             aria-labelledby="create-event-heading"
           >
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-full p-1 transition-colors z-10"
               aria-label="Close modal"
             >
@@ -1331,7 +1365,9 @@ export default function CreateEventModal({
                             <button
                               key={option.value}
                               type="button"
+                              disabled={eventTypeToLock && option.value !== eventTypeToLock}
                               onClick={() =>
+                                !eventTypeToLock &&
                                 setNewEventData({
                                   ...newEventData,
                                   type: option.value as EventType,
@@ -1341,6 +1377,10 @@ export default function CreateEventModal({
                                 newEventData.type === option.value
                                   ? "border-blue-500 bg-blue-50 text-blue-700"
                                   : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                              } ${
+                                eventTypeToLock && option.value !== eventTypeToLock
+                                  ? "cursor-not-allowed opacity-50"
+                                  : ""
                               }`}
                             >
                               <span className="mr-2">{option.icon}</span>

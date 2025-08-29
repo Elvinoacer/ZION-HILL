@@ -50,16 +50,6 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
             </li>
             <li>
               <Link
-                href="/admin/kids-teens-resources"
-                className="flex items-center p-4 hover:bg-gray-700"
-                onClick={onClose}
-              >
-                <Users className="mr-3" />
-                Kids & Teens
-              </Link>
-            </li>
-            <li>
-              <Link
                 href="/admin/media"
                 className="flex items-center p-4 hover:bg-gray-700"
                 onClick={onClose}
@@ -70,12 +60,12 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
             </li>
             <li>
               <Link
-                href="/AdminCommandCenterDashboard"
+                href="/admin/institutions"
                 className="flex items-center p-4 hover:bg-gray-700"
                 onClick={onClose}
               >
-                <Home className="mr-3" />
-                (Future Dashboard)
+                <Users className="mr-3" />
+                Institutions
               </Link>
             </li>
           </ul>

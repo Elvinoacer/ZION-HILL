@@ -17,7 +17,7 @@ interface DonationState {
   fetchGateways: () => Promise<void>;
   fetchRecurringGifts: () => Promise<void>;
   createDonation: (donation: Omit<Transaction, "id">) => Promise<void>;
-  sendReceipt: (donationId: string, template: string) => Promise<void>;
+  
   scanReceipt: (transactionId: string) => Promise<void>;
   generateReport: (reportId: string) => Promise<void>;
   switchGateway: (gatewayId: string) => Promise<void>;
@@ -134,24 +134,7 @@ export const useDonationStore = create<DonationState>((set) => ({
     }
   },
 
-  sendReceipt: async (donationId, template) => {
-    set({ loading: true, error: null });
-    try {
-      const response = await fetch('/api/church-admin?type=send-receipt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ donationId, template }),
-      });
-      if (!response.ok) {
-        throw new Error(`Error sending receipt: ${response.statusText}`);
-      }
-      set({ loading: false });
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
-    }
-  },
+  
 
   scanReceipt: async (transactionId) => {
     set({ loading: true, error: null });
