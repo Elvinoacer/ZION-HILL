@@ -68,7 +68,7 @@ model User {
 
   attendedSessions          CounselingSession[]       @relation("Client")
   counselingSessions        CounselingSession[]       @relation("Counselor")
-  createFamily              Family?                   @relation("createdBy")
+  createdFamilies           Family[]                  @relation("createdBy")
   feedback                  Feedback[]
   ForumPost                 ForumPost[]
   ForumTopic                ForumTopic[]
@@ -228,7 +228,7 @@ enum BaptismStatus {
 model Family {
   id          String   @id @default(cuid())
   name        String
-  createdById String   @unique
+  createdById String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   createdBy   User     @relation("createdBy", fields: [createdById], references: [id])
