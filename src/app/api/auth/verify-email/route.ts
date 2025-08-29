@@ -1,6 +1,8 @@
+"use client";
+
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import * as jose from 'jose';
+import { encode } from 'next-auth/jwt';
 import { cookies } from 'next/headers';
 
 export async function GET(request: Request) {
@@ -17,6 +19,7 @@ export async function GET(request: Request) {
     });
 
     if (!verificationToken || new Date() > verificationToken.expires) {
+      await prisma.verificationToken.deleteMany({ where: { identifier: verificationToken?.identifier } });
       return NextResponse.redirect(new URL('/login?error=Invalid or expired token', request.url));
     }
 
@@ -40,34 +43,32 @@ export async function GET(request: Request) {
       where: { token },
     });
 
-    const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET);
-    const alg = 'HS256'
-
-    const jwt = await new jose.SignJWT({
+    const sessionToken = await encode({
+      secret: process.env.NEXTAUTH_SECRET!,
+      token: {
         id: user.id,
+        name: user.name,
         email: user.email,
         roles: user.roles,
-        name: user.name,
-        image: user.image,
-      })
-      .setProtectedHeader({ alg })
-      .setIssuedAt()
-      .setExpirationTime('30d')
-      .sign(secret);
+        photo: user.photo,
+        sub: user.id, // Subject, standard JWT claim
+      },
+    });
 
-    const cookieStore = cookies();
-    cookieStore.set('next-auth.session-token', jwt, {
+    const cookieName = process.env.NODE_ENV === 'production' 
+      ? '__Secure-next-auth.session-token' 
+      : 'next-auth.session-token';
+
+    cookies().set(cookieName, sessionToken, {
       httpOnly: true,
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
     });
 
-    // Redirect to the profile setup page
-    console.log('NEXTAUTH_URL in verify-email:', process.env.NEXTAUTH_URL);
-    const response = NextResponse.redirect(new URL('/setup-profile', request.url));
-
-    return response;
+    // Redirect to the profile setup page, which will now have a valid session
+    const redirectUrl = new URL('/setup-profile', request.url);
+    return NextResponse.redirect(redirectUrl);
 
   } catch (error) {
     console.error('Email verification error:', error);
