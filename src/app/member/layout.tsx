@@ -1,8 +1,8 @@
 "use client";
-import React from "react";
 import Sidebar from "@/components/Sidebar";
-import { FiHome, FiInfo, FiMail, FiMenu, FiUser } from "react-icons/fi";
 import { useSession } from "next-auth/react";
+import React from "react";
+import { FiMenu } from "react-icons/fi";
 
 export default function AuthenticatedLayout({
   children,
@@ -14,11 +14,13 @@ export default function AuthenticatedLayout({
   const { data: session } = useSession();
   const userRoles = session?.user?.roles || [];
 
-  const hasRequiredRole = userRoles.includes('MEMBER');
+  const hasRequiredRole = userRoles.includes("MEMBER");
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {hasRequiredRole && <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />}
+      {hasRequiredRole && (
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      )}
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="flex justify-between items-center p-4 bg-white border-b">
@@ -36,7 +38,7 @@ export default function AuthenticatedLayout({
 
           <div className="flex items-center space-x-4">
             <a
-              href="/profile"
+              href="/member/profile"
               className="flex items-center text-gray-600 hover:text-gray-900"
             >
               <img
