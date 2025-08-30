@@ -507,6 +507,5 @@ const ErrorDisplay = ({ message }: { message: string }) => (
     </DialogContent>
   </Dialog>
 );
-);
 
 export default TestimoniesWallPage;
