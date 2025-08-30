@@ -121,13 +121,6 @@ const SidebarContent = ({ setSidebarOpen }) => {
       path: "/member/bible-study",
       requiredRoles: ["MEMBER"],
     },
-
-    {
-      name: "Testimonials",
-      icon: <FaStar />,
-      path: "/member/testimonials",
-      requiredRoles: ["MEMBER"],
-    },
     {
       name: "Financial Support",
       icon: <FaHandHoldingUsd />,

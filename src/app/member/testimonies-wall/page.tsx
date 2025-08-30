@@ -13,6 +13,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 interface Testimony {
   id: string;
@@ -59,6 +69,14 @@ const TestimoniesWallPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentTestimony, setCurrentTestimony] =
+    useState<Testimony | null>(null);
+  const [editedComment, setEditedComment] = useState("");
+  const [editedImage, setEditedImage] = useState<File | null>(null);
+  const [editedImagePreview, setEditedImagePreview] = useState<string | null>(
+    null
+  );
 
   const fetchTestimonies = useCallback(async () => {
     try {
@@ -140,6 +158,76 @@ const TestimoniesWallPage = () => {
     }
   };
 
+  const handleDelete = async (testimonialId: string) => {
+    toast.warning("Are you sure you want to delete this testimonial?", {
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            await safeFetch(`/api/testimonies-wall?id=${testimonialId}`, {
+              method: "DELETE",
+            });
+            toast.success("Testimonial deleted successfully!");
+            fetchTestimonies();
+          } catch (err: any) {
+            toast.error("Failed to delete testimonial", {
+              description: err.message,
+            });
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+      },
+    });
+  };
+
+  const handleEditClick = (testimony: Testimony) => {
+    setCurrentTestimony(testimony);
+    setEditedComment(testimony.comment);
+    setEditedImage(null);
+    setEditedImagePreview(testimony.imageUrl || null);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentTestimony || !editedComment.trim()) {
+      toast.error("Testimonial comment cannot be empty.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      let imageUrl: string | undefined | null = currentTestimony.imageUrl;
+      if (editedImage) {
+        const formData = new FormData();
+        formData.append("file", editedImage);
+        const uploadRes = await fetch("/api/upload-image", {
+          method: "POST",
+          body: formData,
+        });
+        if (!uploadRes.ok) throw new Error("Failed to upload new image.");
+        const uploadData = await uploadRes.json();
+        imageUrl = uploadData.url;
+      } else if (editedImagePreview === null) {
+        imageUrl = null;
+      }
+
+      await safeFetch(`/api/testimonies-wall?id=${currentTestimony.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ comment: editedComment, imageUrl }),
+      });
+
+      toast.success("Testimonial updated successfully!");
+      setIsEditModalOpen(false);
+      fetchTestimonies();
+    } catch (err: any) {
+      toast.error("Failed to update testimonial", { description: err.message });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (loading) return <LoadingSkeleton />;
 
   return (
@@ -169,7 +257,7 @@ const TestimoniesWallPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {testimonies.map((testimony) => (
                             <motion.div key={testimony.id} layout initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.3 }}>
-                                <TestimonyCard testimony={testimony} />
+                                <TestimonyCard testimony={testimony} session={session} handleEditClick={handleEditClick} handleDelete={handleDelete} />
                             </motion.div>
                         ))}
                     </div>
@@ -179,6 +267,20 @@ const TestimoniesWallPage = () => {
             </AnimatePresence>
         </div>
       </div>
+      <EditTestimonialDialog
+        {
+...{
+          isEditModalOpen,
+          setIsEditModalOpen,
+          handleUpdate,
+          editedComment,
+          setEditedComment,
+          editedImagePreview,
+          handleFileChange,
+          setEditedImagePreview,
+          isSubmitting,
+        }}
+      />
     </div>
   );
 };
@@ -229,7 +331,7 @@ const SubmitTestimonyForm = ({ handleSubmit, newTestimony, setNewTestimony, imag
     </Card>
 );
 
-const TestimonyCard = ({ testimony }: { testimony: Testimony }) => (
+const TestimonyCard = ({ testimony, session, handleEditClick, handleDelete }: { testimony: Testimony, session: any, handleEditClick: any, handleDelete: any }) => (
     <Card className="h-full flex flex-col bg-white dark:bg-gray-800/50 rounded-2xl shadow-lg border border-gray-200/80 dark:border-gray-700/60 overflow-hidden transform hover:-translate-y-1.5 transition-transform duration-300 group">
         {testimony.imageUrl && (
             <div className="aspect-video w-full overflow-hidden">
@@ -254,6 +356,25 @@ const TestimonyCard = ({ testimony }: { testimony: Testimony }) => (
                     </p>
                 </div>
             </div>
+            {session?.user?.id === testimony.userId && (
+        <div className="mt-4 flex justify-end space-x-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleEditClick(testimony)}
+          >
+            <Edit className="h-4 w-4 mr-2" /> Edit
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-red-500 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50"
+            onClick={() => handleDelete(testimony.id)}
+          >
+            <Trash2 className="h-4 w-4 mr-2" /> Delete
+          </Button>
+        </div>
+      )}
         </CardContent>
     </Card>
 );
@@ -276,6 +397,89 @@ const ErrorDisplay = ({ message }: { message: string }) => (
             <CardContent><p className="text-red-500 dark:text-red-300">{message}</p></CardContent>
         </Card>
     </div>
+);
+
+const EditTestimonialDialog = ({
+  isEditModalOpen,
+  setIsEditModalOpen,
+  handleUpdate,
+  editedComment,
+  setEditedComment,
+  editedImagePreview,
+  handleFileChange,
+  setEditedImagePreview,
+  isSubmitting,
+}: any) => (
+  <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+    <DialogContent className="sm:max-w-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+      <DialogHeader>
+        <DialogTitle className="text-2xl font-bold">
+          Edit Your Testimonial
+        </DialogTitle>
+        <DialogDescription>
+          Make changes to your story. Click save when you're done.
+        </DialogDescription>
+      </DialogHeader>
+      <form
+        id="edit-testimonial-form"
+        onSubmit={handleUpdate}
+        className="space-y-4 pt-4"
+      >
+        <Textarea
+          value={editedComment}
+          onChange={(e) => setEditedComment(e.target.value)}
+          rows={5}
+          required
+          className="min-h-[120px] bg-gray-100 dark:bg-gray-700 border-0 focus:ring-2 focus:ring-yellow-500"
+        />
+        <Input
+          id="edit-image-upload"
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleFileChange(e, true)}
+          className="text-sm"
+        />
+        {editedImagePreview && (
+          <div className="relative group mt-2">
+            <img
+              src={editedImagePreview}
+              alt="Preview"
+              className="w-full h-auto rounded-lg shadow-md"
+            />
+            <Button
+              type="button"
+              variant="destructive"
+              size="icon"
+              className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => setEditedImagePreview(null)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+        <DialogFooter className="pt-4">
+          <DialogClose asChild>
+            <Button type="button" variant="outline">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
+          </Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
+  </Dialog>
 );
 
 export default TestimoniesWallPage;
