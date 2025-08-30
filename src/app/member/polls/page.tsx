@@ -156,35 +156,35 @@ export default function PollsPage() {
                       <form onSubmit={handleCreatePoll} className="space-y-6">
                         <div className="space-y-2">
                           <label htmlFor="pollTitle" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Poll Title</label>
-                          <Input id="pollTitle" type="text" placeholder="What question do you want to ask?" value={newPollTitle} onChange={(e) => setNewPollTitle(e.target.value)} required className="dark:bg-gray-700 dark:border-gray-600" />
+                          <Input id="pollTitle" type="text" placeholder="What question do you want to ask?" value={newPollTitle} onChange={(e) => setNewPollTitle(e.target.value)} required maxLength={150} className="dark:bg-gray-700 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500" />
                         </div>
 
                         <div className="space-y-2">
                           <label htmlFor="pollDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description (Optional)</label>
-                          <Textarea id="pollDescription" placeholder="Provide some context or details..." value={newPollDescription} onChange={(e) => setNewPollDescription(e.target.value)} rows={3} className="dark:bg-gray-700 dark:border-gray-600" />
+                          <Textarea id="pollDescription" placeholder="Provide some context or details..." value={newPollDescription} onChange={(e) => setNewPollDescription(e.target.value)} rows={3} maxLength={500} className="dark:bg-gray-700 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500" />
                         </div>
 
                         <div className="space-y-3">
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Options</label>
                           {newPollOptions.map((option, index) => (
                             <motion.div key={index} layout initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} className="flex items-center gap-2">
-                              <Input type="text" placeholder={`Option ${index + 1}`} value={option} onChange={(e) => handleOptionChange(index, e.target.value)} required className="flex-1 dark:bg-gray-700 dark:border-gray-600" />
+                              <Input type="text" placeholder={`Option ${index + 1}`} value={option} onChange={(e) => handleOptionChange(index, e.target.value)} required maxLength={100} className="flex-1 dark:bg-gray-700 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500" />
                               {newPollOptions.length > 2 && (
-                                <Button type="button" variant="ghost" size="icon" onClick={() => removeOption(index)} className="text-gray-400 hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-900/50">
+                                <Button type="button" variant="ghost" size="icon" onClick={() => removeOption(index)} className="text-gray-400 hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-full">
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               )}
                             </motion.div>
                           ))}
                            {newPollOptions.length < 5 && (
-                            <Button type="button" variant="outline" onClick={addOption} className="mt-2 border-dashed dark:border-gray-600 dark:text-gray-400">
+                            <Button type="button" variant="outline" onClick={addOption} className="mt-2 border-dashed dark:border-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50">
                                 <PlusCircle className="h-4 w-4 mr-2" /> Add Option
                             </Button>
                            )}
                         </div>
 
                         <div className="flex justify-end">
-                            <Button type="submit" disabled={isCreating} className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+                            <Button type="submit" disabled={isCreating} className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
                                 {isCreating ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Publishing...</> : <><CheckCircle className="h-4 w-4 mr-2" /> Publish Poll</>}
                             </Button>
                         </div>

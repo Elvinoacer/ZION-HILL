@@ -41,9 +41,12 @@ export const usePollStore = create<PollState>()(
         const data: Poll[] = await response.json();
         set(state => {
           state.polls = data;
-          // Rehydrate userVotes from fetched data if available (e.g., if user's vote is included)
-          // For simplicity, we'll assume userVotes are managed client-side after initial fetch
-          // or fetched separately if needed.
+          // Rehydrate userVotes from the fetched polls
+          data.forEach(poll => {
+            if (poll.votes && poll.votes.length > 0) {
+              state.userVotes[poll.id] = poll.votes[0].optionId;
+            }
+          });
         });
       } catch (error) {
         console.error('Error fetching polls:', error);

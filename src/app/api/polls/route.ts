@@ -6,11 +6,13 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 // GET /api/polls - Fetch all polls
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions);
+
     const polls = await prisma.poll.findMany({
       include: {
         options: {
           include: {
-            votes: true, // Include votes to count them
+            _count: { select: { votes: true } },
           },
         },
         createdBy: {
@@ -20,23 +22,18 @@ export async function GET() {
             email: true,
           },
         },
+        votes: {
+          where: {
+            userId: session?.user?.id,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
     });
 
-    const pollsWithVoteCounts = polls.map((poll) => ({
-      ...poll,
-      options: poll.options.map((option) => ({
-        ...option,
-        _count: {
-          votes: option.votes.length,
-        },
-      })),
-    }));
-
-    return NextResponse.json(pollsWithVoteCounts);
+    return NextResponse.json(polls);
   } catch (error) {
     console.error("Error fetching polls:", error);
     return NextResponse.json(
@@ -79,12 +76,21 @@ export async function POST(req: Request) {
           },
         },
         include: {
-          options: true,
+          options: {
+            include: {
+              _count: { select: { votes: true } },
+            },
+          },
           createdBy: {
             select: {
               id: true,
               name: true,
               email: true,
+            },
+          },
+          votes: {
+            where: {
+              userId: session.user.id,
             },
           },
         },

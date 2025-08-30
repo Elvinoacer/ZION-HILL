@@ -44,7 +44,7 @@ export default withAuth(
       );
 
       if (!hasRequiredRole) {
-        return NextResponse.redirect(new URL("/public/denied", req.url));
+        return NextResponse.redirect(new URL("/denied", req.url));
       }
     }
 
