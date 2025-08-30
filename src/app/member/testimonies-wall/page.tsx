@@ -94,6 +94,29 @@ const TestimoniesWallPage = () => {
     fetchTestimonies();
   }, [fetchTestimonies]);
 
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+      if (editedImagePreview) URL.revokeObjectURL(editedImagePreview);
+    };
+  }, [imagePreview, editedImagePreview]);
+
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    isEdit = false
+  ) => {
+    const file = e.target.files?.[0] || null;
+    if (isEdit) {
+      setEditedImage(file);
+      if (file) setEditedImagePreview(URL.createObjectURL(file));
+      else setEditedImagePreview(currentTestimony?.imageUrl || null);
+    } else {
+      setImageFile(file);
+      if (file) setImagePreview(URL.createObjectURL(file));
+      else setImagePreview(null);
+    }
+  };
+
   const handleImageUpload = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
