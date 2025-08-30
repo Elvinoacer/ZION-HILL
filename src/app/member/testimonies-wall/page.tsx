@@ -7,7 +7,7 @@ import { safeFetch } from "@/lib/api";
 import { useSession } from "next-auth/react";
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { FileImage, Loader2, Send, Quote, User, Calendar, Sparkles, Inbox, AlertCircle, X } from "lucide-react";
+import { FileImage, Loader2, Send, Quote, User, Calendar, Sparkles, Inbox, AlertCircle, X, Edit, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
