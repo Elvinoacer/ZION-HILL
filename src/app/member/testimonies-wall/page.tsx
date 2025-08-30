@@ -422,6 +422,17 @@ const ErrorDisplay = ({ message }: { message: string }) => (
     </div>
 );
 
+  const EditTestimonialDialog = ({
+  isEditModalOpen,
+  setIsEditModalOpen,
+  handleUpdate,
+  editedComment,
+  setEditedComment,
+  editedImagePreview,
+  handleFileChange,
+  setEditedImagePreview,
+  isSubmitting,
+}: any) => (
   <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
     <DialogContent className="sm:max-w-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 max-h-[90vh] flex flex-col">
       <DialogHeader>
@@ -495,6 +506,7 @@ const ErrorDisplay = ({ message }: { message: string }) => (
       </DialogFooter>
     </DialogContent>
   </Dialog>
+);
 );
 
 export default TestimoniesWallPage;
