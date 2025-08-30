@@ -422,19 +422,8 @@ const ErrorDisplay = ({ message }: { message: string }) => (
     </div>
 );
 
-const EditTestimonialDialog = ({
-  isEditModalOpen,
-  setIsEditModalOpen,
-  handleUpdate,
-  editedComment,
-  setEditedComment,
-  editedImagePreview,
-  handleFileChange,
-  setEditedImagePreview,
-  isSubmitting,
-}: any) => (
   <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-    <DialogContent className="sm:max-w-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+    <DialogContent className="sm:max-w-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 max-h-[90vh] flex flex-col">
       <DialogHeader>
         <DialogTitle className="text-2xl font-bold">
           Edit Your Testimonial
@@ -443,64 +432,67 @@ const EditTestimonialDialog = ({
           Make changes to your story. Click save when you're done.
         </DialogDescription>
       </DialogHeader>
-      <form
-        id="edit-testimonial-form"
-        onSubmit={handleUpdate}
-        className="space-y-4 pt-4"
-      >
-        <Textarea
-          value={editedComment}
-          onChange={(e) => setEditedComment(e.target.value)}
-          rows={5}
-          required
-          className="min-h-[120px] bg-gray-100 dark:bg-gray-700 border-0 focus:ring-2 focus:ring-yellow-500"
-        />
-        <Input
-          id="edit-image-upload"
-          type="file"
-          accept="image/*"
-          onChange={(e) => handleFileChange(e, true)}
-          className="text-sm"
-        />
-        {editedImagePreview && (
-          <div className="relative group mt-2">
-            <img
-              src={editedImagePreview}
-              alt="Preview"
-              className="w-full h-auto rounded-lg shadow-md"
-            />
-            <Button
-              type="button"
-              variant="destructive"
-              size="icon"
-              className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => setEditedImagePreview(null)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-        <DialogFooter className="pt-4">
-          <DialogClose asChild>
-            <Button type="button" variant="outline">
-              Cancel
-            </Button>
-          </DialogClose>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...
-              </>
-            ) : (
-              "Save Changes"
-            )}
+      <div className="flex-grow overflow-y-auto pr-4 -mr-4">
+        <form
+          id="edit-testimonial-form"
+          onSubmit={handleUpdate}
+          className="space-y-4 pt-4"
+        >
+          <Textarea
+            value={editedComment}
+            onChange={(e) => setEditedComment(e.target.value)}
+            rows={5}
+            required
+            className="min-h-[120px] bg-gray-100 dark:bg-gray-700 border-0 focus:ring-2 focus:ring-yellow-500"
+          />
+          <Input
+            id="edit-image-upload"
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleFileChange(e, true)}
+            className="text-sm"
+          />
+          {editedImagePreview && (
+            <div className="relative group mt-2 max-h-64 overflow-hidden rounded-lg">
+              <img
+                src={editedImagePreview}
+                alt="Preview"
+                className="w-full h-auto object-contain rounded-lg shadow-md"
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => setEditedImagePreview(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </form>
+      </div>
+      <DialogFooter className="pt-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
+        <DialogClose asChild>
+          <Button type="button" variant="outline">
+            Cancel
           </Button>
-        </DialogFooter>
-      </form>
+        </DialogClose>
+        <Button
+          type="submit"
+          form="edit-testimonial-form"
+          disabled={isSubmitting}
+          className="bg-yellow-500 hover:bg-yellow-600 text-white"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...
+            </>
+          ) : (
+            "Save Changes"
+          )}
+        </Button>
+      </DialogFooter>
     </DialogContent>
   </Dialog>
 );
