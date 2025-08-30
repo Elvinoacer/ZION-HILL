@@ -27,7 +27,6 @@ interface Message {
   sender: { name: string; image?: string };
   content: string;
   imageUrl?: string;
-  linkPreview?: any;
   createdAt: string;
 }
 
@@ -39,7 +38,6 @@ const ChatPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [totalMembers, setTotalMembers] = useState<number | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [linkPreview, setLinkPreview] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -88,35 +86,7 @@ const ChatPage = () => {
     }
   }, [newMessage]);
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      const urlRegex = /(https?:\/\/[^\s]+)/g;
-      const urls = newMessage.match(urlRegex);
-
-      if (urls && urls.length > 0) {
-        const fetchLinkPreview = async () => {
-          try {
-            const res = await fetch("/api/link-preview", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ url: urls[0] }),
-            });
-            const data = await res.json();
-            setLinkPreview(data);
-          } catch (error) {
-            console.error("Failed to fetch link preview", error);
-          }
-        };
-        fetchLinkPreview();
-      } else {
-        setLinkPreview(null);
-      }
-    }, 500);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [newMessage]);
+  
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -237,7 +207,6 @@ const ChatPage = () => {
 
       setNewMessage("");
       setPreviewUrl(null);
-      setLinkPreview(null);
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
       }
@@ -425,12 +394,11 @@ const ChatPage = () => {
 
           {/* Input Area */}
           <div className="p-3 md:p-4 border-t border-gray-200 bg-gray-50">
-            {(previewUrl || linkPreview) && (
+            {previewUrl && (
               <div className="mb-3 p-2 border rounded-lg relative bg-white shadow-sm">
                 <button
                   onClick={() => {
                     removePreview();
-                    setLinkPreview(null);
                   }}
                   className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors z-10"
                   aria-label="Remove preview"
@@ -456,30 +424,6 @@ const ChatPage = () => {
                     alt="Preview"
                     className="max-h-32 rounded-md mx-auto"
                   />
-                )}
-                {linkPreview && (
-                  <a
-                    href={linkPreview.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-3 p-2"
-                  >
-                    {linkPreview.images && linkPreview.images.length > 0 && (
-                      <img
-                        src={linkPreview.images[0]}
-                        alt={linkPreview.title}
-                        className="w-16 h-16 object-cover rounded-md"
-                      />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm truncate">
-                        {linkPreview.title}
-                      </p>
-                      <p className="text-xs text-gray-500 line-clamp-2">
-                        {linkPreview.description}
-                      </p>
-                    </div>
-                  </a>
                 )}
               </div>
             )}

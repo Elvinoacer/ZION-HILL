@@ -101,38 +101,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ msg, onDelete }) => {
 
         {/* Message content */}
         <div className="mt-2 text-base">
-          {msg.linkPreview ? (
-            <a
-              href={msg.linkPreview.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`block rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow duration-200 ${
-                isOwnMessage
-                  ? "bg-blue-400/20 hover:bg-blue-400/30"
-                  : "bg-gray-100 hover:bg-gray-200"
-              }`}
-            >
-              {msg.linkPreview.title && (
-                <p className="font-bold text-sm mb-1 line-clamp-2">
-                  {msg.linkPreview.title}
-                </p>
-              )}
-              {msg.linkPreview.description && (
-                <p className="text-xs sm:text-sm line-clamp-2">
-                  {msg.linkPreview.description}
-                </p>
-              )}
-              {msg.linkPreview.images && msg.linkPreview.images.length > 0 && (
-                <img
-                  src={msg.linkPreview.images[0]}
-                  alt={msg.linkPreview.title || "Link preview"}
-                  className="mt-2 rounded-md w-full max-h-40 object-cover"
-                />
-              )}
-            </a>
-          ) : (
-            <RichMessageContent content={msg.content} />
-          )}
+          <RichMessageContent content={msg.content} />
         </div>
 
         {/* Timestamp */}
