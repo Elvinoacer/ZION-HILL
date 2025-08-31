@@ -19,6 +19,7 @@ import {
   Star,
   Target,
   Eye,
+  MessageSquare,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -45,6 +46,8 @@ interface User {
   email: string | null;
   image?: string | null;
   role?: string;
+  description?: string;
+  whatsapp?: string;
 }
 
 const AboutPage = () => {
@@ -59,17 +62,15 @@ const AboutPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [themeRes, servicesRes, eventsRes, usersRes] = await Promise.all([
+        const [themeRes, servicesRes, eventsRes] = await Promise.all([
           fetch("/api/theme-of-the-week"),
           fetch("/api/services?type=SERVICE"),
           fetch("/api/events?type=EVENT&limit=3"),
-          fetch("/api/users"),
         ]);
 
         if (!themeRes.ok) throw new Error("Failed to fetch theme of the week");
         if (!servicesRes.ok) throw new Error("Failed to fetch services");
         if (!eventsRes.ok) throw new Error("Failed to fetch events");
-        if (!usersRes.ok) throw new Error("Failed to fetch users");
 
         const themes: Theme[] = await themeRes.json();
         setWeeklyTheme(themes.length > 0 ? themes[0] : null);
@@ -80,17 +81,45 @@ const AboutPage = () => {
         const eventsData: ServiceEvent[] = await eventsRes.json();
         setUpcomingEvents(eventsData);
 
-        const usersData: User[] = await usersRes.json();
-        const filteredLeaders = usersData
-          .filter(
-            (user) =>
-              user.name?.toLowerCase().includes("pastor") ||
-              user.name?.toLowerCase().includes("leader") ||
-              user.name?.toLowerCase().includes("coordinator") ||
-              user.email?.toLowerCase().includes("pastor")
-          )
-          .slice(0, 4);
-        setLeadership(filteredLeaders);
+        const hardcodedTeam = [
+          {
+            id: 'pastor-1',
+            name: 'Pastor John Doe',
+            email: 'pastor@example.com',
+            whatsapp: '1234567890',
+            image: 'https://randomuser.me/api/portraits/men/1.jpg',
+            role: 'Senior Pastor',
+            description: 'Leads the church with a heart for the community.',
+          },
+          {
+            id: 'leader-1',
+            name: 'Worship Leader Jane',
+            email: 'jane@example.com',
+            whatsapp: '1234567890',
+            image: 'https://randomuser.me/api/portraits/women/2.jpg',
+            role: 'Worship Leader',
+            description: 'Leads the congregation in worship every Sunday.',
+          },
+          {
+            id: 'coordinator-1',
+            name: 'Events Coordinator Mike',
+            email: 'mike@example.com',
+            whatsapp: '1234567890',
+            image: 'https://randomuser.me/api/portraits/men/3.jpg',
+            role: 'Events Coordinator',
+            description: 'Organizes all church events and activities.',
+          },
+          {
+            id: 'finance-1',
+            name: 'Finance Admin Sarah',
+            email: 'sarah@example.com',
+            whatsapp: '1234567890',
+            image: 'https://randomuser.me/api/portraits/women/4.jpg',
+            role: 'Finance Administrator',
+            description: 'Manages the church finances and budget.',
+          },
+        ];
+        setLeadership(hardcodedTeam);
       } catch (err: any) {
         setError(err.message);
         console.error("Error fetching data for About page:", err);
@@ -512,7 +541,7 @@ const AboutPage = () => {
         >
           <div className="text-center mb-8 sm:mb-10">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-2 sm:mb-4">
-              Our Leadership
+              Meet Our Team
             </h2>
             <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
               Dedicated servants guiding our church community
@@ -530,10 +559,14 @@ const AboutPage = () => {
                 >
                   <Card className="h-full text-center p-4 sm:p-6 border-slate-100 shadow-sm hover:shadow-md transition-all duration-300">
                     <CardHeader className="flex flex-col items-center p-0 mb-3 sm:mb-4">
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-blue-800 text-xl sm:text-2xl font-bold mb-3 sm:mb-4 ring-3 sm:ring-4 ring-white shadow-inner">
-                        {person.name?.charAt(0) ||
+                      <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-blue-800 text-3xl font-bold mb-3 sm:mb-4 ring-4 ring-white shadow-inner">
+                        {person.image ? (
+                          <img src={person.image} alt={person.name || ''} className="w-full h-full object-cover" />
+                        ) : (
+                          person.name?.charAt(0) ||
                           person.email?.charAt(0) ||
-                          "?"}
+                          "?"
+                        )}
                       </div>
                       <CardTitle className="text-lg sm:text-xl font-semibold text-slate-800">
                         {person.name || person.email}
@@ -543,6 +576,21 @@ const AboutPage = () => {
                       <p className="text-sm sm:text-base text-blue-600 font-medium">
                         {person.role || "Church Leader"}
                       </p>
+                      <p className="text-xs text-slate-500 mt-2">
+                        {person.description}
+                      </p>
+                      <div className="flex justify-center mt-4 space-x-2">
+                        <a href={`mailto:${person.email}`}>
+                          <Button variant="outline" size="icon">
+                            <Mail className="h-4 w-4" />
+                          </Button>
+                        </a>
+                        <a href={`https://wa.me/${person.whatsapp}`} target="_blank" rel="noopener noreferrer">
+                          <Button variant="outline" size="icon">
+                            <MessageSquare className="h-4 w-4" />
+                          </Button>
+                        </a>
+                      </div>
                     </CardContent>
                   </Card>
                 </motion.div>

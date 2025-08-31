@@ -44,6 +44,68 @@ async function main() {
     console.log(`Created role: ${role.name}`);
   }
 
+  // Create a Pastor
+  const pastor = await prisma.user.upsert({
+    where: { email: "pastor@example.com" },
+    update: {},
+    create: {
+      email: "pastor@example.com",
+      name: "Pastor John Doe",
+      password: "hashedpassword", // In a real app, hash this
+      phone: faker.phone.number(),
+      address: faker.location.streetAddress(),
+      membersince: faker.date.past().toISOString(),
+      birthdate: faker.date.past().toISOString(),
+      photo: faker.image.avatar(),
+      isActive: true,
+      roles: {
+        set: ["SENIOR_PASTOR"],
+      },
+    },
+  });
+  console.log(`Created pastor with id: ${pastor.id}`);
+
+  // Create Team Members
+  const teamMembers = [
+    {
+      email: "leader1@example.com",
+      name: "Worship Leader Jane",
+      roles: ["WORSHIP_LEADER"],
+    },
+    {
+      email: "coordinator1@example.com",
+      name: "Events Coordinator Mike",
+      roles: ["EVENTS_MANAGER"],
+    },
+    {
+      email: "finance@example.com",
+      name: "Finance Admin Sarah",
+      roles: ["FINANCE_ADMINISTRATOR"],
+    },
+  ];
+
+  for (const member of teamMembers) {
+    const newMember = await prisma.user.upsert({
+      where: { email: member.email },
+      update: {},
+      create: {
+        email: member.email,
+        name: member.name,
+        password: "hashedpassword",
+        phone: faker.phone.number(),
+        address: faker.location.streetAddress(),
+        membersince: faker.date.past().toISOString(),
+        birthdate: faker.date.past().toISOString(),
+        photo: faker.image.avatar(),
+        isActive: true,
+        roles: {
+          set: member.roles,
+        },
+      },
+    });
+    console.log(`Created team member with id: ${newMember.id}`);
+  }
+
   // Create Users
   const users = [];
   for (let i = 0; i < 10; i++) {
