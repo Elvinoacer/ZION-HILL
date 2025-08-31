@@ -6,13 +6,13 @@ import { motion } from 'framer-motion';
 import { ChevronRight, BookOpen, Menu, X } from 'lucide-react';
 
 const markdownContent = `
-# Grace Community Church Platform Documentation
+# K.A.G Church Platform Documentation
 
-Welcome to the comprehensive documentation for the Grace Community Church Platform. This document provides an overview of the platform's features, functionalities, and how different user roles can interact with it to foster spiritual growth, community engagement, and efficient church administration.
+Welcome to the comprehensive documentation for the K.A.G Church Platform. This document provides an overview of the platform's features, functionalities, and how different user roles can interact with it to foster spiritual growth, community engagement, and efficient church administration.
 
 ## 1. Introduction
 
-The Grace Community Church Platform is a holistic digital solution designed to connect, empower, and serve our church family and the wider community. It aims to streamline church operations, enhance member experience, facilitate spiritual development, and expand our outreach efforts through a user-friendly and feature-rich environment.
+The K.A.G Church Platform is a holistic digital solution designed to connect, empower, and serve our church family and the wider community. It aims to streamline church operations, enhance member experience, facilitate spiritual development, and expand our outreach efforts through a user-friendly and feature-rich environment.
 
 ## 2. Core Features
 
@@ -227,7 +227,7 @@ The platform leverages modern technologies to ensure a seamless and secure exper
 
 ## 6. Getting Started
 
-To begin using the Grace Community Church Platform:
+To begin using the K.A.G Church Platform:
 
 1. **Visit the Website:** Navigate to the main church website.
 2. **Sign Up/Login:** If you are a new user, create an account. Existing members can log in with their credentials.
@@ -324,7 +324,7 @@ const DocumentationPage: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-base md:text-lg lg:text-xl opacity-90 max-w-3xl mx-auto"
           >
-            Your comprehensive guide to understanding and utilizing the Grace Community Church Platform.
+            Your comprehensive guide to understanding and utilizing the K.A.G Church Platform.
           </motion.p>
         </div>
       </header>

@@ -68,7 +68,7 @@ const Header = () => {
             GC
           </div>
           <span className="ml-1 text-lg sm:text-xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600 whitespace-nowrap">
-            Grace Community
+            K.A.G
           </span>
         </Link>
 

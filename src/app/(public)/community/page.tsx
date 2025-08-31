@@ -37,7 +37,7 @@ const CommunityPage = () => {
             Find Your Community
           </h1>
           <p className="text-lg md:text-2xl mb-8 max-w-3xl mx-auto text-gray-300">
-            Life is better together. Discover the many ways to connect and build relationships at Grace Community.
+            Life is better together. Discover the many ways to connect and build relationships at K.A.G.
           </p>
         </div>
       </section>
