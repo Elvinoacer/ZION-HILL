@@ -119,7 +119,7 @@ const Header = () => {
           ) : (
             <Link
               href="/signup"
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-md hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md md:text-sm lg:text-base font-medium transform hover:scale-105"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-md hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md md:text-sm lg:text-base font-medium transform hover:scale-105 whitespace-nowrap"
             >
               Become a Member
             </Link>
