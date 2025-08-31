@@ -1,4 +1,5 @@
 "use client";
+import { churchConfig } from "@/lib/church-config";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,8 +21,8 @@ export default function CertificateGenerator() {
     dateOfEvent: "",
     eventName: "",
     pastorName: "",
-    churchName: "Grace Community Church",
-    churchLocation: "New York, NY",
+    churchName: churchConfig.name,
+    churchLocation: churchConfig.contact.address,
     certificateId: "",
     briefDescription:
       "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life. - John 3:16",

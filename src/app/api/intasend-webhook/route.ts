@@ -1,3 +1,4 @@
+import { churchConfig } from "@/lib/church-config";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -62,7 +63,7 @@ const sendDonationReceipt = async (donationDetails: {
             </div>
             
             <div style="background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #64748b;">
-              © ${new Date().getFullYear()} Our Church. All rights reserved.
+              © ${new Date().getFullYear()} {churchConfig.name}. All rights reserved.
             </div>
           </div>
         `,

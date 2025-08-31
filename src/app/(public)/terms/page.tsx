@@ -1,3 +1,4 @@
+import { churchConfig } from "@/lib/church-config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const TermsOfServicePage = () => {
@@ -21,20 +22,20 @@ const TermsOfServicePage = () => {
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
               You agree to use the website for lawful purposes only. You may not use the website
               in any way that could damage the website, the services, or the general business of
-              Grace Community Church.
+              {churchConfig.name}.
             </p>
 
             <h2 className="text-2xl font-bold mt-6 mb-4">Intellectual Property</h2>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
               All content on this website, including text, graphics, logos, and images, is the
-              property of Grace Community Church or its content suppliers and is protected by
+              property of {churchConfig.name} or its content suppliers and is protected by
               international copyright laws.
             </p>
 
             <h2 className="text-2xl font-bold mt-6 mb-4">Contact Us</h2>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
               If you have any questions about these Terms of Service, please contact us at:
-              info@gracecommunity.org
+              {churchConfig.contact.email}
             </p>
           </CardContent>
         </Card>

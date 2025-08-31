@@ -67,7 +67,6 @@ const AdminPrayerRequestsPage = () => {
   const [filteredRequests, setFilteredRequests] = useState<PrayerRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isAuthorized, setIsAuthorized] = useState(false);
   const [isInitiatingRoom, setIsInitiatingRoom] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -92,21 +91,13 @@ const AdminPrayerRequestsPage = () => {
   };
 
   useEffect(() => {
-    if (status === "loading") return;
-
     if (status === "authenticated") {
-      const userRoles = session?.user?.roles || [];
-      const hasPrayerManagerRole = userRoles.some(
-        (role: any) => role === "PRAYER_MANAGER"
-      );
-
-      setIsAuthorized(hasPrayerManagerRole);
       fetchPrayerRequests();
     } else if (status === "unauthenticated") {
       setError("You must be logged in to view this page.");
       setLoading(false);
     }
-  }, [status, session]);
+  }, [status]);
 
   useEffect(() => {
     let results = prayerRequests;
@@ -229,7 +220,7 @@ const AdminPrayerRequestsPage = () => {
     );
   }
 
-  if (error || !isAuthorized) {
+  if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
         <motion.div
@@ -239,11 +230,7 @@ const AdminPrayerRequestsPage = () => {
         >
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Error</h2>
-          <p className="text-gray-600 mb-6">
-            {!isAuthorized
-              ? "You are not authorized to view this page."
-              : error}
-          </p>
+          <p className="text-gray-600 mb-6">{error}</p>
           <Button
             onClick={() => window.location.reload()}
             className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"

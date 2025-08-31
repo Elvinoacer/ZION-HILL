@@ -6,6 +6,11 @@ import { cn } from "@/lib/utils";
 import { useSecretaryStore } from "@/store/secretaryStore";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { LayoutDashboard, Calendar, Inbox } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { FaUser } from "react-icons/fa";
+import { Icons } from "@/components/icons";
+import AlertDialog from "@/components/ui/AlertDialog";
+import { useState } from "react";
 
 const navItems = [
   { href: "/secretary", label: "Secretary Dashboard", icon: LayoutDashboard },
@@ -15,8 +20,84 @@ const navItems = [
 
 export default function SecretarySidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const userRoles = session?.user?.roles || [];
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  const handleLogout = () => {
+    signOut();
+  };
+
   const { sidebarCollapsed, mobileMenuOpen, closeMobileMenu } =
     useSecretaryStore();
+
+  const sidebarContent = (
+    <div className="flex flex-col h-full">
+      <div className="mb-4 p-4">
+        <h2
+          className={cn(
+            "text-lg font-semibold text-white",
+            sidebarCollapsed ? "hidden" : "block"
+          )}
+        >
+          Secretary
+        </h2>
+      </div>
+      <nav className="flex flex-col space-y-1 w-full flex-grow">
+        {navItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              "flex items-center px-3 py-2 rounded-md text-sm font-medium",
+              pathname === item.href
+                ? "bg-primary text-primary-foreground"
+                : "text-gray-300 hover:bg-gray-700 hover:text-white",
+              sidebarCollapsed ? "justify-center" : ""
+            )}
+          >
+            <item.icon
+              className={cn("h-6 w-6", sidebarCollapsed ? "" : "mr-3")}
+            />
+            <span className={cn(sidebarCollapsed ? "hidden" : "block")}>
+              {item.label}
+            </span>
+          </Link>
+        ))}
+      </nav>
+      <div className={cn("p-4 border-t border-gray-700", sidebarCollapsed ? "w-20" : "w-64")}>
+        <div className="flex items-center">
+          <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center border-2 border-gray-600 overflow-hidden flex-shrink-0">
+            {session?.user?.photo ? (
+              <img
+                src={session.user.photo}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <FaUser className="text-gray-400 text-4xl" />
+            )}
+          </div>
+          <div className={cn("ml-3 flex-1", sidebarCollapsed ? "hidden" : "block")}>
+            <div className="font-semibold text-white truncate">
+              {session?.user?.name || "Guest"}
+            </div>
+            <div className="text-xs text-gray-400 capitalize truncate">
+              {userRoles.map((role) => role.replace(/_/g, " ")).join(", ") ||
+                "Public User"}
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={() => setIsLogoutModalOpen(true)}
+          className={cn("w-full flex items-center justify-center mt-4 p-2 rounded-lg bg-red-600/10 text-red-500 hover:bg-red-600/20 hover:text-red-400 transition-all", sidebarCollapsed ? "hidden" : "block")}
+        >
+          <Icons.logout className="mr-2 h-4 w-4" />
+          <span>Log Out</span>
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -26,67 +107,26 @@ export default function SecretarySidebar() {
           <SheetTitle id="secretary-sidebar-title" className="sr-only">
             Secretary Navigation
           </SheetTitle>
-          <nav className="flex flex-col p-4 space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center px-3 py-2 rounded-md text-sm font-medium",
-                  pathname === item.href
-                    ? "bg-primary text-primary-foreground"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                )}
-                onClick={closeMobileMenu}
-              >
-                <item.icon className="h-6 w-6 mr-3" />
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+          {sidebarContent}
         </SheetContent>
       </Sheet>
 
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "hidden md:flex flex-col bg-gray-800 border-r border-gray-700 h-screen sticky top-0 p-4 transition-all duration-300",
+          "hidden md:flex flex-col bg-gray-800 border-r border-gray-700 h-screen sticky top-0 transition-all duration-300",
           sidebarCollapsed ? "w-20 items-center" : "w-64"
         )}
       >
-        <div className="mb-4">
-          <h2
-            className={cn(
-              "text-lg font-semibold text-white",
-              sidebarCollapsed ? "hidden" : "block"
-            )}
-          >
-            Secretary
-          </h2>
-        </div>
-        <nav className="flex flex-col space-y-1 w-full">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center px-3 py-2 rounded-md text-sm font-medium",
-                pathname === item.href
-                  ? "bg-primary text-primary-foreground"
-                  : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                sidebarCollapsed ? "justify-center" : ""
-              )}
-            >
-              <item.icon
-                className={cn("h-6 w-6", sidebarCollapsed ? "" : "mr-3")}
-              />
-              <span className={cn(sidebarCollapsed ? "hidden" : "block")}>
-                {item.label}
-              </span>
-            </Link>
-          ))}
-        </nav>
+        {sidebarContent}
       </aside>
+      <AlertDialog
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogout}
+        title="Are you sure you want to log out?"
+        description="You will be returned to the login page."
+      />
     </>
   );
 }

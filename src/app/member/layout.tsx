@@ -1,4 +1,5 @@
 "use client";
+import { churchConfig } from "@/lib/church-config";
 import Sidebar from "@/components/Sidebar";
 import { useSession } from "next-auth/react";
 import React from "react";
@@ -32,7 +33,7 @@ export default function AuthenticatedLayout({
               <FiMenu size={24} />
             </button>
             <h1 className="text-2xl font-semibold text-gray-800 ml-4">
-              ChurchConnect
+              {churchConfig.name}
             </h1>
           </div>
 

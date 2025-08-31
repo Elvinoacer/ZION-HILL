@@ -1,4 +1,5 @@
 "use client";
+import { churchConfig } from "@/lib/church-config";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -101,10 +102,8 @@ const AboutPage = () => {
     fetchData();
   }, []);
 
-  const missionStatement =
-    "Our mission is to glorify God by making disciples of Jesus Christ who love God, love others, and serve the world. We are committed to fostering a vibrant community where faith is nurtured, lives are transformed, and God's love is shared abundantly.";
-  const visionStatement =
-    "To be a beacon of hope and transformation, impacting our city and beyond with the message of Christ's love and grace.";
+  const missionStatement = churchConfig.mission;
+  const visionStatement = churchConfig.vision;
 
   const values = [
     {
@@ -214,7 +213,7 @@ const AboutPage = () => {
             <div className="max-w-4xl space-y-4 sm:space-y-6">
               <Church className="h-10 w-10 sm:h-12 sm:w-12 text-white mx-auto opacity-90" />
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-2 sm:mb-4 leading-tight">
-                Welcome to Our Church Family
+                Welcome to {churchConfig.name}
               </h1>
               <p className="text-lg sm:text-xl text-blue-100 mb-4 sm:mb-8 max-w-2xl mx-auto">
                 Where faith grows, hope shines, and love connects.
@@ -604,7 +603,7 @@ const AboutPage = () => {
           </p>
           <div className="inline-flex items-center gap-2 sm:gap-3 text-blue-600 bg-blue-50 px-4 sm:px-6 py-3 sm:py-4 rounded-xl">
             <Mail size={20} />
-            <p className="text-base sm:text-lg font-medium">info@ourchurch.org</p>
+            <p className="text-base sm:text-lg font-medium">{churchConfig.contact.email}</p>
           </div>
           <p className="text-slate-400 text-xs sm:text-sm mt-4 sm:mt-6">
             We typically respond within 24 hours

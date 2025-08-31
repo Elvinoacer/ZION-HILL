@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "sonner";
+import { churchConfig } from "@/lib/church-config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,20 +15,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Replace these with your actual church information
-const CHURCH_NAME = "Grace Community Church";
-const CHURCH_TAGLINE = "Growing in faith, serving in love, shining God's light";
-const CHURCH_DESCRIPTION =
-  "Join our vibrant Christian community for worship, fellowship, and spiritual growth. Experience meaningful connections and transformative faith at Grace Community Church.";
 const BASE_URL = "https://church-web-v2.vercel.app"; // Replace with your actual domain
 const PREVIEW_IMAGE_URL = `${BASE_URL}/images/church-image.png`; // Create this image (1200x630px recommended)
 
 export const metadata: Metadata = {
   title: {
-    default: CHURCH_NAME,
-    template: `%s | ${CHURCH_NAME}`,
+    default: churchConfig.name,
+    template: `%s | ${churchConfig.name}`,
   },
-  description: CHURCH_DESCRIPTION,
+  description: churchConfig.mission,
 
   keywords: [
     "church",
@@ -39,24 +35,24 @@ export const metadata: Metadata = {
     "prayer",
     "fellowship",
   ],
-  authors: [{ name: CHURCH_NAME }],
-  creator: CHURCH_NAME,
-  publisher: CHURCH_NAME,
+  authors: [{ name: churchConfig.name }],
+  creator: churchConfig.name,
+  publisher: churchConfig.name,
 
   // Open Graph for Facebook, WhatsApp, LinkedIn, etc.
   openGraph: {
     type: "website",
     locale: "en_US",
     url: BASE_URL,
-    siteName: CHURCH_NAME,
-    title: CHURCH_NAME,
-    description: CHURCH_DESCRIPTION,
+    siteName: churchConfig.name,
+    title: churchConfig.name,
+    description: churchConfig.mission,
     images: [
       {
         url: PREVIEW_IMAGE_URL,
         width: 1200,
         height: 630,
-        alt: `${CHURCH_NAME} - ${CHURCH_TAGLINE}`,
+        alt: `${churchConfig.name} - ${churchConfig.vision}`,
       },
     ],
   },
@@ -64,10 +60,10 @@ export const metadata: Metadata = {
   // Twitter Card
   twitter: {
     card: "summary_large_image",
-    title: CHURCH_NAME,
-    description: CHURCH_DESCRIPTION,
+    title: churchConfig.name,
+    description: churchConfig.mission,
     images: [PREVIEW_IMAGE_URL],
-    creator: "@yourchurchhandle", // Replace with your church's Twitter handle
+    creator: churchConfig.socials.twitter,
   },
 
   // Additional metadata
@@ -89,7 +85,7 @@ export const metadata: Metadata = {
   // Icons
   icons: {
     icon: [
-      { url: "/church-init.svg" },
+      { url: churchConfig.logo },
       { url: "/images/church-image.png", sizes: "16x16", type: "image/png" },
       { url: "/images/church-image.png", sizes: "32x32", type: "image/png" },
     ],
@@ -97,7 +93,7 @@ export const metadata: Metadata = {
     other: [
       {
         rel: "mask-icon",
-        url: "/church-init.svg",
+        url: churchConfig.logo,
         color: "#5bbad5",
       },
     ],
@@ -140,7 +136,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#1a365d" />
 
         {/* Apple specific meta tags */}
-        <meta name="apple-mobile-web-app-title" content={CHURCH_NAME} />
+        <meta name="apple-mobile-web-app-title" content={churchConfig.name} />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>

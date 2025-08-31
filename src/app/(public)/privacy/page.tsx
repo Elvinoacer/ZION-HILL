@@ -1,3 +1,4 @@
+import { churchConfig } from "@/lib/church-config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const PrivacyPolicyPage = () => {
@@ -13,7 +14,7 @@ const PrivacyPolicyPage = () => {
 
             <h2 className="text-2xl font-bold mt-6 mb-4">Introduction</h2>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              Welcome to Grace Community Church. We are committed to protecting your privacy.
+              Welcome to {churchConfig.name}. We are committed to protecting your privacy.
               This Privacy Policy explains how we collect, use, disclose, and safeguard your
               information when you visit our website.
             </p>
@@ -39,7 +40,7 @@ const PrivacyPolicyPage = () => {
             <h2 className="text-2xl font-bold mt-6 mb-4">Contact Us</h2>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
               If you have any questions about this Privacy Policy, please contact us at:
-              info@gracecommunity.org
+              {churchConfig.contact.email}
             </p>
           </CardContent>
         </Card>

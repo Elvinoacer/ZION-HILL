@@ -1,4 +1,5 @@
 "use client";
+import { churchConfig } from "@/lib/church-config";
 
 import { safeFetch } from "@/lib/api";
 import Head from "next/head"; // Keep Head for meta tags
@@ -75,10 +76,10 @@ const HomePage = () => {
   return (
     <>
       <Head>
-        <title>Grace Community Church | Welcome Home</title>
+        <title>{churchConfig.name} | Welcome Home</title>
         <meta
           name="description"
-          content="Join our loving church community for worship, fellowship, and spiritual growth"
+          content={churchConfig.vision}
         />
       </Head>
 
@@ -188,7 +189,7 @@ const HomePage = () => {
             id="hero-heading"
             className="text-4xl md:text-6xl font-bold mb-6 glow-text bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600"
           >
-            Welcome to Grace Community
+            Welcome to {churchConfig.name}
           </h1>
           <p className="text-lg md:text-2xl mb-8 max-w-3xl mx-auto animate-fade-in text-gray-300">
             A loving church family where you can grow in faith and serve with
@@ -229,9 +230,7 @@ const HomePage = () => {
             ></span>
           </h2>
           <p className="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            To spread the love of God, foster spiritual growth, and serve our
-            community with compassion and dedication. We believe in building
-            meaningful relationships that reflect Christ's love to the world.
+            {churchConfig.mission}
           </p>
         </section>
 

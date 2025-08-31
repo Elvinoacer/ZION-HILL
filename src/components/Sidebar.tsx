@@ -1,4 +1,5 @@
 "use client";
+import { churchConfig } from "@/lib/church-config";
 import { Icons } from "@/components/icons";
 import { AnimatePresence, motion } from "framer-motion";
 import { Award, LayoutDashboardIcon } from "lucide-react";
@@ -36,6 +37,7 @@ import {
   FaPoll,
   FaQuoteRight,
 } from "react-icons/fa";
+import AlertDialog from "@/components/ui/AlertDialog";
 
 const SidebarContent = ({ setSidebarOpen }) => {
   const pathname = usePathname();
@@ -315,6 +317,12 @@ const SidebarContent = ({ setSidebarOpen }) => {
     },
   ];
 
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  const handleLogout = () => {
+    signOut();
+  };
+
   const NavItem = ({ item, setSidebarOpen }) => (
     <motion.li whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
       <Link
@@ -362,7 +370,7 @@ const SidebarContent = ({ setSidebarOpen }) => {
       <div className="flex items-center justify-between p-4 border-b border-gray-800">
         <div className="text-xl font-bold flex items-center text-white">
           <Icons.logo className="mr-2 h-6 w-6 text-blue-500" />
-          <span>ChurchConnect</span>
+          <span>{churchConfig.name}</span>
         </div>
         <button
           onClick={() => setSidebarOpen(false)}
@@ -392,34 +400,43 @@ const SidebarContent = ({ setSidebarOpen }) => {
 
       <div className="p-4 border-t border-gray-800">
         <div className="flex items-center">
-          <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
+          <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center border-2 border-gray-700 overflow-hidden flex-shrink-0">
             {session?.user?.photo ? (
               <img
                 src={session.user.photo}
                 alt="Profile"
-                className="rounded-full"
+                className="w-full h-full object-cover"
               />
             ) : (
-              <FaUser className="text-gray-400" />
+              <FaUser className="text-gray-400 text-4xl" />
             )}
           </div>
-          <div className="ml-3">
-            <div className="font-medium text-white">
+          <div className="ml-3 flex-1">
+            <div className="font-semibold text-white truncate">
               {session?.user?.name || "Guest"}
             </div>
-            <div className="text-xs text-gray-400 mb-2">
+            <div className="text-xs text-gray-400 capitalize truncate">
               {userRoles.map((role) => role.replace(/_/g, " ")).join(", ") ||
                 "Public User"}
             </div>
-            <button
-              onClick={() => signOut()}
-              className="w-full text-left text-sm text-red-400 hover:text-red-300 transition-colors"
-            >
-              Log Out
-            </button>
           </div>
         </div>
+        <button
+          onClick={() => setIsLogoutModalOpen(true)}
+          className="w-full flex items-center justify-center mt-4 p-2 rounded-lg bg-red-600/10 text-red-500 hover:bg-red-600/20 hover:text-red-400 transition-all"
+        >
+          <Icons.logout className="mr-2 h-4 w-4" />
+          <span>Log Out</span>
+        </button>
       </div>
+
+      <AlertDialog
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogout}
+        title="Are you sure you want to log out?"
+        description="You will be returned to the login page."
+      />
     </div>
   );
 };

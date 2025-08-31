@@ -1,3 +1,4 @@
+import { churchConfig } from "@/lib/church-config";
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { z } from "zod";
@@ -85,7 +86,7 @@ const generateReceiptHtml = (donation: z.infer<typeof sendReceiptSchema>) => {
         </p>
         <div style="text-align: center; font-size: 12px; color: #777; margin-top: 20px;">
           <p>This is an automated receipt. No tax advice is provided in this email.</p>
-          <p>&copy; ${new Date().getFullYear()} Your Church Name. All rights reserved.</p>
+          <p>&copy; ${new Date().getFullYear()} {churchConfig.name}. All rights reserved.</p>
         </div>
       </div>
     </div>
@@ -110,7 +111,7 @@ export async function POST(req: NextRequest) {
     const mailOptions = {
       from: process.env.EMAIL_FROM,
       to: donorEmail,
-      subject: "Donation Receipt from Your Church Name",
+      subject: `Donation Receipt from ${churchConfig.name}`,
       html: htmlContent,
     };
 

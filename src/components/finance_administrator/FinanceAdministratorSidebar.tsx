@@ -3,6 +3,11 @@
 import { motion } from 'framer-motion';
 import { PiggyBank, DollarSign, PieChart, FileText, CreditCard, HandHeart, ListPlus, Settings, User, Search } from 'lucide-react';
 import { useFinanceDashboardStore } from '@/store/financeDashboardStore';
+import { useSession, signOut } from "next-auth/react";
+import { FaUser } from "react-icons/fa";
+import { Icons } from "@/components/icons";
+import AlertDialog from "@/components/ui/AlertDialog";
+import { useState } from "react";
 
 
 const theme = {
@@ -59,6 +64,13 @@ const sections = [
 ];
 
 const FinanceAdministratorSidebar = () => {
+  const { data: session } = useSession();
+  const userRoles = session?.user?.roles || [];
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  const handleLogout = () => {
+    signOut();
+  };
   
   const { 
     sidebarCollapsed, 
@@ -79,7 +91,7 @@ const FinanceAdministratorSidebar = () => {
     <motion.div
       className={`fixed z-40 ${
         sidebarCollapsed ? "w-20" : "w-64"
-      } h-screen bg-white shadow-lg transition-all duration-300 ease-in-out`}
+      } h-screen bg-white shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
       initial={{ x: -300 }}
       animate={{
         x: mobileMenuOpen ? 0 : (typeof window !== 'undefined' && window.innerWidth >= 768 ? 0 : -300),
@@ -116,7 +128,7 @@ const FinanceAdministratorSidebar = () => {
         </div>
       )}
 
-      <nav className="mt-4 overflow-y-auto h-[calc(100vh-120px)]">
+      <nav className="mt-4 overflow-y-auto flex-grow">
         {filteredSections.map((section) => (
           <motion.button
             key={section.id}
@@ -154,18 +166,53 @@ const FinanceAdministratorSidebar = () => {
         ))}
       </nav>
 
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
-        <div className="flex items-center justify-between">
-          <button className="p-2 rounded-full hover:bg-gray-100">
-            <Settings className="h-5 w-5 text-gray-600" />
-          </button>
-          <button className="p-2 rounded-full hover:bg-gray-100">
-            <User className="h-5 w-5 text-gray-600" />
-          </button>
+      <div className="p-4 border-t border-gray-200">
+        <div className="flex items-center">
+          <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center border-2 border-gray-600 overflow-hidden flex-shrink-0">
+            {session?.user?.photo ? (
+              <img
+                src={session.user.photo}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <FaUser className="text-gray-400 text-4xl" />
+            )}
+          </div>
+          {!sidebarCollapsed && (
+            <div className="ml-3 flex-1">
+              <div className="font-semibold text-gray-800 truncate">
+                {session?.user?.name || "Guest"}
+              </div>
+              <div className="text-xs text-gray-500 capitalize truncate">
+                {userRoles.map((role) => role.replace(/_/g, " ")).join(", ") ||
+                  "Public User"}
+              </div>
+            </div>
+          )}
         </div>
+        {!sidebarCollapsed && (
+          <button
+            onClick={() => setIsLogoutModalOpen(true)}
+            className="w-full flex items-center justify-center mt-4 p-2 rounded-lg bg-red-600/10 text-red-500 hover:bg-red-600/20 hover:text-red-400 transition-all"
+          >
+            <Icons.logout className="mr-2 h-4 w-4" />
+            <span>Log Out</span>
+          </button>
+        )}
       </div>
+      <AlertDialog
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogout}
+        title="Are you sure you want to log out?"
+        description="You will be returned to the login page."
+      />
     </motion.div>
   );
 };
+
+export default FinanceAdministratorSidebar;
+
 
 export default FinanceAdministratorSidebar;

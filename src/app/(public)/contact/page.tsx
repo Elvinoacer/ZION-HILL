@@ -1,4 +1,5 @@
 "use client";
+import { churchConfig } from "@/lib/church-config";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -141,7 +142,7 @@ const ContactPage = () => {
                 <Church className="h-10 w-10 sm:h-12 sm:w-12 text-white mx-auto" />
               </motion.div>
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-2 sm:mb-4 leading-tight">
-                Connect With Our Church
+                Connect With {churchConfig.name}
               </h1>
               <p className="text-base sm:text-xl text-blue-100 mb-4 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
                 We're here to answer your questions, listen to your needs, and
@@ -188,7 +189,7 @@ const ContactPage = () => {
                     <h3 className="text-lg sm:text-xl font-semibold text-slate-800">
                       Email Us
                     </h3>
-                    <p className="text-sm sm:text-base text-slate-600">info@ourchurch.org</p>
+                    <p className="text-sm sm:text-base text-slate-600">{churchConfig.contact.email}</p>
                   </div>
                 </motion.div>
 
@@ -205,7 +206,7 @@ const ContactPage = () => {
                     <h3 className="text-lg sm:text-xl font-semibold text-slate-800">
                       Call Us
                     </h3>
-                    <p className="text-sm sm:text-base text-slate-600">(123) 456-7890</p>
+                    <p className="text-sm sm:text-base text-slate-600">{churchConfig.contact.phone}</p>
                   </div>
                 </motion.div>
 
@@ -223,7 +224,7 @@ const ContactPage = () => {
                       Visit Us
                     </h3>
                     <p className="text-sm sm:text-base text-slate-600">
-                      123 Church St, City, State, 12345
+                      {churchConfig.contact.address}
                     </p>
                   </div>
                 </motion.div>
@@ -265,7 +266,7 @@ const ContactPage = () => {
               <div className="flex space-x-3 sm:space-x-5 justify-center lg:justify-start">
                 <motion.a
                   whileHover={{ scale: 1.1, y: -3 }}
-                  href="https://facebook.com/yourchurch"
+                  href={churchConfig.socials.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-blue-100 p-2 sm:p-3 rounded-full text-blue-700 hover:bg-blue-200 transition-colors"
@@ -274,7 +275,7 @@ const ContactPage = () => {
                 </motion.a>
                 <motion.a
                   whileHover={{ scale: 1.1, y: -3 }}
-                  href="https://twitter.com/yourchurch"
+                  href={churchConfig.socials.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-sky-100 p-2 sm:p-3 rounded-full text-sky-500 hover:bg-sky-200 transition-colors"
@@ -283,7 +284,7 @@ const ContactPage = () => {
                 </motion.a>
                 <motion.a
                   whileHover={{ scale: 1.1, y: -3 }}
-                  href="https://instagram.com/yourchurch"
+                  href={churchConfig.socials.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-pink-100 p-2 sm:p-3 rounded-full text-pink-500 hover:bg-pink-200 transition-colors"
@@ -292,7 +293,7 @@ const ContactPage = () => {
                 </motion.a>
                 <motion.a
                   whileHover={{ scale: 1.1, y: -3 }}
-                  href="https://youtube.com/yourchurch"
+                  href={churchConfig.socials.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-red-100 p-2 sm:p-3 rounded-full text-red-600 hover:bg-red-200 transition-colors"
@@ -518,9 +519,9 @@ const ContactPage = () => {
                 <Popup>
                   <div className="text-center p-1 sm:p-2">
                     <Church className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 mx-auto mb-1 sm:mb-2" />
-                    <strong className="text-sm sm:text-base">Our Church Location</strong>
+                    <strong className="text-sm sm:text-base">{churchConfig.name}</strong>
                     <br />
-                    <span className="text-xs sm:text-sm">123 Church St, City, State, 12345</span>
+                    <span className="text-xs sm:text-sm">{churchConfig.contact.address}</span>
                   </div>
                 </Popup>
               </Marker>

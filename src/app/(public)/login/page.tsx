@@ -1,4 +1,5 @@
 "use client";
+import { churchConfig } from "@/lib/church-config";
 
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -64,7 +65,7 @@ const LoginPage = () => {
         <Card className="bg-white shadow-xl rounded-2xl border border-gray-100">
           <CardHeader className="pb-4">
             <CardTitle className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-blue-600 to-purple-500 bg-clip-text text-transparent">
-              Login to ChurchConnect
+              Login to {churchConfig.name}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6 sm:p-8">
