@@ -8,6 +8,7 @@ interface ChurchTeamMember {
   role: string;
   image: StaticImageData | string;
 }
+//
 
 interface ChurchConfig {
   name: string;
@@ -34,7 +35,7 @@ interface ChurchConfig {
 export const churchConfig: ChurchConfig = {
   name: "Kenya Assemblies of God",
   fullName: "Kenya Assemblies of God - Central Church",
-  logo: "/church-init.svg",
+  logo: "/images/church-image.png",
   mission:
     "To be a Christ-centered, Holy Spirit-filled, and mission-oriented church that transforms communities.",
   vision:
