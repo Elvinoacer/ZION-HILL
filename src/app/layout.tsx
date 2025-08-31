@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const BASE_URL = "https://church-web-v2.vercel.app"; // Replace with your actual domain
+const BASE_URL = "https://kenya-assemblies-of-god.vercel.app"; // Replace with your actual domain
 const PREVIEW_IMAGE_URL = `${BASE_URL}/images/church-image.png`; // Create this image (1200x630px recommended)
 
 export const metadata: Metadata = {
