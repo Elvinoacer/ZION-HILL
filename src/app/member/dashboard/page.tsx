@@ -527,7 +527,7 @@ const DashboardPage = () => {
                 </div>
               )}
               <div className="mt-4">
-                <Link href="/counseling-request">
+                <Link href="/member/counseling-request">
                   <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
                     Request a Session
                   </Button>
