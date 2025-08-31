@@ -162,38 +162,55 @@ const DashboardPage = () => {
 
         {/* Grid Layout */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Profile Card */}
+          {/* Announcements Card */}
           <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-up">
-            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 sm:p-6">
+            <CardHeader className="bg-gradient-to-r from-rose-50 to-red-50 p-4 sm:p-6">
               <div className="flex items-center space-x-4">
-                <div className="bg-blue-100 p-3 rounded-full">
-                  <Icons.user className="h-5 w-5 text-blue-600" />
+                <div className="bg-rose-100 p-3 rounded-full">
+                  <Icons.megaphone className="h-5 w-5 text-rose-600" />
                 </div>
                 <CardTitle className="text-lg sm:text-xl font-semibold text-gray-800">
-                  Your Profile
+                  Announcements
                 </CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6 space-y-4">
-              {profile ? (
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <Icons.userCircle className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-700 text-sm sm:text-base">
-                      {profile.name}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Icons.mail className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-700 text-sm sm:text-base break-all">
-                      {profile.email}
-                    </span>
-                  </div>
-                </div>
+            <CardContent className="p-4 sm:p-6">
+              {announcements.length > 0 ? (
+                <ul className="space-y-4">
+                  {announcements.slice(0, 3).map((announcement) => (
+                    <li
+                      key={announcement.id}
+                      className="flex items-start space-x-3"
+                    >
+                      <div className="bg-rose-50 p-2 rounded-lg mt-1">
+                        <Icons.megaphone className="h-5 w-5 text-rose-500" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-800 text-sm sm:text-base">
+                          {announcement.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">
+                          {announcement.content}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                  {announcements.length > 3 && (
+                    <Link href="/member/announcements">
+                      <Button
+                        variant="ghost"
+                        className="w-full text-rose-600 hover:bg-rose-50"
+                      >
+                        View All ({announcements.length})
+                      </Button>
+                    </Link>
+                  )}
+                </ul>
               ) : (
-                <p className="text-gray-400 italic text-sm">
-                  No profile data available
-                </p>
+                <div className="flex flex-col items-center justify-center py-8 space-y-3">
+                  <Icons.megaphone className="h-8 w-8 text-gray-300" />
+                  <p className="text-gray-400 text-sm">No announcements</p>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -297,6 +314,58 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
 
+          {/* Bible Study Progress */}
+          <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-up">
+            <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 p-4 sm:p-6">
+              <div className="flex items-center space-x-4">
+                <div className="bg-indigo-100 p-3 rounded-full">
+                  <Icons.bookOpen className="h-5 w-5 text-indigo-600" />
+                </div>
+                <CardTitle className="text-lg sm:text-xl font-semibold text-gray-800">
+                  Bible Study
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6">
+              {bibleStudyProgress ? (
+                <div className="space-y-4">
+                  <h3 className="font-medium text-gray-800 text-sm sm:text-base">
+                    {bibleStudyProgress.title}
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Progress</span>
+                      <span>{bibleStudyProgress.progress || 0}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div
+                        className="bg-gradient-to-r from-indigo-500 to-blue-500 h-2.5 rounded-full transition-all duration-500"
+                        style={{
+                          width: `${bibleStudyProgress.progress || 0}%`,
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  <Link href="/member/bible-study">
+                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
+                      Continue Study
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <Icons.bookOpenCheck className="h-8 w-8 text-gray-300" />
+                  <p className="text-gray-400 text-sm">No active study</p>
+                  <Link href="/member/bible-study">
+                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
+                      Start a Study
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Giving History */}
           <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-up">
             <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 sm:p-6">
@@ -355,59 +424,9 @@ const DashboardPage = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 space-y-3">
                   <Icons.piggyBank className="h-8 w-8 text-gray-300" />
-                  <p className="text-gray-400 text-sm">No giving history yet</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Bible Study Progress */}
-          <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-up">
-            <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 p-4 sm:p-6">
-              <div className="flex items-center space-x-4">
-                <div className="bg-indigo-100 p-3 rounded-full">
-                  <Icons.bookOpen className="h-5 w-5 text-indigo-600" />
-                </div>
-                <CardTitle className="text-lg sm:text-xl font-semibold text-gray-800">
-                  Bible Study
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-6">
-              {bibleStudyProgress ? (
-                <div className="space-y-4">
-                  <h3 className="font-medium text-gray-800 text-sm sm:text-base">
-                    {bibleStudyProgress.title}
-                  </h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>Progress</span>
-                      <span>{bibleStudyProgress.progress || 0}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div
-                        className="bg-gradient-to-r from-indigo-500 to-blue-500 h-2.5 rounded-full transition-all duration-500"
-                        style={{
-                          width: `${bibleStudyProgress.progress || 0}%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                  <Link href="/bible-study">
-                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
-                      Continue Study
-                    </Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-8 space-y-4">
-                  <Icons.bookOpenCheck className="h-8 w-8 text-gray-300" />
-                  <p className="text-gray-400 text-sm">No active study</p>
-                  <Link href="/bible-study">
-                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
-                      Start a Study
-                    </Button>
-                  </Link>
+                  <p className="text-gray-400 text-sm">
+                    No giving history yet
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -586,62 +605,14 @@ const DashboardPage = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 space-y-4">
                   <Icons.dropletOff className="h-8 w-8 text-gray-300" />
-                  <p className="text-gray-400 text-sm">No application found.</p>
+                  <p className="text-gray-400 text-sm">
+                    No application found.
+                  </p>
                   <Link href="/member/baptism-application">
                     <Button className="w-full bg-sky-600 hover:bg-sky-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
                       Apply for Baptism
                     </Button>
                   </Link>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Announcements Card */}
-          <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-up">
-            <CardHeader className="bg-gradient-to-r from-rose-50 to-red-50 p-4 sm:p-6">
-              <div className="flex items-center space-x-4">
-                <div className="bg-rose-100 p-3 rounded-full">
-                  <Icons.megaphone className="h-5 w-5 text-rose-600" />
-                </div>
-                <CardTitle className="text-lg sm:text-xl font-semibold text-gray-800">
-                  Announcements
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-6">
-              {announcements.length > 0 ? (
-                <ul className="space-y-4">
-                  {announcements.slice(0, 3).map((announcement) => (
-                    <li key={announcement.id} className="flex items-start space-x-3">
-                      <div className="bg-rose-50 p-2 rounded-lg mt-1">
-                        <Icons.megaphone className="h-5 w-5 text-rose-500" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-gray-800 text-sm sm:text-base">
-                          {announcement.title}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">
-                          {announcement.content}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                  {announcements.length > 3 && (
-                    <Link href="/member/announcements">
-                        <Button
-                          variant="ghost"
-                          className="w-full text-rose-600 hover:bg-rose-50"
-                        >
-                          View All ({announcements.length})
-                        </Button>
-                    </Link>
-                  )}
-                </ul>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-8 space-y-3">
-                  <Icons.megaphone className="h-8 w-8 text-gray-300" />
-                  <p className="text-gray-400 text-sm">No announcements</p>
                 </div>
               )}
             </CardContent>
