@@ -58,17 +58,19 @@ const Header = () => {
       <div className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center gap-x-4">
         <Link
           href="/"
-          className="flex items-center flex-shrink-0"
+          className="flex items-center flex-shrink-0 space-x-2"
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <div
-            className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg hover:animate-spin transition-all duration-300"
+            className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-400 to-blue-500 via-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-lg transform transition-all duration-300 hover:scale-110 hover:shadow-xl"
             aria-hidden="true"
           >
-            GC
+            <span className="transform group-hover:rotate-12 transition-transform duration-300">
+              K.A.G
+            </span>
           </div>
-          <span className="ml-1 text-lg sm:text-xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600 whitespace-nowrap">
-            K.A.G
+          <span className="text-white font-semibold text-base md:text-lg">
+            Kenya Assemblies of God
           </span>
         </Link>
 

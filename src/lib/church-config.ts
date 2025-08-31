@@ -32,7 +32,7 @@ interface ChurchConfig {
 }
 
 export const churchConfig: ChurchConfig = {
-  name: "Kenya Assemblies of God (KAG)",
+  name: "Kenya Assemblies of God",
   fullName: "Kenya Assemblies of God - Central Church",
   logo: "/church-init.svg",
   mission:
@@ -77,7 +77,7 @@ export const churchConfig: ChurchConfig = {
   contact: {
     email: "info@kagcentral.org",
     phone: "+254 700 000 000",
-    address: "123 Gospel Lane, Nairobi, Kenya",
+    address: "PO BOX 3596, Eldoret, Kenya",
     mapUrl: "https://goo.gl/maps/your-map-link",
   },
   socials: {
