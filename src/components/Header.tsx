@@ -112,14 +112,14 @@ const Header = () => {
           {session ? (
             <Link
               href="/member/dashboard"
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-md hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md md:text-sm lg:text-base font-medium"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-md hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md md:text-sm lg:text-base font-medium transform hover:scale-105"
             >
               Dashboard
             </Link>
           ) : (
             <Link
               href="/signup"
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-md hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md md:text-sm lg:text-base font-medium"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-md hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-md md:text-sm lg:text-base font-medium transform hover:scale-105"
             >
               Become a Member
             </Link>
@@ -224,7 +224,7 @@ const Header = () => {
               {session ? (
                 <Link
                   href="/member/dashboard"
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg text-xl font-bold mt-6 w-3/4 text-center"
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg text-xl font-bold mt-6 w-3/4 text-center transform hover:scale-105"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Dashboard
@@ -232,7 +232,7 @@ const Header = () => {
               ) : (
                 <Link
                   href="/signup"
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg text-xl font-bold mt-6 w-3/4 text-center"
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg text-xl font-bold mt-6 w-3/4 text-center transform hover:scale-105"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Become a Member
