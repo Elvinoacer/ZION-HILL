@@ -38,6 +38,7 @@ import {
   FaQuoteRight,
 } from "react-icons/fa";
 import AlertDialog from "@/components/ui/AlertDialog";
+// test this
 
 const SidebarContent = ({ setSidebarOpen }) => {
   const pathname = usePathname();
