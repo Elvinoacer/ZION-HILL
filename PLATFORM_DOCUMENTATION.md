@@ -4,9 +4,9 @@ This document lists all the pages in the platform, grouped by their respective r
 
 ## Admin
 
-- `src/app/(futuristic-pages)/docs-gpt5/page.tsx`
-- `src/app/(futuristic-pages)/docs-grok/page.tsx`
-- `src/app/(futuristic-pages)/grok-editor/page.tsx`
+- `src/app/admin/(futuristic-pages)/docs-gpt5/page.tsx`
+- `src/app/admin/(futuristic-pages)/docs-grok/page.tsx`
+- `src/app/admin/(futuristic-pages)/grok-editor/page.tsx`
 - `src/app/admin/devotionals/page.tsx`
 - `src/app/admin/institutions/page.tsx`
 - `src/app/admin/media/page.tsx`
@@ -19,7 +19,6 @@ This document lists all the pages in the platform, grouped by their respective r
 ## Communications Officer
 
 - `src/app/communications_officer/admin/newsletter/page.tsx`
-- `src/app/communications_officer/BrandEngagementHubDashboard/page.tsx`
 - `src/app/communications_officer/communications-officer/create-blog-post/page.tsx`
 - `src/app/communications_officer/communications-officer/edit-blog-post/[id]/page.tsx`
 - `src/app/communications_officer/communications-officer/page.tsx`
@@ -37,30 +36,27 @@ This document lists all the pages in the platform, grouped by their respective r
 - `src/app/discipleship_leader/courses/discipleship/theme-of-the-week/create/page.tsx`
 - `src/app/discipleship_leader/courses/discipleship/theme-of-the-week/manage/page.tsx`
 - `src/app/discipleship_leader/discipleship-leader/page.tsx`
-- `src/app/discipleship_leader/DiscipleshipHubDashboard/page.tsx`
 
 ## Events Manager
 
+- `src/app/events_manager/events-manager/create/page.tsx`
 - `src/app/events_manager/events-manager/dashboard/[id]/page.tsx`
 - `src/app/events_manager/events-manager/dashboard/page.tsx`
-- `src/app/events_manager/events-manager/eventdashboard/page.tsx`
 - `src/app/events_manager/events-manager/inbox/page.tsx`
 - `src/app/events_manager/events-manager/page.tsx`
 - `src/app/events_manager/events/page.tsx`
 - `src/app/events_manager/preaching-calendar/page.tsx`
+- `src/app/events_manager/sponsors/page.tsx`
 
 ## Finance Administrator
 
-- `src/app/finance_administrator/_budgets/page.tsx`
 - `src/app/finance_administrator/finance-administrator/donation-plans/[id]/page.tsx`
 - `src/app/finance_administrator/finance-administrator/page.tsx`
-- `src/app/finance_administrator/financials/page.tsx`
 
 ## Member
 
 - `src/app/member/announcements/page.tsx`
 - `src/app/member/baptism-application/page.tsx`
-- `src/app/member/bible-reading-plans/page.tsx`remove this page
 - `src/app/member/bible-study/[courseId]/page.tsx`
 - `src/app/member/bible-study/lesson/[lessonId]/page.tsx`
 - `src/app/member/bible-study/page.tsx`
@@ -85,7 +81,6 @@ This document lists all the pages in the platform, grouped by their respective r
 - `src/app/member/prayer-wall/page.tsx`
 - `src/app/member/profile/page.tsx`
 - `src/app/member/resources/page.tsx`
-- `src/app/member/testimonials/page.tsx`
 - `src/app/member/testimonies-wall/page.tsx`
 - `src/app/member/volunteering/[id]/page.tsx`
 - `src/app/member/volunteering/page.tsx`
@@ -104,8 +99,10 @@ This document lists all the pages in the platform, grouped by their respective r
 ## Public
 
 - `src/app/(public)/about/page.tsx`
+- `src/app/(public)/bible-study/page.tsx`
 - `src/app/(public)/blog/[id]/page.tsx`
 - `src/app/(public)/blog/page.tsx`
+- `.src/app/(public)/community/page.tsx`
 - `src/app/(public)/contact/page.tsx`
 - `src/app/(public)/denied/page.tsx`
 - `src/app/(public)/devotionals/page.tsx`
@@ -117,7 +114,7 @@ This document lists all the pages in the platform, grouped by their respective r
 - `src/app/(public)/financial-support/page.tsx`
 - `src/app/(public)/institutions/page.tsx`
 - `src/app/(public)/livestream-integration/page.tsx`
-- `src/app/(public)/login/page.tsx`
+- `src/app//(public)/login/page.tsx`
 - `src/app/(public)/media/page.tsx`
 - `src/app/(public)/ministries/[id]/page.tsx`
 - `src/app/(public)/ministries/page.tsx`
@@ -125,9 +122,15 @@ This document lists all the pages in the platform, grouped by their respective r
 - `src/app/(public)/page.tsx`
 - `src/app/(public)/partnerships/page.tsx`
 - `src/app/(public)/platform-documentation/page.tsx`
+- `src/app/(public)/privacy/page.tsx`
 - `src/app/(public)/projects/page.tsx`
+- `src/app/(public)/sermons/page.tsx`
 - `src/app/(public)/services/page.tsx`
+- `src/app/(public)/setup-profile/page.tsx`
 - `src/app/(public)/signup/page.tsx`
+- `src/app/(public)/sitemap/page.tsx`
+- `src/app/(public)/terms/page.tsx`
+- `src/app/(public)/verify-email/page.tsx`
 
 ## Secretary
 
@@ -137,15 +140,15 @@ This document lists all the pages in the platform, grouped by their respective r
 
 ## Senior Pastor
 
-- `src/app/senior_pastor/senior-pastor/page.tsx`
-- `src/app/senior_pastor/pastoralcare/dashboard/page.tsx`
-- `src/app/senior_pastor/certificates-view/page.tsx`
-- `src/app/senior_pastor/certificate-generator/page.tsx`
-- `src/app/senior_pastor/baptism-candidates/page.tsx`
 - `src/app/senior_pastor/admin-dashboard/page.tsx`
+- `src/app/senior_pastor/baptism-candidates/page.tsx`
+- `src/app/senior_pastor/certificate-generator/page.tsx`
+- `src/app/senior_pastor/certificates-view/page.tsx`
 - `src/app/senior_pastor/pastoral-care/page.tsx`
+- `src/app/senior_pastor/pastoralcare/dashboard/page.tsx`
 - `src/app/senior_pastor/prayer-requests/page.tsx`
 - `src/app/senior_pastor/role-management/page.tsx`
+- `src/app/senior_pastor/senior-pastor/page.tsx`
 - `src/app/senior_pastor/users/page.tsx`
 
 ## Small Groups Leader

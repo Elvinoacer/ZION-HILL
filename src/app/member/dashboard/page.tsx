@@ -460,7 +460,7 @@ const DashboardPage = () => {
                       View All ({prayerRequests.length})
                     </Button>
                   )}
-                  <Link href="/prayer-wall">
+                  <Link href="/member/prayer-wall">
                     <Button className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
                       <Icons.plus className="h-4 w-4 mr-2" />
                       New Prayer Request
@@ -471,7 +471,7 @@ const DashboardPage = () => {
                 <div className="flex flex-col items-center justify-center py-8 space-y-4">
                   <Icons.pray className="h-8 w-8 text-gray-300" />
                   <p className="text-gray-400 text-sm">No prayer requests</p>
-                  <Link href="/prayer-wall">
+                  <Link href="/member/prayer-wall">
                     <Button className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
                       <Icons.plus className="h-4 w-4 mr-2" />
                       Submit Request
@@ -587,7 +587,7 @@ const DashboardPage = () => {
                 <div className="flex flex-col items-center justify-center py-8 space-y-4">
                   <Icons.dropletOff className="h-8 w-8 text-gray-300" />
                   <p className="text-gray-400 text-sm">No application found.</p>
-                  <Link href="/baptism-application">
+                  <Link href="/member/baptism-application">
                     <Button className="w-full bg-sky-600 hover:bg-sky-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
                       Apply for Baptism
                     </Button>
