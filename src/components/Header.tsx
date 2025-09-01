@@ -43,9 +43,9 @@ const Header = () => {
             alt="The Worship Center Logo"
             width={64}
             height={64}
-            className="h-12 w-12 md:h-14 md:w-14 rounded-full"
+            className="h-12 w-12 md:h-16 md:w-16 rounded-full"
           />
-          <span className="text-white font-semibold text-lg md:text-xl">
+          <span className="text-white font-semibold text-lg md:text-2xl">
             The Worship Center
           </span>
         </Link>

@@ -382,9 +382,9 @@ const SidebarContent = ({ setSidebarOpen }) => {
             alt="The Worship Center Logo"
             width={64}
             height={64}
-            className="h-10 w-10 md:h-12 md:w-12 rounded-full"
+            className="h-10 w-10 md:h-16 md:w-16 rounded-full"
           />
-          <span className="text-lg font-semibold text-white">
+          <span className="text-lg md:text-xl font-semibold text-white">
             The Worship Center
           </span>
         </div>
