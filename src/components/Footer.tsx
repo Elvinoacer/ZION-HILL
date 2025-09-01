@@ -57,7 +57,7 @@ const Footer = () => {
               alt="K.A.G KASARANI-ELD Logo"
               width={144}
               height={144}
-              className="mb-4 w-36 h-36"
+              className="mb-4 w-36 h-36 rounded-full"
             />
             <h3 className="text-2xl font-bold text-white tracking-tight">
               K.A.G KASARANI-ELD
