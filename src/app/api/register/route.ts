@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
-import { sendMail } from '@/lib/email';
+import { sendEmail } from '@/lib/email';
 import crypto from 'crypto';
 
 export async function POST(request: Request) {
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
     const verificationUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify-email?token=${token}`;
 
-    await sendMail({
+    await sendEmail({
       from: process.env.EMAIL_FROM!,
       to: email,
       subject: 'Verify your email address',

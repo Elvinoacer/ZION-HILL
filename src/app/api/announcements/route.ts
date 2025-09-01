@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { messaging } from "@/lib/firebaseAdmin";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,6 +14,24 @@ export async function POST(req: NextRequest) {
         ministryId, // Include ministryId in the creation
       },
     });
+
+    // Send push notification
+    const userTokens = await prisma.fcmToken.findMany();
+    const guestTokens = await prisma.token.findMany();
+    const allTokens = [...userTokens.map(t => t.token), ...guestTokens.map(t => t.token)];
+
+    if (allTokens.length > 0) {
+      const message = {
+        notification: { title: `New Announcement: ${title}`, body: content },
+        tokens: allTokens,
+      };
+      try {
+        await messaging.sendEachForMulticast(message);
+        console.log("Announcement notification sent successfully.");
+      } catch (notificationError) {
+        console.error("Error sending announcement notification:", notificationError);
+      }
+    }
 
     return NextResponse.json(announcement);
   } catch (error) {

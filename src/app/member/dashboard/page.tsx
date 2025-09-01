@@ -1,6 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
+import NotificationPermissionModal from '@/components/NotificationPermissionModal';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useDashboardStore } from "@/store/dashboardStore";
@@ -17,6 +18,15 @@ interface ThemeOfTheWeek {
 
 const DashboardPage = () => {
   const { data: session } = useSession();
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+
+  useEffect(() => {
+    if ('Notification' in window) {
+      if (Notification.permission === 'default') {
+        setShowNotificationModal(true);
+      }
+    }
+  }, []);
   const [themeOfTheWeek, setThemeOfTheWeek] = useState<ThemeOfTheWeek | null>(
     null
   );
@@ -649,6 +659,7 @@ const DashboardPage = () => {
           animation: slideUp 0.6s ease-out;
         }
       `}</style>
+    {showNotificationModal && <NotificationPermissionModal onClose={() => setShowNotificationModal(false)} />}
     </div>
   );
 };

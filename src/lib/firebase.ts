@@ -1,22 +1,34 @@
+// src/lib/firebase.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getMessaging, isSupported } from "firebase/messaging";
+import { getMessaging, getToken, isSupported } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyCRO0syVY11KEa6VLP-YaHP0daxFNnGxVE",
+  authDomain: "the-grok-ntf.firebaseapp.com",
+  projectId: "the-grok-ntf",
+  storageBucket: "the-grok-ntf.firebasestorage.app",
+  messagingSenderId: "590787118981",
+  appId: "1:590787118981:web:020c1b66f86adf998fe6ec",
+  measurementId: "G-YY1YGQHKX9",
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-const getFirebaseMessaging = async () => {
-  if (typeof window !== 'undefined' && (await isSupported())) {
-    return getMessaging(app);
+export const getFCMToken = async () => {
+  if (!(await isSupported())) {
+    console.log("FCM not supported in this browser");
+    return null;
   }
-  return null;
-};
 
-export { app, getFirebaseMessaging };
+  const messaging = getMessaging(app);
+  try {
+    const token = await getToken(messaging, {
+      vapidKey:
+        "BCgaCgoVeI-cmxp1KSeFz6aLhPhIGqsUPp7O30H9t4uc3XRCAYLR31PQBXg4th-aZMvilTa237SofxnFf4OPZHU",
+    });
+    return token;
+  } catch (error) {
+    console.error("Error getting FCM token:", error);
+    return null;
+  }
+};

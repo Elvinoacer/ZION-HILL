@@ -82,7 +82,7 @@ model User {
   polls                     Poll[]
   postFeedbacks             PostFeedback[]
   prayerRequest             PrayerRequest[]
-  pushSubscriptions         PushSubscription[]
+  
   fcmTokens                 FcmToken[]
   sermons                   Sermon[]
   sessions                  Session[]
@@ -716,15 +716,12 @@ model FcmToken {
   createdAt DateTime @default(now())
 }
 
-model PushSubscription {
-  id        String   @id @default(cuid())
-  endpoint  String   @unique
-  p256dh    String
-  auth      String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+model Token {
+  id    String @id @default(cuid())
+  token String @unique
 }
+
+
 
 model ForumTopic {
   id             String          @id @default(cuid())
