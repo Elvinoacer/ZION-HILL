@@ -228,6 +228,12 @@ const SidebarContent = ({ setSidebarOpen }) => {
       path: "/member/testimonies-wall",
       requiredRoles: ["MEMBER"],
     },
+    {
+      name: "Birthdays",
+      icon: <FaStar />,
+      path: "/member/birthdays",
+      requiredRoles: ["MEMBER"],
+    },
   ];
 
   const rolesAndResponsibilitiesNavItems = [

@@ -1,26 +1,31 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_SERVER_HOST,
-  port: Number(process.env.EMAIL_SERVER_PORT),
+  host: process.env.EMAIL_HOST,
+  port: Number(process.env.EMAIL_PORT),
+  secure: process.env.EMAIL_SECURE === 'true',
   auth: {
-    user: process.env.EMAIL_SERVER_USER,
-    pass: process.env.EMAIL_SERVER_PASSWORD,
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
-interface MailOptions {
-  from: string;
+interface SendEmailOptions {
   to: string;
   subject: string;
   html: string;
 }
 
-export const sendMail = async (mailOptions: MailOptions) => {
+export async function sendEmail({ to, subject, html }: SendEmailOptions) {
   try {
-    await transporter.sendMail(mailOptions);
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to,
+      subject,
+      html,
+    });
+    console.log('Email sent successfully');
   } catch (error) {
     console.error('Error sending email:', error);
-    throw new Error('Failed to send email');
   }
-};
+}
