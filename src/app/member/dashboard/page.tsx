@@ -1,7 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
-import NotificationPermissionModal from '@/components/NotificationPermissionModal';
+import NotificationPermissionModal from "@/components/NotificationPermissionModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useDashboardStore } from "@/store/dashboardStore";
@@ -21,8 +21,8 @@ const DashboardPage = () => {
   const [showNotificationModal, setShowNotificationModal] = useState(false);
 
   useEffect(() => {
-    if ('Notification' in window) {
-      if (Notification.permission === 'default') {
+    if ("Notification" in window) {
+      if (Notification.permission === "default") {
         setShowNotificationModal(true);
       }
     }
@@ -121,20 +121,22 @@ const DashboardPage = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Theme of the Week */}
         {themeOfTheWeek && (
-          <div className="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 sm:p-8 rounded-2xl shadow-2xl overflow-hidden mb-8 animate-slide-up">
-            <div className="absolute -top-4 -right-4 h-24 w-24 bg-white bg-opacity-10 rounded-full transform rotate-45"></div>
-            <div className="absolute -bottom-6 -left-6 h-32 w-32 bg-white bg-opacity-10 rounded-full transform -rotate-30"></div>
-            <div className="relative z-10 text-center space-y-3">
-              <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider opacity-80">
+          <div className="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl shadow-lg sm:shadow-2xl overflow-hidden mb-6 sm:mb-8 animate-slide-up">
+            {/* Subtle gradient circles */}
+            <div className="absolute top-0 right-0 h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full transform rotate-45 -translate-y-1/3 translate-x-1/3"></div>
+            <div className="absolute bottom-0 left-0 h-20 w-20 sm:h-24 sm:w-24 md:h-32 md:w-32 bg-gradient-to-tr from-purple-400/15 to-pink-400/15 rounded-full transform -rotate-30 translate-y-1/3 -translate-x-1/3"></div>
+
+            <div className="relative z-10 text-center space-y-2 sm:space-y-3 md:space-y-4">
+              <h2 className="text-xs sm:text-sm font-semibold uppercase tracking-wider opacity-90">
                 Theme of the Week
               </h2>
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight">
+              <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-snug sm:leading-tight px-2">
                 {themeOfTheWeek.title}
               </h3>
-              <p className="text-base sm:text-lg font-medium italic tracking-wide">
+              <p className="text-sm sm:text-base md:text-lg font-medium italic opacity-95 px-4">
                 "{themeOfTheWeek.verse}"
               </p>
-              <p className="text-sm sm:text-base opacity-90">
+              <p className="text-xs sm:text-sm md:text-base opacity-85">
                 {themeOfTheWeek.reference}
               </p>
             </div>
@@ -434,9 +436,7 @@ const DashboardPage = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 space-y-3">
                   <Icons.piggyBank className="h-8 w-8 text-gray-300" />
-                  <p className="text-gray-400 text-sm">
-                    No giving history yet
-                  </p>
+                  <p className="text-gray-400 text-sm">No giving history yet</p>
                 </div>
               )}
             </CardContent>
@@ -615,9 +615,7 @@ const DashboardPage = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 space-y-4">
                   <Icons.dropletOff className="h-8 w-8 text-gray-300" />
-                  <p className="text-gray-400 text-sm">
-                    No application found.
-                  </p>
+                  <p className="text-gray-400 text-sm">No application found.</p>
                   <Link href="/member/baptism-application">
                     <Button className="w-full bg-sky-600 hover:bg-sky-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
                       Apply for Baptism
@@ -659,7 +657,11 @@ const DashboardPage = () => {
           animation: slideUp 0.6s ease-out;
         }
       `}</style>
-    {showNotificationModal && <NotificationPermissionModal onClose={() => setShowNotificationModal(false)} />}
+      {showNotificationModal && (
+        <NotificationPermissionModal
+          onClose={() => setShowNotificationModal(false)}
+        />
+      )}
     </div>
   );
 };
