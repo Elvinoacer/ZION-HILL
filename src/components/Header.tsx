@@ -38,13 +38,14 @@ const Header = () => {
           className="flex items-center flex-shrink-0 space-x-3"
           onClick={() => setIsMobileMenuOpen(false)}
         >
-          <Image
-            src="/images/kag-logo-free-bg.png"
-            alt="The Worship Center Logo"
-            width={64}
-            height={64}
-            className="h-12 w-12 md:h-16 md:w-16 rounded-full"
-          />
+          <div className="relative h-12 w-12 md:h-16 md:w-16 rounded-full overflow-hidden flex-shrink-0">
+            <Image
+              src="/images/kag-logo-free-bg.png"
+              alt="The Worship Center Logo"
+              layout="fill"
+              objectFit="cover"
+            />
+          </div>
           <span className="text-white font-semibold text-lg md:text-2xl">
             The Worship Center
           </span>
