@@ -41,9 +41,9 @@ const Header = () => {
           <Image
             src="/images/kag-logo-free-bg.png"
             alt="The Worship Center Logo"
-            width={48}
-            height={48}
-            className="rounded-full"
+            width={64}
+            height={64}
+            className="h-12 w-12 md:h-14 md:w-14 rounded-full"
           />
           <span className="text-white font-semibold text-lg md:text-xl">
             The Worship Center

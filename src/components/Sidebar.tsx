@@ -380,9 +380,9 @@ const SidebarContent = ({ setSidebarOpen }) => {
           <Image
             src="/images/kag-logo-free-bg.png"
             alt="The Worship Center Logo"
-            width={40}
-            height={40}
-            className="rounded-full"
+            width={64}
+            height={64}
+            className="h-10 w-10 md:h-12 md:w-12 rounded-full"
           />
           <span className="text-lg font-semibold text-white">
             The Worship Center
