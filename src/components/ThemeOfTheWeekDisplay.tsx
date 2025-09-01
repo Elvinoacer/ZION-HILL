@@ -19,11 +19,11 @@ const ThemeOfTheWeekDisplay = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-gradient-to-r from-purple-700 to-purple-600 rounded-xl p-6 text-white shadow-lg"
+      className="bg-gradient-to-r from-purple-700 to-purple-600 rounded-xl px-8 py-4 text-white shadow-lg"
     >
-      <h2 className="text-2xl font-bold mb-2">Theme of the Week</h2>
-      <p className="text-3xl font-extrabold mb-3 leading-tight">{theme.title}</p>
-      <p className="text-lg italic mb-4">'{theme.verse}'</p>
+      <h2 className="text-xl font-bold mb-2">Theme of the Week</h2>
+      <p className="text-2xl font-extrabold mb-3 leading-tight">{theme.title}</p>
+      <p className="text-base italic mb-4">'{theme.verse}'</p>
       <p className="text-sm text-purple-100">{theme.reference}</p>
     </motion.div>
   );

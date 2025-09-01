@@ -19,6 +19,8 @@ import { intlFormat } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, UserPlus, UserMinus, Home, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ViewFamilyMembersModal } from "@/components/ViewFamilyMembersModal";
+import { User } from "@prisma/client";
 
 interface Family {
   id: string;
@@ -26,13 +28,6 @@ interface Family {
   members: User[];
   createdBy: User;
   createdAt: string;
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  photo: string;
 }
 
 const FamilyPage = () => {
@@ -46,6 +41,8 @@ const FamilyPage = () => {
   const [selectedFamilyId, setSelectedFamilyId] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
   const [allFamilies, setAllFamilies] = useState<Family[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [familiesPerPage] = useState(5);
 
   const getAllFamilies = useCallback(async function () {
     try {
@@ -179,6 +176,16 @@ const FamilyPage = () => {
       toast.error(err.message);
     }
   };
+
+  // Pagination logic
+  const indexOfLastFamily = currentPage * familiesPerPage;
+  const indexOfFirstFamily = indexOfLastFamily - familiesPerPage;
+  const currentFamilies = allFamilies.slice(
+    indexOfFirstFamily,
+    indexOfLastFamily
+  );
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   if (loading) {
     return (
@@ -356,9 +363,9 @@ const FamilyPage = () => {
                           >
                             <div className="flex items-center space-x-2">
                               <Avatar className="h-6 w-6">
-                                <AvatarImage src={user.photo} />
+                                <AvatarImage src={user.photo ?? ""} />
                                 <AvatarFallback className="bg-purple-100 text-purple-600">
-                                  {user.name.charAt(0)}
+                                  {user.name?.charAt(0)}
                                 </AvatarFallback>
                               </Avatar>
                               <span className="truncate">
@@ -447,17 +454,14 @@ const FamilyPage = () => {
                               >
                                 <div className="flex items-center space-x-3 flex-grow">
                                   <Avatar className="h-10 w-10">
-                                    <AvatarImage src={member.photo} />
+                                    <AvatarImage src={member.photo ?? ""} />
                                     <AvatarFallback className="bg-indigo-100 text-indigo-600">
-                                      {member.name.charAt(0)}
+                                      {member.name?.charAt(0)}
                                     </AvatarFallback>
                                   </Avatar>
                                   <div className="flex-grow">
                                     <p className="font-medium text-gray-700 text-sm sm:text-base truncate">
                                       {member.name}
-                                    </p>
-                                    <p className="text-xs sm:text-sm text-gray-500 truncate">
-                                      {member.email}
                                     </p>
                                   </div>
                                 </div>
@@ -526,7 +530,7 @@ const FamilyPage = () => {
               {allFamilies.length > 0 ? (
                 <div className="space-y-6">
                   <AnimatePresence>
-                    {allFamilies.map((family) => (
+                    {currentFamilies.map((family) => (
                       <motion.div
                         key={family.id}
                         initial={{ opacity: 0, y: 10 }}
@@ -540,80 +544,60 @@ const FamilyPage = () => {
                             <h3 className="text-lg sm:text-xl font-semibold text-gray-800 truncate">
                               {family.name}
                             </h3>
-                            <p className="text-sm text-gray-500">
-                              Created by{" "}
-                              {family.createdBy.id === session?.user.id
-                                ? "you"
-                                : family.createdBy.name}{" "}
-                              on{" "}
-                              {intlFormat(new Date(family.createdAt), {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              })}
-                            </p>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src={family.createdBy.photo ?? ""} />
+                                <AvatarFallback className="bg-teal-100 text-teal-600">
+                                  {family.createdBy.name?.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span>
+                                Created by{" "}
+                                {family.createdBy.id === session?.user.id
+                                  ? "you"
+                                  : family.createdBy.name}
+                              </span>
+                            </div>
                           </div>
-                          <div className="text-sm px-3 py-1 rounded-full bg-teal-100 text-teal-700 font-medium self-start sm:self-center">
-                            {family.members.length} member
-                            {family.members.length !== 1 ? "s" : ""}
+                          <div className="flex items-center space-x-4">
+                            <div className="text-sm px-3 py-1 rounded-full bg-teal-100 text-teal-700 font-medium self-start sm:self-center">
+                              {family.members.length} member
+                              {family.members.length !== 1 ? "s" : ""}
+                            </div>
+                            <ViewFamilyMembersModal
+                              members={family.members}
+                              familyName={family.name}
+                            />
                           </div>
                         </div>
-                        {family.members.length > 0 ? (
-                          <ul className="space-y-2">
-                            {family.members.map((member) => (
-                              <motion.li
-                                key={member.id}
-                                whileHover={{
-                                  x: 5,
-                                  backgroundColor: "#f9fafb",
-                                }}
-                                transition={{ duration: 0.2 }}
-                                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-lg bg-white border border-gray-100 shadow-sm gap-3"
-                              >
-                                <div className="flex items-center space-x-3 flex-grow">
-                                  <Avatar className="h-10 w-10">
-                                    <AvatarImage src={member.photo} />
-                                    <AvatarFallback className="bg-teal-100 text-teal-600">
-                                      {member.name.charAt(0)}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div className="flex-grow">
-                                    <p className="font-medium text-gray-700 text-sm sm:text-base truncate">
-                                      {member.name}
-                                    </p>
-                                    <p className="text-xs sm:text-sm text-gray-500 truncate">
-                                      {member.email}
-                                    </p>
-                                  </div>
-                                </div>
-                                <Button
-                                  variant="destructive"
-                                  size="sm"
-                                  disabled={
-                                    family.createdBy.id !== session?.user.id
-                                  }
-                                  onClick={() =>
-                                    handleRemoveFamilyMember(
-                                      member.id,
-                                      family.id
-                                    )
-                                  }
-                                  className="rounded-lg bg-red-600 hover:bg-red-700 text-white transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
-                                >
-                                  <UserMinus className="h-4 w-4 mr-1" />
-                                  <span className="sm:inline">Remove</span>
-                                </Button>
-                              </motion.li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <div className="p-4 rounded-lg bg-gray-50 text-center text-gray-500 text-sm">
-                            No members in this family yet
-                          </div>
-                        )}
                       </motion.div>
                     ))}
                   </AnimatePresence>
+                  {allFamilies.length > familiesPerPage && (
+                    <div className="flex justify-center items-center space-x-4 mt-6">
+                      <Button
+                        onClick={() => paginate(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        variant="outline"
+                      >
+                        Previous
+                      </Button>
+                      <span className="text-sm text-gray-600">
+                        Page {currentPage} of{" "}
+                        {Math.ceil(allFamilies.length / familiesPerPage)}
+                      </span>
+                      <Button
+                        onClick={() => paginate(currentPage + 1)}
+                        disabled={
+                          currentPage ===
+                          Math.ceil(allFamilies.length / familiesPerPage)
+                        }
+                        variant="outline"
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="p-8 text-center">

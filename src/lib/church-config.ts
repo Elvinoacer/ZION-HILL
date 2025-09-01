@@ -33,7 +33,7 @@ interface ChurchConfig {
 }
 
 export const churchConfig: ChurchConfig = {
-  name: "Kenya Assemblies of God",
+  name: "Kenya Assemblies of God, Eldoret, Kasarani",
   fullName: "Kenya Assemblies of God - Central Church",
   logo: "/images/church-image.png",
   mission:
