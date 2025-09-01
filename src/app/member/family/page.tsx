@@ -183,7 +183,7 @@ const FamilyPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-screen-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -239,7 +239,7 @@ const FamilyPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-screen-2xl mx-auto">
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -361,7 +361,7 @@ const FamilyPage = () => {
                                   {user.name.charAt(0)}
                                 </AvatarFallback>
                               </Avatar>
-                              <span>
+                              <span className="truncate">
                                 {user.name} ({user.email})
                               </span>
                             </div>
@@ -397,7 +397,7 @@ const FamilyPage = () => {
                 <span>Your Family Units</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               {families.length > 0 ? (
                 <div className="space-y-6">
                   <AnimatePresence>
@@ -411,8 +411,8 @@ const FamilyPage = () => {
                         className="p-4 rounded-lg bg-gray-50 shadow-sm border border-gray-100"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-                          <div>
-                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                          <div className="flex-grow">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 truncate">
                               {family.name}
                             </h3>
                             <p className="text-sm text-gray-500">
@@ -428,7 +428,7 @@ const FamilyPage = () => {
                               })}
                             </p>
                           </div>
-                          <div className="text-sm px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-medium">
+                          <div className="text-sm px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-medium self-start sm:self-center">
                             {family.members.length} member
                             {family.members.length !== 1 ? "s" : ""}
                           </div>
@@ -443,20 +443,20 @@ const FamilyPage = () => {
                                   backgroundColor: "#f9fafb",
                                 }}
                                 transition={{ duration: 0.2 }}
-                                className="flex items-center justify-between p-3 rounded-lg bg-white border border-gray-100 shadow-sm"
+                                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-lg bg-white border border-gray-100 shadow-sm gap-3"
                               >
-                                <div className="flex items-center space-x-3">
+                                <div className="flex items-center space-x-3 flex-grow">
                                   <Avatar className="h-10 w-10">
                                     <AvatarImage src={member.photo} />
                                     <AvatarFallback className="bg-indigo-100 text-indigo-600">
                                       {member.name.charAt(0)}
                                     </AvatarFallback>
                                   </Avatar>
-                                  <div>
-                                    <p className="font-medium text-gray-700 text-sm sm:text-base">
+                                  <div className="flex-grow">
+                                    <p className="font-medium text-gray-700 text-sm sm:text-base truncate">
                                       {member.name}
                                     </p>
-                                    <p className="text-xs sm:text-sm text-gray-500">
+                                    <p className="text-xs sm:text-sm text-gray-500 truncate">
                                       {member.email}
                                     </p>
                                   </div>
@@ -473,10 +473,10 @@ const FamilyPage = () => {
                                       family.id
                                     )
                                   }
-                                  className="rounded-lg bg-red-600 hover:bg-red-700 text-white transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="rounded-lg bg-red-600 hover:bg-red-700 text-white transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
                                 >
                                   <UserMinus className="h-4 w-4 mr-1" />
-                                  Remove
+                                  <span className="sm:inline">Remove</span>
                                 </Button>
                               </motion.li>
                             ))}
@@ -522,7 +522,7 @@ const FamilyPage = () => {
                 <span>All Family Units</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               {allFamilies.length > 0 ? (
                 <div className="space-y-6">
                   <AnimatePresence>
@@ -536,8 +536,8 @@ const FamilyPage = () => {
                         className="p-4 rounded-lg bg-gray-50 shadow-sm border border-gray-100"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-                          <div>
-                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                          <div className="flex-grow">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 truncate">
                               {family.name}
                             </h3>
                             <p className="text-sm text-gray-500">
@@ -553,7 +553,7 @@ const FamilyPage = () => {
                               })}
                             </p>
                           </div>
-                          <div className="text-sm px-3 py-1 rounded-full bg-teal-100 text-teal-700 font-medium">
+                          <div className="text-sm px-3 py-1 rounded-full bg-teal-100 text-teal-700 font-medium self-start sm:self-center">
                             {family.members.length} member
                             {family.members.length !== 1 ? "s" : ""}
                           </div>
@@ -568,20 +568,20 @@ const FamilyPage = () => {
                                   backgroundColor: "#f9fafb",
                                 }}
                                 transition={{ duration: 0.2 }}
-                                className="flex items-center justify-between p-3 rounded-lg bg-white border border-gray-100 shadow-sm"
+                                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-lg bg-white border border-gray-100 shadow-sm gap-3"
                               >
-                                <div className="flex items-center space-x-3">
+                                <div className="flex items-center space-x-3 flex-grow">
                                   <Avatar className="h-10 w-10">
                                     <AvatarImage src={member.photo} />
                                     <AvatarFallback className="bg-teal-100 text-teal-600">
                                       {member.name.charAt(0)}
                                     </AvatarFallback>
                                   </Avatar>
-                                  <div>
-                                    <p className="font-medium text-gray-700 text-sm sm:text-base">
+                                  <div className="flex-grow">
+                                    <p className="font-medium text-gray-700 text-sm sm:text-base truncate">
                                       {member.name}
                                     </p>
-                                    <p className="text-xs sm:text-sm text-gray-500">
+                                    <p className="text-xs sm:text-sm text-gray-500 truncate">
                                       {member.email}
                                     </p>
                                   </div>
@@ -598,10 +598,10 @@ const FamilyPage = () => {
                                       family.id
                                     )
                                   }
-                                  className="rounded-lg bg-red-600 hover:bg-red-700 text-white transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="rounded-lg bg-red-600 hover:bg-red-700 text-white transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
                                 >
                                   <UserMinus className="h-4 w-4 mr-1" />
-                                  Remove
+                                  <span className="sm:inline">Remove</span>
                                 </Button>
                               </motion.li>
                             ))}
