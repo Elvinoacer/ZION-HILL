@@ -13,25 +13,42 @@ export async function POST(request: Request) {
   try {
     const { phone, address, birthdate, photo, familyId, newFamilyName } = await request.json();
 
-    let finalFamilyId = familyId;
+    const sanitize = (str: string | null | undefined) => {
+      if (!str) return str;
+      return str.split('\0').join('');
+    };
 
+    // Sanitize all incoming and session strings that will be written to the DB
+    const sanitizedUserId = sanitize(session.user.id!);
+    const sanitizedName = sanitize(session.user.name);
+    const sanitizedEmail = sanitize(session.user.email);
+    const sanitizedImage = sanitize(session.user.image); // <-- The missing piece
+
+    // Handle Family Creation
+    let finalFamilyId = sanitize(familyId);
     if (newFamilyName) {
       const newFamily = await prisma.family.create({
         data: {
-          name: newFamilyName,
-          createdById: session.user.id,
+          name: sanitize(newFamilyName)!,
+          createdById: sanitizedUserId!,
         },
       });
       finalFamilyId = newFamily.id;
     }
 
+    // Perform a single, comprehensive update that also cleans potential bad data.
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: sanitizedUserId! },
       data: {
-        phone,
-        address,
-        birthdate,
-        photo,
+        // Clean existing fields from session
+        name: sanitizedName,
+        email: sanitizedEmail,
+        image: sanitizedImage, // <-- The missing piece
+        // Add new profile fields
+        phone: sanitize(phone),
+        address: sanitize(address),
+        birthdate: birthdate ? new Date(birthdate) : null,
+        photo: sanitize(photo), // This is the newly uploaded photo
         familyId: finalFamilyId,
         profileComplete: true,
       },

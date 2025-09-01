@@ -59,7 +59,7 @@ export async function GET(request: Request) {
       ? '__Secure-next-auth.session-token' 
       : 'next-auth.session-token';
 
-    await cookies().set(cookieName, sessionToken, {
+    cookies().set(cookieName, sessionToken, {
       httpOnly: true,
       path: '/',
       sameSite: 'lax',

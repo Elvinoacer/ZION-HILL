@@ -51,7 +51,7 @@ model User {
   phone          String?
   address        String?
   membersince    String?
-  birthdate      String?
+  birthdate      DateTime?
   photo          String?
   password       String?
   isActive       Boolean    @default(true)

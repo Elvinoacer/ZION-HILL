@@ -100,10 +100,11 @@ CREATE TABLE "public"."User" (
     "phone" TEXT,
     "address" TEXT,
     "membersince" TEXT,
-    "birthdate" TEXT,
+    "birthdate" TIMESTAMP(3),
     "photo" TEXT,
     "password" TEXT,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "profileComplete" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "familyId" TEXT,
@@ -172,6 +173,8 @@ CREATE TABLE "public"."LessonQuestion" (
     "text" TEXT NOT NULL,
     "options" TEXT[],
     "correctAnswerIndex" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "LessonQuestion_pkey" PRIMARY KEY ("id")
 );
@@ -301,6 +304,7 @@ CREATE TABLE "public"."Event" (
     "latitude" DOUBLE PRECISION,
     "longitude" DOUBLE PRECISION,
     "time" TEXT,
+    "capacity" TEXT,
     "ministryId" TEXT,
     "groupId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -340,6 +344,7 @@ CREATE TABLE "public"."Announcement" (
     "content" TEXT NOT NULL,
     "tags" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "ministryId" TEXT,
 
     CONSTRAINT "Announcement_pkey" PRIMARY KEY ("id")
 );
@@ -419,8 +424,9 @@ CREATE TABLE "public"."Sponsor" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "amount" DOUBLE PRECISION NOT NULL,
-    "logoUrl" TEXT NOT NULL,
-    "eventId" TEXT NOT NULL,
+    "logoUrl" TEXT,
+    "eventId" TEXT,
+    "contactEmail" TEXT,
 
     CONSTRAINT "Sponsor_pkey" PRIMARY KEY ("id")
 );
@@ -702,15 +708,21 @@ CREATE TABLE "public"."Message" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."PushSubscription" (
+CREATE TABLE "public"."FcmToken" (
     "id" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "endpoint" TEXT NOT NULL,
-    "p256dh" TEXT NOT NULL,
-    "auth" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "PushSubscription_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "FcmToken_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."Token" (
+    "id" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+
+    CONSTRAINT "Token_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -960,9 +972,6 @@ CREATE UNIQUE INDEX "BibleStudyEnrollment_userId_courseId_key" ON "public"."Bibl
 CREATE UNIQUE INDEX "LessonProgress_enrollmentId_lessonId_key" ON "public"."LessonProgress"("enrollmentId", "lessonId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Family_createdById_key" ON "public"."Family"("createdById");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Role_name_key" ON "public"."Role"("name");
 
 -- CreateIndex
@@ -993,7 +1002,10 @@ CREATE UNIQUE INDEX "CounselingTopic_name_key" ON "public"."CounselingTopic"("na
 CREATE UNIQUE INDEX "ParentalControl_userId_key" ON "public"."ParentalControl"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "PushSubscription_endpoint_key" ON "public"."PushSubscription"("endpoint");
+CREATE UNIQUE INDEX "FcmToken_token_key" ON "public"."FcmToken"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Token_token_key" ON "public"."Token"("token");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "TopicFeedback_userId_topicId_key" ON "public"."TopicFeedback"("userId", "topicId");
@@ -1095,6 +1107,9 @@ ALTER TABLE "public"."WorshipSet" ADD CONSTRAINT "WorshipSet_leaderId_fkey" FORE
 ALTER TABLE "public"."WorshipResource" ADD CONSTRAINT "WorshipResource_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "public"."Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "public"."Announcement" ADD CONSTRAINT "Announcement_ministryId_fkey" FOREIGN KEY ("ministryId") REFERENCES "public"."Ministry"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "public"."SongProposal" ADD CONSTRAINT "SongProposal_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -1119,7 +1134,7 @@ ALTER TABLE "public"."Participant" ADD CONSTRAINT "Participant_userId_fkey" FORE
 ALTER TABLE "public"."Financials" ADD CONSTRAINT "Financials_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "public"."Event"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."Sponsor" ADD CONSTRAINT "Sponsor_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "public"."Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."Sponsor" ADD CONSTRAINT "Sponsor_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "public"."Event"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Feedback" ADD CONSTRAINT "Feedback_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "public"."Event"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1200,7 +1215,7 @@ ALTER TABLE "public"."Message" ADD CONSTRAINT "Message_recipientId_fkey" FOREIGN
 ALTER TABLE "public"."Message" ADD CONSTRAINT "Message_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."PushSubscription" ADD CONSTRAINT "PushSubscription_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."FcmToken" ADD CONSTRAINT "FcmToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."ForumTopic" ADD CONSTRAINT "ForumTopic_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

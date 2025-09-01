@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
@@ -9,8 +9,8 @@ export async function GET() {
 
     const birthdayMembers = await prisma.$queryRaw`
       SELECT * FROM "User"
-      WHERE EXTRACT(MONTH FROM birthday) = ${todayMonth}
-      AND EXTRACT(DAY FROM birthday) = ${todayDay}
+      WHERE EXTRACT(MONTH FROM birthdate) = ${todayMonth}
+      AND EXTRACT(DAY FROM birthdate) = ${todayDay}
     `;
 
     return NextResponse.json(birthdayMembers);
