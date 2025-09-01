@@ -247,13 +247,13 @@ const ChatPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6">
+        <div className="w-full max-w-lg bg-white rounded-xl shadow-lg p-6">
           <h1 className="text-2xl md:text-3xl font-bold text-center mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Community Chat
           </h1>
           <div className="flex justify-center items-center py-8">
             <div className="animate-pulse flex flex-col items-center space-y-4">
-              <div className="h-12 w-12 rounded-full bg-blue-200"></div>
+              <div className="h-16 w-16 rounded-full bg-blue-200"></div>
               <p className="text-gray-600 font-medium">Loading messages...</p>
             </div>
           </div>
@@ -265,7 +265,7 @@ const ChatPage = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6">
+        <div className="w-full max-w-lg bg-white rounded-xl shadow-lg p-6">
           <h1 className="text-2xl md:text-3xl font-bold text-center mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Community Chat
           </h1>
@@ -273,7 +273,7 @@ const ChatPage = () => {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <svg
-                  className="h-5 w-5 text-red-500"
+                  className="h-6 w-6 text-red-500"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -297,17 +297,17 @@ const ChatPage = () => {
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-blue-50 to-indigo-50">
       {/* Header */}
-      <header className="bg-white shadow-sm p-3 md:p-4 border-b border-gray-200 z-10">
+      <header className="bg-white shadow-sm p-4 border-b border-gray-200 z-10">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Community Chat
           </h1>
-          <div className="flex items-center space-x-2 md:space-x-3">
+          <div className="flex items-center space-x-3">
             <Button
               variant="outline"
               size="sm"
               onClick={requestPermission}
-              className="hidden xs:inline-flex text-xs md:text-sm"
+              className="hidden xs:inline-flex text-sm"
             >
               Enable Notifications
             </Button>
@@ -315,7 +315,7 @@ const ChatPage = () => {
               variant="outline"
               size="sm"
               onClick={() => setShowGuidelines(true)}
-              className="hidden xs:inline-flex text-xs md:text-sm"
+              className="hidden xs:inline-flex text-sm"
             >
               Guidelines
             </Button>
@@ -323,11 +323,11 @@ const ChatPage = () => {
               variant="outline"
               size="icon"
               onClick={() => setShowGuidelines(true)}
-              className="xs:hidden h-8 w-8"
+              className="xs:hidden h-9 w-9"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
+                className="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -341,7 +341,7 @@ const ChatPage = () => {
               </svg>
             </Button>
             {totalMembers !== null && (
-              <div className="text-xs md:text-sm font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-lg">
+              <div className="text-sm font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-lg">
                 <span className="font-bold text-blue-600">{totalMembers}</span>{" "}
                 Online
               </div>
@@ -351,8 +351,8 @@ const ChatPage = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden p-2 md:p-4">
-        <div className="max-w-4xl mx-auto h-full flex flex-col bg-white rounded-xl shadow-md overflow-hidden">
+      <main className="flex-1 overflow-hidden p-0 sm:p-2 md:p-4">
+        <div className="w-full max-w-4xl mx-auto h-full flex flex-col bg-white sm:rounded-xl shadow-md overflow-hidden">
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4">
             {messages.length > 0 ? (
@@ -368,7 +368,7 @@ const ChatPage = () => {
                 <div className="bg-blue-100 p-4 rounded-full mb-4">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-10 w-10 text-blue-500"
+                    className="h-12 w-12 text-blue-500"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -381,7 +381,7 @@ const ChatPage = () => {
                     />
                   </svg>
                 </div>
-                <p className="text-gray-700 font-semibold text-lg">
+                <p className="text-gray-700 font-semibold text-xl">
                   Welcome to the Chat!
                 </p>
                 <p className="text-gray-500 mt-1 text-sm">
@@ -405,7 +405,7 @@ const ChatPage = () => {
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3 md:h-4 md:w-4"
+                    className="h-4 w-4"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -422,7 +422,7 @@ const ChatPage = () => {
                   <img
                     src={previewUrl}
                     alt="Preview"
-                    className="max-h-32 rounded-md mx-auto"
+                    className="max-h-40 rounded-md mx-auto"
                   />
                 )}
               </div>
@@ -438,7 +438,7 @@ const ChatPage = () => {
                   placeholder="Type your message..."
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  className="min-h-[44px] max-h-[120px] pr-10 resize-none border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  className="min-h-[48px] max-h-[120px] pr-10 resize-none border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   disabled={!session?.user?.id}
                   rows={1}
                   onKeyDown={(e) => {
@@ -452,13 +452,13 @@ const ChatPage = () => {
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 bottom-2 h-7 w-7 text-gray-500 hover:text-blue-600"
+                  className="absolute right-2 bottom-2 h-8 w-8 text-gray-500 hover:text-blue-600"
                   disabled={!session?.user?.id}
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
+                    className="h-5 w-5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -485,12 +485,12 @@ const ChatPage = () => {
                 disabled={
                   !session?.user?.id || (!newMessage.trim() && !previewUrl)
                 }
-                className="bg-blue-600 hover:bg-blue-700 text-white h-[44px] px-3 disabled:bg-blue-300 disabled:cursor-not-allowed transition-all duration-200"
+                className="bg-blue-600 hover:bg-blue-700 text-white h-[48px] px-3 disabled:bg-blue-300 disabled:cursor-not-allowed transition-all duration-200"
                 size="icon"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-6 w-6"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -505,10 +505,10 @@ const ChatPage = () => {
               </Button>
             </form>
             {!session?.user?.id && (
-              <div className="mt-2 flex items-center text-xs text-red-500">
+              <div className="mt-2 flex items-center text-sm text-red-500">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-1"
+                  className="h-5 w-5 mr-1"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -529,19 +529,19 @@ const ChatPage = () => {
 
       {/* AlertDialog for delete confirmation */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent className="max-w-[95vw] rounded-xl">
+        <AlertDialogContent className="w-[95vw] max-w-md md:max-w-lg rounded-xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Message</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-2xl">Delete Message</AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
               This action cannot be undone. This will permanently delete your
               message from our servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="mt-0">Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+            <AlertDialogCancel className="mt-2 sm:mt-0 w-full sm:w-auto">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteMessage}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
             >
               Delete
             </AlertDialogAction>
@@ -551,12 +551,12 @@ const ChatPage = () => {
 
       {/* Guidelines Modal */}
       <AlertDialog open={showGuidelines} onOpenChange={setShowGuidelines}>
-        <AlertDialogContent className="max-w-[95vw] rounded-xl max-h-[80vh] overflow-y-auto">
+        <AlertDialogContent className="w-[95vw] max-w-md md:max-w-lg rounded-xl max-h-[80vh] overflow-y-auto">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl">
+            <AlertDialogTitle className="text-2xl">
               Community Guidelines
             </AlertDialogTitle>
-            <div className="text-muted-foreground text-sm">
+            <div className="text-muted-foreground text-base">
               <ul className="list-disc list-inside text-gray-700 space-y-3 mt-4">
                 <li>
                   <strong>Be Respectful:</strong> Treat all members with
@@ -586,7 +586,7 @@ const ChatPage = () => {
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setShowGuidelines(false)}>
+            <AlertDialogAction onClick={() => setShowGuidelines(false)} className="w-full sm:w-auto">
               Got it, thanks!
             </AlertDialogAction>
           </AlertDialogFooter>

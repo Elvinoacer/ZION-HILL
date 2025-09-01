@@ -189,7 +189,7 @@ const RichMessageContent: React.FC<RichMessageContentProps> = ({ content }) => {
   };
 
   return (
-    <div className="rich-message-content leading-relaxed">
+    <div className="rich-message-content leading-relaxed text-sm">
       {renderContent()}
     </div>
   );
