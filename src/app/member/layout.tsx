@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { churchConfig } from "@/lib/church-config";
 import Sidebar from "@/components/Sidebar";
 import { useSession } from "next-auth/react";
@@ -25,16 +26,25 @@ export default function AuthenticatedLayout({
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="flex justify-between items-center p-4 bg-white border-b">
-          <div className="flex items-center">
+          <div className="flex items-center space-x-2">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="text-gray-500 focus:outline-none lg:hidden"
             >
               <FiMenu size={24} />
             </button>
-            <h1 className="text-2xl font-semibold text-gray-800 ml-4">
-              {churchConfig.name}
-            </h1>
+            <div className="flex items-center">
+              <Image
+                src="/images/kag-logo-free-bg.png"
+                alt="Church Logo"
+                width={64}
+                height={64}
+                className="rounded-full drop-shadow-lg"
+              />
+              <h1 className="text-base sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent ml-2 truncate">
+                K.A.G Worship Center, ELD
+              </h1>
+            </div>
           </div>
 
           <div className="flex items-center space-x-4">
