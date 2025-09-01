@@ -1,9 +1,9 @@
 "use client";
 import { churchConfig } from "@/lib/church-config";
-
 import Link from "next/link";
 import React, { useState } from "react";
 import { safeFetch } from "@/lib/api";
+import Image from "next/image";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -52,13 +52,23 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Brand Section */}
           <div className="lg:col-span-1">
-            <div className="mb-6">
-              <h3 className="text-2xl font-bold mb-4 text-white">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300">
-                  {churchConfig.name}
-                </span>
-              </h3>
-              <p className="text-gray-300 mb-4 leading-relaxed">
+            <div className="mb-6 flex flex-col items-start">
+              <div className="flex items-center gap-3 mb-4">
+                <Image
+                  src="/images/kag-logo-free-bg.png"
+                  alt="K.A.G KASARANI-ELD Logo"
+                  width={50}
+                  height={50}
+                  className="rounded-full bg-white p-1"
+                />
+                <div>
+                  <h3 className="text-xl font-bold text-white">
+                    K.A.G
+                  </h3>
+                  <p className="text-sm text-gray-400">KASARANI-ELD</p>
+                </div>
+              </div>
+              <p className="text-gray-300 leading-relaxed">
                 {churchConfig.vision}
               </p>
             </div>
@@ -287,7 +297,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm mb-4 md:mb-0">
-            © {new Date().getFullYear()} {churchConfig.name}. All rights
+            © {new Date().getFullYear()} K.A.G KASARANI-ELD. All rights
             reserved.
           </p>
 

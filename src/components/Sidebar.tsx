@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Award, LayoutDashboardIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -375,9 +376,17 @@ const SidebarContent = ({ setSidebarOpen }) => {
   return (
     <div className="flex h-full flex-col bg-gray-900 border-r border-gray-800">
       <div className="flex items-center justify-between p-4 border-b border-gray-800">
-        <div className="text-xl font-bold flex items-center text-white">
-          <Icons.logo className="mr-2 h-6 w-6 text-blue-500" />
-          <span>{churchConfig.name}</span>
+        <div className="flex items-center gap-3">
+          <Image
+            src="/images/kag-logo-free-bg.png"
+            alt="The Worship Center Logo"
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+          <span className="text-lg font-semibold text-white">
+            The Worship Center
+          </span>
         </div>
         <button
           onClick={() => setSidebarOpen(false)}

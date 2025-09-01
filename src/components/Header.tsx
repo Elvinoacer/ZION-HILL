@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 const Header = () => {
   const pathname = usePathname();
@@ -31,22 +32,21 @@ const Header = () => {
       className="bg-gray-900/90 backdrop-blur-lg shadow-xl sticky top-0 z-50"
       role="banner"
     >
-      <div className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+      <div className="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
         <Link
           href="/"
-          className="flex items-center flex-shrink-0 space-x-2"
+          className="flex items-center flex-shrink-0 space-x-3"
           onClick={() => setIsMobileMenuOpen(false)}
         >
-          <div
-            className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-400 to-blue-500 via-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-lg transform transition-all duration-300 hover:scale-110 hover:shadow-xl"
-            aria-hidden="true"
-          >
-            <span className="transform group-hover:rotate-12 transition-transform duration-300">
-              K.A.G
-            </span>
-          </div>
-          <span className="text-white font-semibold text-base md:text-lg">
-            Kenya Assemblies of God
+          <Image
+            src="/images/kag-logo-free-bg.png"
+            alt="The Worship Center Logo"
+            width={48}
+            height={48}
+            className="rounded-full"
+          />
+          <span className="text-white font-semibold text-lg md:text-xl">
+            The Worship Center
           </span>
         </Link>
 
