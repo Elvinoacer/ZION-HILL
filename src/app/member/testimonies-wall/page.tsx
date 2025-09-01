@@ -79,6 +79,14 @@ const TestimoniesWallPage = () => {
   );
   const [selectedTestimony, setSelectedTestimony] = useState<Testimony | null>(null);
 
+  const handleCardClick = (testimony: Testimony) => {
+    setSelectedTestimony(testimony);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedTestimony(null);
+  };
+
   const fetchTestimonies = useCallback(async () => {
     try {
       const data = await safeFetch<Testimony[]>("/api/testimonies-wall");
@@ -292,8 +300,7 @@ const TestimoniesWallPage = () => {
         </div>
       </div>
       <EditTestimonialDialog
-        {
-...{
+        {...{
           isEditModalOpen,
           setIsEditModalOpen,
           handleUpdate,
@@ -305,6 +312,11 @@ const TestimoniesWallPage = () => {
           isSubmitting,
         }}
       />
+      <AnimatePresence>
+        {selectedTestimony && (
+          <TestimonyModal testimony={selectedTestimony} onClose={handleCloseModal} />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -353,8 +365,8 @@ const SubmitTestimonyForm = ({ handleSubmit, newTestimony, setNewTestimony, imag
     </Card>
 );
 
-const TestimonyCard = ({ testimony, session, handleEditClick, handleDelete }: { testimony: Testimony, session: any, handleEditClick: any, handleDelete: any }) => (
-    <Card className="h-full flex flex-col bg-white dark:bg-gray-800/50 rounded-2xl shadow-lg border border-gray-200/80 dark:border-gray-700/60 overflow-hidden transform hover:-translate-y-1.5 transition-transform duration-300 group">
+const TestimonyCard = ({ testimony, session, handleEditClick, handleDelete, onCardClick }: { testimony: Testimony, session: any, handleEditClick: any, handleDelete: any, onCardClick: any }) => (
+    <Card onClick={() => onCardClick(testimony)} className="h-full flex flex-col bg-white dark:bg-gray-800/50 rounded-2xl shadow-lg border border-gray-200/80 dark:border-gray-700/60 overflow-hidden transform hover:-translate-y-1.5 transition-transform duration-300 group cursor-pointer">
         {testimony.imageUrl && (
             <div className="aspect-video w-full overflow-hidden">
                 <Image src={testimony.imageUrl} alt="Testimony Image" width={500} height={300} className="object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -363,7 +375,7 @@ const TestimonyCard = ({ testimony, session, handleEditClick, handleDelete }: { 
         <CardContent className="p-6 flex-grow flex flex-col">
             <blockquote className="flex-grow text-gray-600 dark:text-gray-300 italic mb-4">
                 <Quote className="h-5 w-5 text-teal-500/50 absolute -left-3 top-4"/>
-                {testimony.comment}
+                <p className="truncate">{testimony.comment}</p>
             </blockquote>
             <div className="flex items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700/60">
                 <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
@@ -383,7 +395,7 @@ const TestimonyCard = ({ testimony, session, handleEditClick, handleDelete }: { 
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => handleEditClick(testimony)}
+            onClick={(e) => {e.stopPropagation(); handleEditClick(testimony)}}
           >
             <Edit className="h-4 w-4 mr-2" /> Edit
           </Button>
@@ -391,7 +403,7 @@ const TestimonyCard = ({ testimony, session, handleEditClick, handleDelete }: { 
             variant="ghost"
             size="sm"
             className="text-red-500 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50"
-            onClick={() => handleDelete(testimony.id)}
+            onClick={(e) => {e.stopPropagation(); handleDelete(testimony.id)}}
           >
             <Trash2 className="h-4 w-4 mr-2" /> Delete
           </Button>
@@ -506,5 +518,45 @@ const ErrorDisplay = ({ message }: { message: string }) => (
     </DialogContent>
   </Dialog>
 );
+
+const TestimonyModal = ({ testimony, onClose }: { testimony: Testimony, onClose: () => void }) => {
+  if (!testimony) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 20 }}
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <CardHeader className="flex-shrink-0">
+          <CardTitle className="text-2xl">{testimony.user?.name || "Anonymous"}'s Testimony</CardTitle>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {format(new Date(testimony.createdAt), "MMMM d, yyyy")}
+          </p>
+        </CardHeader>
+        <div className="overflow-y-auto flex-grow p-6">
+          {testimony.imageUrl && (
+            <div className="mb-6">
+              <Image src={testimony.imageUrl} alt="Testimony Image" width={800} height={600} className="w-full h-auto object-contain rounded-lg" />
+            </div>
+          )}
+          <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{testimony.comment}</p>
+        </div>
+        <CardFooter className="flex-shrink-0">
+          <Button onClick={onClose} variant="outline">Close</Button>
+        </CardFooter>
+      </motion.div>
+    </motion.div>
+  );
+};
 
 export default TestimoniesWallPage;
