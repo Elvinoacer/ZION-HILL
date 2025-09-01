@@ -55,9 +55,9 @@ const Footer = () => {
             <Image
               src="/images/kag-logo-free-bg.png"
               alt="K.A.G KASARANI-ELD Logo"
-              width={72}
-              height={72}
-              className="mb-4"
+              width={144}
+              height={144}
+              className="mb-4 w-36 h-36"
             />
             <h3 className="text-2xl font-bold text-white tracking-tight">
               K.A.G KASARANI-ELD
