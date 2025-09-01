@@ -1,11 +1,11 @@
 "use client";
-import { churchConfig } from "@/lib/church-config";
 import { Icons } from "@/components/icons";
+import AlertDialog from "@/components/ui/AlertDialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { Award, LayoutDashboardIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -17,6 +17,7 @@ import {
   FaChild,
   FaChurch,
   FaComment,
+  FaCross,
   FaFileInvoiceDollar,
   FaHandHoldingHeart,
   FaHandHoldingUsd,
@@ -24,21 +25,17 @@ import {
   FaLandmark,
   FaMusic,
   FaPhotoVideo,
-  FaPray,
+  FaPoll,
   FaPrayingHands,
+  FaQuoteRight,
   FaSitemap,
   FaStar,
   FaTimes,
   FaUser,
   FaUsers,
-  FaUsersCog,
   FaUserShield,
   FaVideo,
-  FaCross,
-  FaPoll,
-  FaQuoteRight,
 } from "react-icons/fa";
-import AlertDialog from "@/components/ui/AlertDialog";
 // test this
 
 const SidebarContent = ({ setSidebarOpen }) => {
@@ -380,9 +377,9 @@ const SidebarContent = ({ setSidebarOpen }) => {
           <Image
             src="/images/kag-logo-free-bg.png"
             alt="The Worship Center Logo"
-            width={64}
-            height={64}
-            className="h-10 w-10 md:h-16 md:w-16 rounded-full"
+            width={80}
+            height={80}
+            className="h-12 w-12 md:h-20 md:w-20 rounded-full object-cover"
           />
           <span className="text-lg md:text-xl font-semibold text-white">
             The Worship Center

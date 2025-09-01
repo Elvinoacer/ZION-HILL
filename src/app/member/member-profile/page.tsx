@@ -237,326 +237,213 @@ const MemberProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 px-4 sm:px-6 lg:px-8 py-12">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Member Profile
-          </h1>
-          <p className="text-base sm:text-lg text-gray-600 mt-2">
-            Manage your personal information, view your giving history, and
-            check your volunteer schedules.
+          <h1 className="text-4xl font-bold text-gray-800">Member Profile</h1>
+          <p className="text-lg text-gray-600 mt-1">
+            View and manage your profile information.
           </p>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 mb-8">
-            <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-t-2xl">
-              <CardTitle className="flex items-center space-x-2 text-indigo-700 text-lg sm:text-xl font-bold">
-                <User className="h-5 w-5" />
-                <span>Your Profile Information</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {profile ? (
-                <>
-                  <div className="flex items-center space-x-4 mb-6">
-                    <Avatar className="h-16 w-16">
-                      <AvatarImage src={profile?.photo} />
-                      <AvatarFallback className="bg-indigo-100 text-indigo-600 text-lg">
-                        {profile?.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
-                        {profile?.name}
-                      </h3>
-                      <p className="text-sm text-gray-500">{profile?.email}</p>
-                    </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Profile Details Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-bold text-gray-700">
+                    Profile Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                  <div className="space-y-1">
+                    <p className="font-medium text-gray-500">Full Name</p>
+                    <p className="text-gray-800 text-base">{profile?.name}</p>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        htmlFor="name"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Name
-                      </label>
-                      <Input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={profile?.name || ""}
-                        disabled={true}
-                        className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="email"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Email
-                      </label>
-                      <Input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={profile?.email || ""}
-                        disabled={true}
-                        className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="phone"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Phone
-                      </label>
-                      <Input
-                        type="text"
-                        id="phone"
-                        name="phone"
-                        value={profile?.phone || ""}
-                        disabled={true}
-                        className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="address"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Address
-                      </label>
-                      <Input
-                        type="text"
-                        id="address"
-                        name="address"
-                        value={profile?.address || ""}
-                        disabled={true}
-                        className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="membersince"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Member Since
-                      </label>
-                      <Input
-                        type="text"
-                        id="membersince"
-                        name="membersince"
-                        value={profile?.membersince || ""}
-                        disabled={true}
-                        className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="birthdate"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Birthdate
-                      </label>
-                      <Input
-                        type="text"
-                        id="birthdate"
-                        name="birthdate"
-                        value={profile?.birthdate || ""}
-                        disabled={true}
-                        placeholder="YYYY-MM-DD"
-                        className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="photo"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Photo URL
-                      </label>
-                      <Input
-                        type="text"
-                        id="photo"
-                        name="photo"
-                        value={profile?.photo || ""}
-                        disabled={true}
-                        className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
-                      />
-                    </div>
-                    <div className="md:col-span-2 flex space-x-2 mt-4">
-                      <Button
-                        onClick={() => router.push("/profile")}
-                        className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        View Full Profile
-                      </Button>
-                    </div>
+                  <div className="space-y-1">
+                    <p className="font-medium text-gray-500">Email Address</p>
+                    <p className="text-gray-800 text-base">{profile?.email}</p>
                   </div>
-                </>
-              ) : (
-                <p className="text-gray-500 text-sm">
-                  No profile data available.
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+                  <div className="space-y-1">
+                    <p className="font-medium text-gray-500">Phone Number</p>
+                    <p className="text-gray-800 text-base">
+                      {profile?.phone || "Not provided"}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-medium text-gray-500">Address</p>
+                    <p className="text-gray-800 text-base">
+                      {profile?.address || "Not provided"}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-medium text-gray-500">Member Since</p>
+                    <p className="text-gray-800 text-base">
+                      {profile?.membersince
+                        ? format(new Date(profile.membersince), "MMMM d, yyyy")
+                        : "Not available"}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-medium text-gray-500">Birthdate</p>
+                    <p className="text-gray-800 text-base">
+                      {profile?.birthdate
+                        ? format(new Date(profile.birthdate), "MMMM d, yyyy")
+                        : "Not provided"}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 mb-8">
-            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-2xl">
-              <CardTitle className="flex items-center space-x-2 text-blue-700 text-lg sm:text-xl font-bold">
-                <DollarSign className="h-5 w-5" />
-                <span>Giving History</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {profile?.transactions && profile.transactions.length > 0 ? (
-                <ul className="space-y-3">
-                  <AnimatePresence>
-                    {profile.transactions.map((transaction) => (
-                      <motion.li
-                        key={transaction.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 10 }}
-                        transition={{ duration: 0.3 }}
-                        className="p-3 rounded-lg bg-gray-50 border border-gray-100 flex justify-between items-center"
-                      >
-                        <div>
-                          <p className="text-sm sm:text-base font-medium text-gray-700">
-                            {format(new Date(transaction.date), "MMMM d, yyyy")}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {transaction.description || "Donation"}
-                          </p>
-                        </div>
-                        <p className="text-sm sm:text-base font-semibold text-blue-600">
-                          ${transaction.amount.toFixed(2)}
-                        </p>
-                      </motion.li>
-                    ))}
-                  </AnimatePresence>
-                </ul>
-              ) : (
-                <div className="p-6 text-center">
-                  <DollarSign className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                  <p className="text-gray-500 text-sm">
-                    No giving history available.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-t-2xl">
-              <CardTitle className="flex items-center space-x-2 text-purple-700 text-lg sm:text-xl font-bold">
-                <Calendar className="h-5 w-5" />
-                <span>Volunteer Schedules</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {profile?.shifts && profile.shifts.length > 0 ? (
-                <ul className="space-y-3">
-                  <AnimatePresence>
-                    {profile.shifts.map((shift) => (
-                      <motion.li
-                        key={shift.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 10 }}
-                        transition={{ duration: 0.3 }}
-                        className="p-3 rounded-lg bg-gray-50 border border-gray-100 flex justify-between items-center"
-                      >
-                        <div>
-                          <p className="text-sm sm:text-base font-medium text-gray-700">
-                            {shift.time}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            Event ID: {shift.eventId}
-                          </p>
-                        </div>
-                        <p
-                          className={`text-sm font-medium ${
-                            shift.checkedIn
-                              ? "text-green-600"
-                              : "text-yellow-600"
-                          }`}
+            {/* Giving History Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-bold text-gray-700">
+                    Giving History
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {profile?.transactions && profile.transactions.length > 0 ? (
+                    <ul className="space-y-4">
+                      {profile.transactions.map((transaction) => (
+                        <li
+                          key={transaction.id}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                         >
-                          {shift.checkedIn ? "Checked In" : "Pending"}
-                        </p>
-                      </motion.li>
-                    ))}
-                  </AnimatePresence>
-                </ul>
-              ) : (
-                <div className="p-6 text-center">
-                  <Calendar className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                  <p className="text-gray-500 text-sm">
-                    No volunteer schedules available.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+                          <div className="flex items-center space-x-4">
+                            <div className="bg-green-100 p-2 rounded-full">
+                              <DollarSign className="h-5 w-5 text-green-600" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-gray-800">
+                                {transaction.description || "Donation"}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {format(
+                                  new Date(transaction.date),
+                                  "MMMM d, yyyy"
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                          <p className="font-bold text-lg text-green-700">
+                            ${transaction.amount.toFixed(2)}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">No giving history found.</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
 
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.6s ease-out;
-        }
-        .animate-slide-up {
-          animation: slideUp 0.6s ease-out;
-        }
-      `}</style>
+          {/* Right Column */}
+          <div className="lg:col-span-1 space-y-8">
+            {/* Profile Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 text-center">
+                <CardContent className="p-8">
+                  <Avatar className="h-32 w-32 mx-auto mb-4">
+                    <AvatarImage src={profile?.photo} />
+                    <AvatarFallback className="text-4xl bg-blue-100 text-blue-600">
+                      {profile?.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    {profile?.name}
+                  </h2>
+                  <p className="text-gray-500">{profile?.email}</p>
+                  <Button className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    Edit Profile
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Volunteer Schedule Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-bold text-gray-700">
+                    Volunteer Schedule
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {profile?.shifts && profile.shifts.length > 0 ? (
+                    <ul className="space-y-4">
+                      {profile.shifts.map((shift) => (
+                        <li
+                          key={shift.id}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                        >
+                          <div className="flex items-center space-x-4">
+                            <div className="bg-purple-100 p-2 rounded-full">
+                              <Calendar className="h-5 w-5 text-purple-600" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-gray-800">
+                                {shift.time}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                Event ID: {shift.eventId}
+                              </p>
+                            </div>
+                          </div>
+                          <span
+                            className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                              shift.checkedIn
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {shift.checkedIn ? "Checked In" : "Pending"}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">
+                        No volunteer schedules found.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
