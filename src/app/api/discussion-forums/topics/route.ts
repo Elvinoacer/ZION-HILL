@@ -5,14 +5,28 @@ export async function GET() {
   try {
     const topics = await prisma.forumTopic.findMany({
       include: {
-        user: { select: { name: true, image: true } }, // Include user name and image
-        _count: { select: { posts: true } }, // Count of posts for each topic
+        user: { select: { name: true, image: true } },
+        _count: { select: { posts: true } },
+        topicFeedbacks: {
+          select: {
+            type: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
-    return NextResponse.json(topics);
+
+    const topicsWithCounts = topics.map(topic => {
+      const likes = topic.topicFeedbacks.filter(fb => fb.type === 'LIKE').length;
+      const dislikes = topic.topicFeedbacks.filter(fb => fb.type === 'DISLIKE').length;
+      // eslint-disable-next-line no-unused-vars
+      const { topicFeedbacks, ...rest } = topic;
+      return { ...rest, likes, dislikes };
+    });
+
+    return NextResponse.json(topicsWithCounts);
   } catch (error: any) {
     console.error('Error fetching forum topics:', error);
     return NextResponse.json({ error: `Error fetching forum topics: ${error.message}` }, { status: 500 });

@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -18,13 +19,27 @@ export async function GET(req: NextRequest) {
       },
       take: limit, // Take a limited number of topics
       include: {
+        user: { select: { name: true, image: true } },
         _count: {
           select: { posts: true }, // Include count of posts for each topic
         },
+        topicFeedbacks: {
+            select: {
+                type: true
+            }
+        }
       },
     });
 
-    return NextResponse.json(relatedTopics);
+    const topicsWithCounts = relatedTopics.map(topic => {
+        const likes = topic.topicFeedbacks.filter(fb => fb.type === 'LIKE').length;
+        const dislikes = topic.topicFeedbacks.filter(fb => fb.type === 'DISLIKE').length;
+        // eslint-disable-next-line no-unused-vars
+        const { topicFeedbacks, ...rest } = topic;
+        return { ...rest, likes, dislikes };
+    });
+
+    return NextResponse.json(topicsWithCounts);
   } catch (error: any) {
     console.error("Error fetching related topics:", error.message);
     return NextResponse.json(

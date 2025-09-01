@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,6 +33,11 @@ interface User {
   image?: string;
 }
 
+interface Feedback {
+    userId: string;
+    type: 'LIKE' | 'DISLIKE';
+}
+
 interface ForumContent {
   id: string;
   content: string;
@@ -49,23 +53,36 @@ interface ForumContent {
 
 interface ForumTopic extends ForumContent {
   title: string;
+  posts: ForumPost[];
+  topicFeedbacks: Feedback[];
 }
 
-interface ForumPost extends ForumContent {}
+interface ForumPost extends ForumContent {
+    feedback: Feedback[];
+}
 
 const TopicPage = () => {
   const { data: session } = useSession();
   const params = useParams();
   const topicId = params.topicId as string;
 
-  const [state, setState] = useState({
-    topic: null as ForumTopic | null,
-    posts: [] as ForumPost[],
+  const [state, setState] = useState<{
+    topic: ForumTopic | null;
+    posts: ForumPost[];
+    newPostContent: string;
+    newPostImageUrl: string;
+    newPostVideoUrl: string;
+    loading: boolean;
+    error: string | null;
+    isSubmitting: boolean;
+  }>({
+    topic: null,
+    posts: [],
     newPostContent: "",
     newPostImageUrl: "",
     newPostVideoUrl: "",
     loading: true,
-    error: null as string | null,
+    error: null,
     isSubmitting: false,
   });
 
@@ -81,24 +98,28 @@ const TopicPage = () => {
   } = state;
 
   const fetchTopicAndPosts = async () => {
+    if (!topicId) return;
     try {
       setState((prev) => ({ ...prev, loading: true, error: null }));
 
-      const topicData = await safeFetch<ForumTopic[]>(
-        `/api/discussion-forums/topics?id=${topicId}`
+      const fetchedTopic = await safeFetch<ForumTopic>(
+        `/api/discussion-forums/topics/${topicId}`
       );
-      const fetchedTopic = await addUserFeedback(topicData[0] || null, "topic");
 
-      const postsData = await safeFetch<ForumPost[]>(
-        `/api/discussion-forums/topics/${topicId}/posts`
-      );
-      const postsWithFeedback = await Promise.all(
-        postsData.map((post) => addUserFeedback(post, "post"))
-      );
+      const topicWithUserFeedback = {
+          ...fetchedTopic,
+          userFeedback: fetchedTopic.topicFeedbacks.find(fb => fb.userId === session?.user?.id)?.type || null
+      }
+
+      const postsWithFeedback = fetchedTopic.posts.map(post => ({
+          ...post,
+          userFeedback: post.feedback.find(fb => fb.userId === session?.user?.id)?.type || null
+      }))
+
 
       setState((prev) => ({
         ...prev,
-        topic: fetchedTopic,
+        topic: topicWithUserFeedback,
         posts: postsWithFeedback,
         loading: false,
       }));
@@ -107,30 +128,8 @@ const TopicPage = () => {
     }
   };
 
-  const addUserFeedback = async <T extends ForumContent>(
-    content: T | null,
-    type: "topic" | "post"
-  ) => {
-    if (!content || !session?.user?.id) return content;
-
-    try {
-      const endpoint =
-        type === "topic"
-          ? `/api/discussion-forums/topics/${content.id}/user-feedback?userId=${session.user.id}`
-          : `/api/discussion-forums/posts/${content.id}/user-feedback?userId=${session.user.id}`;
-
-      const feedbackRes = await safeFetch<{ type: "LIKE" | "DISLIKE" } | null>(
-        endpoint
-      );
-      return { ...content, userFeedback: feedbackRes?.type || null };
-    } catch (error) {
-      console.error(`Error fetching user feedback for ${type}:`, error);
-      return { ...content, userFeedback: null };
-    }
-  };
-
   useEffect(() => {
-    if (topicId) fetchTopicAndPosts();
+    if (topicId && session) fetchTopicAndPosts();
   }, [topicId, session]);
 
   const handleSubmitPost = async (e: React.FormEvent) => {
@@ -148,7 +147,7 @@ const TopicPage = () => {
     try {
       setState((prev) => ({ ...prev, isSubmitting: true }));
 
-      await safeFetch(`/api/discussion-forums/topics/${topicId}/posts`, {
+      const newPost = await safeFetch<ForumPost>(`/api/discussion-forums/topics/${topicId}/posts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -161,6 +160,7 @@ const TopicPage = () => {
 
       setState((prev) => ({
         ...prev,
+        posts: [...prev.posts, newPost],
         newPostContent: "",
         newPostImageUrl: "",
         newPostVideoUrl: "",
@@ -168,7 +168,6 @@ const TopicPage = () => {
         isSubmitting: false,
       }));
 
-      await fetchTopicAndPosts();
     } catch (err: any) {
       setState((prev) => ({
         ...prev,
@@ -206,7 +205,7 @@ const TopicPage = () => {
       const endpoint =
         contentType === "topic"
           ? `/api/discussion-forums/topics/${id}/feedback`
-          : `/api/discussion-forums/posts/${id}/feedback`;
+          : `/api/discussion-forums/topics/${topicId}/posts/${id}/feedback`;
 
       await safeFetch(endpoint, {
         method: "POST",
@@ -219,14 +218,14 @@ const TopicPage = () => {
     }
   };
 
-  const updateFeedback = <T extends ForumContent>(
+  const updateFeedback = <T extends ForumTopic | ForumPost>(
     content: T | null,
     type: "LIKE" | "DISLIKE"
-  ) => {
+  ): T | null => {
     if (!content) return null;
 
     const { userFeedback, likes, dislikes } = content;
-    let newFeedback = userFeedback;
+    let newFeedback: "LIKE" | "DISLIKE" | null = userFeedback || null;
     let newLikes = likes;
     let newDislikes = dislikes;
 
@@ -597,8 +596,8 @@ const TopicCard = ({
 
               <div className="flex items-center text-sm text-gray-500">
                 <MessageSquare className="w-4 h-4 mr-1.5" />
-                {topic._count.posts}{" "}
-                {topic._count.posts === 1 ? "response" : "responses"}
+                {topic.posts.length}{" "}
+                {topic.posts.length === 1 ? "response" : "responses"}
               </div>
             </div>
           </div>
@@ -1094,7 +1093,7 @@ const RelatedTopicsCard = ({ currentTopicId }: { currentTopicId: string }) => {
                     {topic.title}
                   </h3>
                   <div className="flex items-center text-xs text-gray-500 mt-1 space-x-2">
-                    <span>{topic._count.posts} responses</span>
+                    <span>{topic.posts.length} responses</span>
                     <span className="mx-1">•</span>
                     <span>{topic.likes} likes</span>
                   </div>

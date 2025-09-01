@@ -46,6 +46,11 @@ interface User {
   image?: string;
 }
 
+interface Feedback {
+    userId: string;
+    type: 'LIKE' | 'DISLIKE';
+}
+
 interface ForumTopic {
   id: string;
   title: string;
@@ -58,19 +63,29 @@ interface ForumTopic {
   dislikes: number;
   createdAt: string;
   _count: { posts: number };
+  topicFeedbacks: Feedback[];
   userFeedback?: "LIKE" | "DISLIKE" | null;
 }
 
 export default function DiscussionForumsPage() {
   const { data: session } = useSession();
-  const [state, setState] = useState({
-    topics: [] as ForumTopic[],
+  const [state, setState] = useState<{
+    topics: ForumTopic[];
+    newTopicTitle: string;
+    newTopicContent: string;
+    newTopicImageUrl: string;
+    newTopicVideoUrl: string;
+    loading: boolean;
+    error: string | null;
+    isCreatingTopic: boolean;
+  }>({
+    topics: [],
     newTopicTitle: "",
     newTopicContent: "",
     newTopicImageUrl: "",
     newTopicVideoUrl: "",
     loading: true,
-    error: null as string | null,
+    error: null,
     isCreatingTopic: false,
   });
 
@@ -95,33 +110,20 @@ export default function DiscussionForumsPage() {
       const data = await safeFetch<ForumTopic[]>(
         "/api/discussion-forums/topics"
       );
-      const topicsWithFeedback = await Promise.all(
-        data.map(async (topic) => {
-          if (!session?.user?.id) return { ...topic, userFeedback: null };
+      
+      const topicsWithFeedback = data.map(topic => ({
+          ...topic,
+          userFeedback: topic.topicFeedbacks.find(fb => fb.userId === session?.user?.id)?.type || null
+      }));
 
-          try {
-            const feedbackRes = await safeFetch<{
-              type: "LIKE" | "DISLIKE";
-            } | null>(
-              `/api/discussion-forums/topics/${topic.id}/user-feedback?userId=${session.user.id}`
-            );
-            return { ...topic, userFeedback: feedbackRes?.type || null };
-          } catch {
-            return { ...topic, userFeedback: null };
-          }
-        })
-      );
-
-      setState((prev) => ({ ...prev, topics: topicsWithFeedback }));
+      setState((prev) => ({ ...prev, topics: topicsWithFeedback, loading: false }));
     } catch (err: any) {
-      setState((prev) => ({ ...prev, error: err.message }));
-    } finally {
-      setState((prev) => ({ ...prev, loading: false }));
-    }
+      setState((prev) => ({ ...prev, error: err.message, loading: false }));
+    } 
   };
 
   useEffect(() => {
-    fetchTopics();
+    if(session) fetchTopics();
   }, [session]);
 
   const handleSubmitTopic = async (e: React.FormEvent) => {
@@ -187,7 +189,7 @@ export default function DiscussionForumsPage() {
         if (topic.id !== topicId) return topic;
 
         const { userFeedback, likes, dislikes } = topic;
-        let newFeedback = userFeedback;
+        let newFeedback: 'LIKE' | 'DISLIKE' | null = userFeedback || null;
         let newLikes = likes;
         let newDislikes = dislikes;
 
@@ -718,11 +720,9 @@ const TopicItem = ({
   return (
     <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
       <CardContent
-        className="p-6 relative cursor-pointer"
-        onClick={() =>
-          (window.location.href = `/discussion-forums/${topic.id}`)
-        }
+        className="p-6 relative"
       >
+        <Link href={`/member/discussion-forums/${topic.id}`} className="cursor-pointer">
         {session?.user?.id === topic.userId && (
           <Popover>
             <PopoverTrigger asChild>
@@ -808,6 +808,7 @@ const TopicItem = ({
             />
           </div>
         </div>
+        </Link>
       </CardContent>
       <div className="px-6 pb-4 flex justify-between items-center">
         <FeedbackControls
@@ -926,6 +927,7 @@ const FeedbackButton = ({
     <button
       onClick={(e) => {
         e.preventDefault();
+        e.stopPropagation();
         onClick();
       }}
       disabled={disabled}
@@ -989,7 +991,7 @@ const PopularTopics = ({ topics }: { topics: ForumTopic[] }) => {
           {popularTopics.map((topic) => (
             <Link
               key={topic.id}
-              href={`/discussion-forums/${topic.id}`}
+              href={`/member/discussion-forums/${topic.id}`}
               className="block group"
             >
               <div className="flex items-start space-x-3">

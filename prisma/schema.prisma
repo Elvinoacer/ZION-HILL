@@ -730,12 +730,10 @@ model ForumTopic {
   userId         String
   imageUrl       String?
   videoUrl       String?
-  likes          Int             @default(0)
-  dislikes       Int             @default(0)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   posts          ForumPost[]
-  user           User            @relation(fields: [userId], references: [id])
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   topicFeedbacks TopicFeedback[]
 }
 
@@ -746,12 +744,10 @@ model ForumPost {
   topicId   String
   imageUrl  String?
   videoUrl  String?
-  likes     Int            @default(0)
-  dislikes  Int            @default(0)
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
-  topic     ForumTopic     @relation(fields: [topicId], references: [id])
-  user      User           @relation(fields: [userId], references: [id])
+  topic     ForumTopic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   feedback  PostFeedback[]
 }
 
@@ -762,7 +758,7 @@ model TopicFeedback {
   type      FeedbackType
   createdAt DateTime     @default(now())
   topic     ForumTopic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  user      User         @relation(fields: [userId], references: [id])
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, topicId])
 }
@@ -773,8 +769,8 @@ model PostFeedback {
   postId    String
   type      FeedbackType
   createdAt DateTime     @default(now())
-  post      ForumPost    @relation(fields: [postId], references: [id])
-  user      User         @relation(fields: [userId], references: [id])
+  post      ForumPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
 }

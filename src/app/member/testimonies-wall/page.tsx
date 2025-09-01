@@ -321,7 +321,7 @@ interface SubmitTestimonyFormProps {
 }
 
 const SubmitTestimonyForm = ({ handleSubmit, newTestimony, setNewTestimony, imagePreview, handleImageChange, isSubmitting, session, setImageFile, setImagePreview }: SubmitTestimonyFormProps) => (
-    <Card className="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/60 rounded-2xl shadow-xl max-w-2xl mx-auto">
+    <Card className="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/60 rounded-2xl shadow-xl w-full mx-auto">
         <CardHeader>
             <CardTitle className="flex items-center gap-3 text-2xl font-bold text-gray-800 dark:text-gray-100">
                 Share Your Testimony
@@ -329,7 +329,7 @@ const SubmitTestimonyForm = ({ handleSubmit, newTestimony, setNewTestimony, imag
         </CardHeader>
         <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-                <Textarea value={newTestimony} onChange={(e) => setNewTestimony(e.target.value)} placeholder="What has God done for you?" rows={4} disabled={!session?.user?.id || isSubmitting} className="bg-gray-100 dark:bg-gray-700 border-0 focus:ring-2 focus:ring-teal-500 rounded-xl p-4 transition" />
+                <Textarea value={newTestimony} onChange={(e) => setNewTestimony(e.target.value)} placeholder="What has God done for you?" rows={6} disabled={!session?.user?.id || isSubmitting} className="bg-gray-100 dark:bg-gray-700 border-0 focus:ring-2 focus:ring-teal-500 rounded-xl p-4 transition w-full min-h-[150px]" />
                 <label htmlFor="image-upload" className={`cursor-pointer w-full border-2 border-dashed dark:border-gray-600 rounded-xl p-4 text-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition ${!session?.user?.id || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <div className="flex flex-col items-center justify-center">
                         <FileImage className="h-8 w-8 mb-2" />

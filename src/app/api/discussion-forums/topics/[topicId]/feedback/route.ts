@@ -1,67 +1,34 @@
-import { FeedbackType } from "@/generated/prisma";
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { FeedbackType } from '@prisma/client';
 
-export async function POST(
-  request: Request,
-  { params }: { params: { topicId: string } }
-) {
-  const { topicId } = await params;
-  const { userId, type } = await request.json(); // type will be 'LIKE' or 'DISLIKE'
-
-  console.log(
-    `Received POST feedback for topic ${topicId}: userId=${userId}, type=${type}`
-  );
-
-  if (!userId || !type) {
-    console.error("Missing userId or type in POST request");
-    return NextResponse.json(
-      { error: "userId and type are required" },
-      { status: 400 }
-    );
-  }
-
+export async function POST(request: Request, { params }: { params: { topicId: string } }) {
   try {
+    const { userId, type } = await request.json();
+
+    if (!userId || !type || !Object.values(FeedbackType).includes(type)) {
+      return NextResponse.json({ error: 'userId and a valid type (LIKE/DISLIKE) are required' }, { status: 400 });
+    }
+
     const existingFeedback = await prisma.topicFeedback.findUnique({
       where: {
         userId_topicId: {
           userId,
-          topicId,
+          topicId: params.topicId,
         },
       },
     });
 
-    console.log("Existing topic feedback:", existingFeedback);
-    console.log(
-      "Comparing types:",
-      type,
-      FeedbackType.LIKE,
-      FeedbackType.DISLIKE
-    );
-
-    let updatedTopic;
-
     if (existingFeedback) {
-      // User is changing their feedback or removing it
       if (existingFeedback.type === type) {
-        // User is removing their existing feedback
-        console.log("Removing existing topic feedback");
+        // If the user is submitting the same feedback type, remove it (toggle off)
         await prisma.topicFeedback.delete({
           where: {
             id: existingFeedback.id,
           },
         });
-        updatedTopic = await prisma.forumTopic.update({
-          where: { id: topicId },
-          data: {
-            likes: type === FeedbackType.LIKE ? { decrement: 1 } : undefined,
-            dislikes:
-              type === FeedbackType.DISLIKE ? { decrement: 1 } : undefined,
-          },
-        });
       } else {
-        // User is changing feedback (e.g., from LIKE to DISLIKE)
-        console.log("Changing topic feedback");
+        // If the user is changing their feedback type, update it
         await prisma.topicFeedback.update({
           where: {
             id: existingFeedback.id,
@@ -70,47 +37,21 @@ export async function POST(
             type,
           },
         });
-        updatedTopic = await prisma.forumTopic.update({
-          where: { id: topicId },
-          data: {
-            likes:
-              type === FeedbackType.LIKE ? { increment: 1 } : { decrement: 1 },
-            dislikes:
-              type === FeedbackType.DISLIKE
-                ? { increment: 1 }
-                : { decrement: 1 },
-          },
-        });
       }
     } else {
-      // User is adding new feedback
-      console.log("Adding new topic feedback");
+      // If no feedback exists, create it
       await prisma.topicFeedback.create({
         data: {
           userId,
-          topicId,
+          topicId: params.topicId,
           type,
-        },
-      });
-      updatedTopic = await prisma.forumTopic.update({
-        where: { id: topicId },
-        data: {
-          likes: type === FeedbackType.LIKE ? { increment: 1 } : undefined,
-          dislikes:
-            type === FeedbackType.DISLIKE ? { increment: 1 } : undefined,
         },
       });
     }
 
-    return NextResponse.json(updatedTopic);
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: any) {
-    console.error(
-      `Error processing topic feedback for topic ${topicId}:`,
-      error
-    );
-    return NextResponse.json(
-      { error: `Error processing feedback: ${error.message}` },
-      { status: 500 }
-    );
+    console.error(`Error processing feedback for topic ${params.topicId}:`, error);
+    return NextResponse.json({ error: `Error processing feedback: ${error.message}` }, { status: 500 });
   }
 }
