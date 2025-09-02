@@ -18,6 +18,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import GivingSummaryCards from "@/components/member/GivingSummaryCards";
+import GivingSummaryExpansiveCard from "@/components/member/GivingSummaryExpansiveCard";
 import { motion } from "framer-motion";
 import { AlertCircle, ArrowRight, Handshake, Loader } from "lucide-react";
 import { useSession } from "next-auth/react";
