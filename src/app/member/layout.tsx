@@ -60,7 +60,7 @@ export default function AuthenticatedLayout({
             </a>
           </div>
         </header>
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-8">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 sm:p-6 md:p-8">
           {children}
         </main>
       </div>
