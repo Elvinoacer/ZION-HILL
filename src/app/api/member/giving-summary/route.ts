@@ -1,8 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@/generated/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";// Assuming you have this
-import { startOfDay, startOfWeek, startOfMonth, startOfYear, endOfDay, endOfWeek, endOfMonth, endOfYear, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, eachYearOfInterval, format } from 'date-fns';
+
+import {
+  startOfDay,
+  startOfWeek,
+  startOfMonth,
+  startOfYear,
+  endOfDay,
+  endOfWeek,
+  endOfMonth,
+  endOfYear,
+  eachDayOfInterval,
+  eachWeekOfInterval,
+  eachMonthOfInterval,
+  eachYearOfInterval,
+  format,
+} from "date-fns";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 const prisma = new PrismaClient();
 
@@ -18,12 +33,12 @@ export async function GET(req: NextRequest) {
   try {
     const transactions = await prisma.transaction.findMany({
       where: { userId },
-      orderBy: { date: 'asc' },
+      orderBy: { date: "asc" },
     });
 
     // 1. Pie Chart Data
     const pieChartData = transactions.reduce((acc, t) => {
-      const existing = acc.find(item => item.name === t.type);
+      const existing = acc.find((item) => item.name === t.type);
       if (existing) {
         existing.value += t.amount;
       } else {
@@ -34,20 +49,25 @@ export async function GET(req: NextRequest) {
 
     // 2. Line Chart Data (Grouped by different time periods)
     const now = new Date();
-    const firstTransactionDate = transactions.length > 0 ? new Date(transactions[0].date) : now;
+    const firstTransactionDate =
+      transactions.length > 0 ? new Date(transactions[0].date) : now;
 
-    const dailyData = eachDayOfInterval({ start: startOfDay(firstTransactionDate), end: endOfDay(now) }).map(day => ({
-      date: format(day, 'yyyy-MM-dd'),
+    const dailyData = eachDayOfInterval({
+      start: startOfDay(firstTransactionDate),
+      end: endOfDay(now),
+    }).map((day) => ({
+      date: format(day, "yyyy-MM-dd"),
       Tithes: 0,
-      'Special Offerings': 0,
-      'Project/Support': 0,
+      "Special Offerings": 0,
+      "Project/Support": 0,
     }));
 
-    transactions.forEach(t => {
-      const day = format(new Date(t.date), 'yyyy-MM-dd');
-      const dayData = dailyData.find(d => d.date === day);
+    transactions.forEach((t) => {
+      const day = format(new Date(t.date), "yyyy-MM-dd");
+      const dayData = dailyData.find((d) => d.date === day);
       if (dayData) {
-        dayData[t.type as 'Tithes' | 'Special Offerings' | 'Project/Support'] += t.amount;
+        dayData[t.type as "Tithes" | "Special Offerings" | "Project/Support"] +=
+          t.amount;
       }
     });
 
@@ -56,7 +76,8 @@ export async function GET(req: NextRequest) {
 
     // 3. Average Donation
     const totalDonations = transactions.reduce((sum, t) => sum + t.amount, 0);
-    const averageDonation = transactions.length > 0 ? totalDonations / transactions.length : 0;
+    const averageDonation =
+      transactions.length > 0 ? totalDonations / transactions.length : 0;
 
     return NextResponse.json({
       pieChartData,
@@ -69,9 +90,11 @@ export async function GET(req: NextRequest) {
       averageDonation,
       totalDonations,
     });
-
   } catch (error) {
     console.error("Error fetching giving summary:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
