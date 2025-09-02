@@ -4,7 +4,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import Papa from 'papaparse';
 import { saveAs } from 'file-saver';
-import * as HTMLToDocx from 'html-to-docx';
+
 import { Plus, Download, Edit, Trash2 } from 'lucide-react';
 
 interface GivingOpportunity {
@@ -148,8 +148,25 @@ const GivingOpportunities = () => {
       </html>
     `;
 
-    const docx = await HTMLToDocx.asBlob(html);
-    saveAs(docx, 'giving_opportunities.docx');
+    try {
+      const response = await fetch('/api/export-docx', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ htmlContent: html }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to export DOCX');
+      }
+
+      const blob = await response.blob();
+      saveAs(blob, 'giving_opportunities.docx');
+    } catch (error) {
+      console.error('Error exporting DOCX:', error);
+      setError('Failed to export DOCX');
+    }
   };
 
   if (loading) return <div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div></div>;
