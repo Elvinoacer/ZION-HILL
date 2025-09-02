@@ -20,6 +20,8 @@ interface Transaction {
   amount: number;
   date: string;
   type: string;
+  method: string;
+  status: string;
 }
 
 interface GivingOpportunity {

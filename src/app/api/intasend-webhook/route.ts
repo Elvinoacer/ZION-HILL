@@ -80,7 +80,6 @@ const sendDonationReceipt = async (donationDetails: {
 export async function POST(request: Request) {
   try {
     const payload = await request.json();
-    console.log("Intasend Webhook Received:", payload);
 
     // TODO: Implement webhook verification (e.g., using a secret key from Intasend)
 
@@ -133,14 +132,16 @@ export async function POST(request: Request) {
 
     // Send email only if the status is COMPLETE and donor email is available
     if (intasendState === "COMPLETE" && updatedTransaction.donorEmail) {
-      const planName = updatedTransaction.donationPlan?.name || updatedTransaction.giving?.name || "General Contribution";
+      const planName =
+        updatedTransaction.donationPlan?.name ||
+        updatedTransaction.giving?.name ||
+        "General Contribution";
       await sendDonationReceipt({
         amount: updatedTransaction.amount,
         planName: planName,
         donorName: updatedTransaction.donorName || "Contributor",
         donorEmail: updatedTransaction.donorEmail,
       });
-      console.log(`Email sent for transaction ${transactionId}`);
     }
 
     return NextResponse.json(

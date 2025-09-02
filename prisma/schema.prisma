@@ -43,46 +43,46 @@ model VerificationToken {
 }
 
 model User {
-  id             String     @id @default(cuid())
-  name           String?
-  email          String?    @unique
-  emailVerified  DateTime?
-  image          String?
-  phone          String?
-  address        String?
-  membersince    String?
-  birthdate      DateTime?
-  photo          String?
-  password       String?
-  isActive       Boolean    @default(true)
-  profileComplete Boolean @default(false)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  familyId       String?
-  roles          RoleName[]
-  roleId         Int?
-  christian      Boolean?
-  accounts       Account[]
-  uploadedAssets Asset[]
-  auditLogs      AuditLog[]
+  id              String     @id @default(cuid())
+  name            String?
+  email           String?    @unique
+  emailVerified   DateTime?
+  image           String?
+  phone           String?
+  address         String?
+  membersince     String?
+  birthdate       DateTime?
+  photo           String?
+  password        String?
+  isActive        Boolean    @default(true)
+  profileComplete Boolean    @default(false)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  familyId        String?
+  roles           RoleName[]
+  roleId          Int?
+  christian       Boolean?
+  accounts        Account[]
+  uploadedAssets  Asset[]
+  auditLogs       AuditLog[]
 
-  attendedSessions          CounselingSession[]       @relation("Client")
-  counselingSessions        CounselingSession[]       @relation("Counselor")
-  createdFamilies           Family[]                  @relation("createdBy")
-  feedback                  Feedback[]
-  ForumPost                 ForumPost[]
-  ForumTopic                ForumTopic[]
-  ledGroups                 Group[]
-  receivedMessages          Message[]                 @relation("ReceivedMessages")
-  sentMessages              Message[]                 @relation("SentMessages")
-  ledMinistries             Ministry[]
-  ministryMemberships       MinistryMember[]
-  parentalControl           ParentalControl?
-  participants              Participant[]
-  polls                     Poll[]
-  postFeedbacks             PostFeedback[]
-  prayerRequest             PrayerRequest[]
-  
+  attendedSessions    CounselingSession[] @relation("Client")
+  counselingSessions  CounselingSession[] @relation("Counselor")
+  createdFamilies     Family[]            @relation("createdBy")
+  feedback            Feedback[]
+  ForumPost           ForumPost[]
+  ForumTopic          ForumTopic[]
+  ledGroups           Group[]
+  receivedMessages    Message[]           @relation("ReceivedMessages")
+  sentMessages        Message[]           @relation("SentMessages")
+  ledMinistries       Ministry[]
+  ministryMemberships MinistryMember[]
+  parentalControl     ParentalControl?
+  participants        Participant[]
+  polls               Poll[]
+  postFeedbacks       PostFeedback[]
+  prayerRequest       PrayerRequest[]
+
   fcmTokens                 FcmToken[]
   sermons                   Sermon[]
   sessions                  Session[]
@@ -733,8 +733,6 @@ model Token {
   token String @unique
 }
 
-
-
 model ForumTopic {
   id             String          @id @default(cuid())
   title          String
@@ -959,6 +957,7 @@ enum TransactionType {
   DONATION
   EXPENSE
   REVENUE
+  GIVING
 }
 
 enum TransactionMethod {

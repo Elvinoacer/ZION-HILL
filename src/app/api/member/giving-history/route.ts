@@ -14,7 +14,8 @@ export async function GET(req: Request) {
     const givingHistory = await prisma.transaction.findMany({
       where: {
         userId: session.user.id,
-        type: "DONATION",
+        type: "GIVING",
+        reconciliationStatus: "APPROVED",
       },
       include: {
         giving: true,
@@ -29,6 +30,8 @@ export async function GET(req: Request) {
       date: item.date.toISOString(),
       type: item.giving?.name || "General Donation",
       amount: item.amount,
+      method: item.method,
+      status: item.reconciliationStatus,
     }));
 
     return NextResponse.json(formattedHistory);

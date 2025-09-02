@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
   try {
     let transactionData: any = {
-      type: "DONATION",
+      type: donationType === 'giving' ? "GIVING" : "DONATION",
       amount: amount,
       method: "MPESA",
       description: description || `Donation`,

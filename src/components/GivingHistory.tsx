@@ -65,6 +65,12 @@ export default function GivingHistory({ donations }: GivingHistoryProps) {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                     {donation.type}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {donation.method}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {donation.status}
+                  </td>
                 </motion.tr>
               ))}
           </tbody>
