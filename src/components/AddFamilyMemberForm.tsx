@@ -80,7 +80,7 @@ export default function AddFamilyMemberForm({
             </option>
             {users.map((user) => (
               <option key={user.id} value={user.id}>
-                {user.name} ({user.email})
+                {user.name}
               </option>
             ))}
           </select>

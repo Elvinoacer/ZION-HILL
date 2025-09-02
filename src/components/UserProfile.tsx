@@ -94,7 +94,12 @@ export default function UserProfile() {
   };
 
   const handleSave = async () => {
-    await updateUserProfile(userId, profileData);
+    const dataToSend = {
+      ...profileData,
+      birthdate: profileData.birthdate ? new Date(profileData.birthdate).toISOString() : null,
+      membersince: profileData.membersince ? new Date(profileData.membersince).toISOString() : null,
+    };
+    await updateUserProfile(userId, dataToSend);
     setIsEditing(false);
   };
 

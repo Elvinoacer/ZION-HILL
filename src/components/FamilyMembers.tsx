@@ -73,7 +73,7 @@ export default function FamilyMembers() {
                   alt={member.name || "Family Member"}
                   width={48}
                   height={48}
-                  className="rounded-full object-cover"
+                  className="rounded-full object-cover w-12 h-12"
                 />
                 <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full shadow-sm">
                   <div

@@ -10,6 +10,8 @@ import { Calendar, CheckCircle2, DollarSign, User, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+const router = useRouter();
 
 interface UserProfile {
   id: string;
@@ -37,6 +39,7 @@ interface UserProfile {
 }
 
 const MemberProfilePage = () => {
+  const router = useRouter();
   const { data: session } = useSession();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -379,7 +382,10 @@ const MemberProfilePage = () => {
                     {profile?.name}
                   </h2>
                   <p className="text-gray-500">{profile?.email}</p>
-                  <Button className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button
+                    onClick={() => router.push('/member/profile')}
+                    className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  >
                     Edit Profile
                   </Button>
                 </CardContent>

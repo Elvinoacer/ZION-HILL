@@ -17,10 +17,10 @@ import { toast } from "sonner";
 import { safeFetch } from "@/lib/api";
 import { intlFormat } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, UserPlus, UserMinus, Home, Plus } from "lucide-react";
+import { Users, UserPlus, UserMinus, Home, Plus, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ViewFamilyMembersModal } from "@/components/ViewFamilyMembersModal";
-import { User } from "@prisma/client";
+import { User } from "@/generated/prisma";
 
 interface Family {
   id: string;
@@ -43,6 +43,7 @@ const FamilyPage = () => {
   const [allFamilies, setAllFamilies] = useState<Family[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [familiesPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const getAllFamilies = useCallback(async function () {
     try {
@@ -177,10 +178,14 @@ const FamilyPage = () => {
     }
   };
 
+  const filteredFamilies = allFamilies.filter((family) =>
+    family.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   // Pagination logic
   const indexOfLastFamily = currentPage * familiesPerPage;
   const indexOfFirstFamily = indexOfLastFamily - familiesPerPage;
-  const currentFamilies = allFamilies.slice(
+  const currentFamilies = filteredFamilies.slice(
     indexOfFirstFamily,
     indexOfLastFamily
   );
@@ -189,7 +194,7 @@ const FamilyPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 p-4 sm:p-6 lg:p-8">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
         <div className="max-w-screen-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
@@ -211,25 +216,15 @@ const FamilyPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+      <div className="min-h-screen bg-red-50 flex items-center justify-center p-4">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
           className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center"
         >
-          <div className="inline-flex items-center justify-center bg-red-100 p-4 rounded-full mb-4">
-            <svg
-              className="h-6 w-6 text-red-600"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clipRule="evenodd"
-              />
-            </svg>
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+            <UserMinus className="h-6 w-6 text-red-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Error</h1>
           <p className="text-sm text-red-600 mb-6">{error}</p>
@@ -245,7 +240,7 @@ const FamilyPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <div className="max-w-screen-2xl mx-auto">
         <motion.div
           initial={{ y: -20, opacity: 0 }}
@@ -253,7 +248,7 @@ const FamilyPage = () => {
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
             Family Management
           </h1>
           <p className="text-base sm:text-lg text-gray-600">
@@ -270,9 +265,9 @@ const FamilyPage = () => {
             whileHover={{ y: -5, transition: { duration: 0.2 } }}
           >
             <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-              <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-t-2xl">
-                <CardTitle className="flex items-center space-x-2 text-indigo-700 text-lg sm:text-xl font-bold">
-                  <Home className="h-5 w-5" />
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2 text-gray-800 text-lg sm:text-xl font-bold">
+                  <Home className="h-5 w-5 text-indigo-600" />
                   <span>Create New Family</span>
                 </CardTitle>
               </CardHeader>
@@ -288,12 +283,12 @@ const FamilyPage = () => {
                       value={newFamilyName}
                       onChange={(e) => setNewFamilyName(e.target.value)}
                       required
-                      className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
+                      className="rounded-lg border-gray-300 bg-gray-50 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                     />
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
                   >
                     <Plus className="mr-2 h-4 w-4" />
                     Create Family
@@ -311,9 +306,9 @@ const FamilyPage = () => {
             whileHover={{ y: -5, transition: { duration: 0.2 } }}
           >
             <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-t-2xl">
-                <CardTitle className="flex items-center space-x-2 text-purple-700 text-lg sm:text-xl font-bold">
-                  <UserPlus className="h-5 w-5" />
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2 text-gray-800 text-lg sm:text-xl font-bold">
+                  <UserPlus className="h-5 w-5 text-purple-600" />
                   <span>Add Family Member</span>
                 </CardTitle>
               </CardHeader>
@@ -327,7 +322,7 @@ const FamilyPage = () => {
                       onValueChange={setSelectedFamilyId}
                       value={selectedFamilyId}
                     >
-                      <SelectTrigger className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-purple-500 focus:ring-2 focus:ring-purple-200">
+                      <SelectTrigger className="rounded-lg border-gray-300 bg-gray-50 text-sm sm:text-base focus:border-purple-500 focus:ring-2 focus:ring-purple-200">
                         <SelectValue placeholder="Select a family" />
                       </SelectTrigger>
                       <SelectContent className="rounded-lg bg-white shadow-lg">
@@ -351,7 +346,7 @@ const FamilyPage = () => {
                       onValueChange={setSelectedUserId}
                       value={selectedUserId}
                     >
-                      <SelectTrigger className="rounded-lg border-gray-200 bg-gray-50 text-sm sm:text-base focus:border-purple-500 focus:ring-2 focus:ring-purple-200">
+                      <SelectTrigger className="rounded-lg border-gray-300 bg-gray-50 text-sm sm:text-base focus:border-purple-500 focus:ring-2 focus:ring-purple-200">
                         <SelectValue placeholder="Select a user" />
                       </SelectTrigger>
                       <SelectContent className="rounded-lg bg-white shadow-lg">
@@ -368,9 +363,7 @@ const FamilyPage = () => {
                                   {user.name?.charAt(0)}
                                 </AvatarFallback>
                               </Avatar>
-                              <span className="truncate">
-                                {user.name} ({user.email})
-                              </span>
+                              <span className="truncate">{user.name}</span>
                             </div>
                           </SelectItem>
                         ))}
@@ -379,7 +372,7 @@ const FamilyPage = () => {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-105"
                   >
                     <UserPlus className="mr-2 h-4 w-4" />
                     Add Member
@@ -398,9 +391,9 @@ const FamilyPage = () => {
           className="mt-8"
         >
           <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-t-2xl">
-              <CardTitle className="flex items-center space-x-2 text-indigo-700 text-lg sm:text-xl font-bold">
-                <Users className="h-5 w-5" />
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-gray-800 text-lg sm:text-xl font-bold">
+                <Users className="h-5 w-5 text-indigo-600" />
                 <span>Your Family Units</span>
               </CardTitle>
             </CardHeader>
@@ -415,7 +408,7 @@ const FamilyPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="p-4 rounded-lg bg-gray-50 shadow-sm border border-gray-100"
+                        className="p-4 rounded-lg bg-gray-50 shadow-sm border border-gray-200"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                           <div className="flex-grow">
@@ -520,14 +513,26 @@ const FamilyPage = () => {
           className="mt-8"
         >
           <Card className="bg-white border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader className="bg-gradient-to-r from-teal-50 to-blue-50 rounded-t-2xl">
-              <CardTitle className="flex items-center space-x-2 text-teal-700 text-lg sm:text-xl font-bold">
-                <Users className="h-5 w-5" />
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-gray-800 text-lg sm:text-xl font-bold">
+                <Users className="h-5 w-5 text-teal-600" />
                 <span>All Family Units</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 sm:p-6">
-              {allFamilies.length > 0 ? (
+              <div className="mb-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Search for a family..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 rounded-lg border-gray-300 bg-gray-50 text-sm sm:text-base focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all duration-200"
+                  />
+                </div>
+              </div>
+              {filteredFamilies.length > 0 ? (
                 <div className="space-y-6">
                   <AnimatePresence>
                     {currentFamilies.map((family) => (
@@ -537,7 +542,7 @@ const FamilyPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="p-4 rounded-lg bg-gray-50 shadow-sm border border-gray-100"
+                        className="p-4 rounded-lg bg-gray-50 shadow-sm border border-gray-200"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                           <div className="flex-grow">
@@ -546,7 +551,9 @@ const FamilyPage = () => {
                             </h3>
                             <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
                               <Avatar className="h-6 w-6">
-                                <AvatarImage src={family.createdBy.photo ?? ""} />
+                                <AvatarImage
+                                  src={family.createdBy.photo ?? ""}
+                                />
                                 <AvatarFallback className="bg-teal-100 text-teal-600">
                                   {family.createdBy.name?.charAt(0)}
                                 </AvatarFallback>
@@ -573,7 +580,7 @@ const FamilyPage = () => {
                       </motion.div>
                     ))}
                   </AnimatePresence>
-                  {allFamilies.length > familiesPerPage && (
+                  {filteredFamilies.length > familiesPerPage && (
                     <div className="flex justify-center items-center space-x-4 mt-6">
                       <Button
                         onClick={() => paginate(currentPage - 1)}
@@ -584,13 +591,13 @@ const FamilyPage = () => {
                       </Button>
                       <span className="text-sm text-gray-600">
                         Page {currentPage} of{" "}
-                        {Math.ceil(allFamilies.length / familiesPerPage)}
+                        {Math.ceil(filteredFamilies.length / familiesPerPage)}
                       </span>
                       <Button
                         onClick={() => paginate(currentPage + 1)}
                         disabled={
                           currentPage ===
-                          Math.ceil(allFamilies.length / familiesPerPage)
+                          Math.ceil(filteredFamilies.length / familiesPerPage)
                         }
                         variant="outline"
                       >
@@ -616,32 +623,3 @@ const FamilyPage = () => {
 };
 
 export default FamilyPage;
-
-<style jsx>{`
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .animate-fade-in {
-    animation: fadeIn 0.6s ease-out;
-  }
-  .animate-slide-up {
-    animation: slideUp 0.6s ease-out;
-  }
-`}</style>;
