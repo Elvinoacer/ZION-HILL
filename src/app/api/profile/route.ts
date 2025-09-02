@@ -59,13 +59,15 @@ export async function GET(request: Request) {
 
 export async function PUT(request: Request) {
   const body = await request.json();
+  const { id, ...data } = body;
   try {
     const updatedUser = await prisma.user.update({
-      where: { id: body.id },
-      data: body,
+      where: { id },
+      data,
     });
     return NextResponse.json(updatedUser);
   } catch (error) {
+    console.error("Error updating user:", error);
     return NextResponse.json({ error: "Error updating data" }, { status: 500 });
   }
 }

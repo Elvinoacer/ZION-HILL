@@ -8,16 +8,19 @@ async function main() {
         id: 'cky2qj3g50000u09m9g7h3k8n',
         name: 'Tithes',
         description: 'Regular tithes from church members.',
+        imageUrl: '/images/tithes-offerings.png',
       },
       {
         id: 'cky2qj3g50001u09m4f7g3h9o',
         name: 'Project/Support',
         description: 'Support for various church projects and outreach programs.',
+        imageUrl: '/images/project-support.png',
       },
       {
         id: 'cky2qj3g50002u09m9g7h3k8p',
         name: 'Special Offerings',
         description: 'Special offerings for specific events or causes.',
+        imageUrl: '/images/special-offerings.png',
       },
     ],
     skipDuplicates: true, // This will prevent errors if the records already exist

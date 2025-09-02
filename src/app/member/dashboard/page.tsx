@@ -425,12 +425,14 @@ const DashboardPage = () => {
                     ))}
                   </ul>
                   {givingHistory.length > 3 && (
-                    <Button
-                      variant="ghost"
-                      className="w-full text-emerald-600 hover:bg-emerald-50"
-                    >
-                      View All
-                    </Button>
+                    <Link href="/member/giving">
+                      <Button
+                        variant="ghost"
+                        className="w-full text-emerald-600 hover:bg-emerald-50"
+                      >
+                        Show More
+                      </Button>
+                    </Link>
                   )}
                 </div>
               ) : (

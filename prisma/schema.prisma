@@ -501,6 +501,7 @@ model Giving {
   id           String        @id @default(cuid())
   name         String
   description  String?
+  imageUrl     String? // Added imageUrl field
   goalAmount   Float?
   startDate    DateTime?
   endDate      DateTime?
