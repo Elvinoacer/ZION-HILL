@@ -11,6 +11,7 @@ import OnlineGivingOptimization from "@/components/finance_administrator/section
 import FinancialSupportRequests from "@/components/finance_administrator/sections/FinancialSupportRequests";
 import DonationPlans from "@/components/finance_administrator/sections/DonationPlans";
 import Budgets from "@/components/finance_administrator/sections/Budgets";
+import GivingPage from "@/app/finance_administrator/giving/page";
 import { useDonationStore, useAdminStore } from "@/store";
 import { useFinanceDashboardStore } from "@/store/financeDashboardStore";
 import {
@@ -40,6 +41,7 @@ const sectionIcons = {
   support: <HandHeart className="h-5 w-5" />,
   plans: <ListPlus className="h-5 w-5" />,
   budgets: <PiggyBank className="h-5 w-5" />,
+  "giving-opportunities": <HandHeart className="h-5 w-5" />,
 };
 
 // Section titles mapping
@@ -51,6 +53,7 @@ const sectionTitles = {
   support: "Support Requests",
   plans: "Donation Plans",
   budgets: "Budgets",
+  "giving-opportunities": "Giving",
 };
 
 export default function FinanceAdministratorDashboard() {
@@ -152,6 +155,8 @@ export default function FinanceAdministratorDashboard() {
         return <DonationPlans searchQuery={planSearchQuery} />;
       case "budgets":
         return <Budgets />;
+      case "giving-opportunities":
+        return <GivingPage />;
       default:
         return <ContributionManagement donations={donations} />;
     }

@@ -60,35 +60,10 @@ export default function GivingHistory({ donations }: GivingHistoryProps) {
                     })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ${donation.amount.toFixed(2)}
+                    KES {donation.amount.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                     {donation.type}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {donation.method === "Credit Card" ? (
-                      <CreditCard
-                        className="inline mr-1 h-4 w-4"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <Building
-                        className="inline mr-1 h-4 w-4"
-                        aria-hidden="true"
-                      />
-                    )}
-                    {donation.method}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        donation.status === "Completed"
-                          ? "bg-green-600 text-white"
-                          : "bg-yellow-600 text-white"
-                      }`}
-                    >
-                      {donation.status}
-                    </span>
                   </td>
                 </motion.tr>
               ))}

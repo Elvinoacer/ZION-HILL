@@ -69,7 +69,7 @@ const DonationsPageContent = () => {
 
   if (planId) {
     const plan = planId === "general" ? generalDonationPlan : selectedDonationPlan;
-    if (plan) return <DonationForm plan={plan} />;
+    if (plan) return <DonationForm plan={plan} donationType="plan" />;
   }
 
   return (

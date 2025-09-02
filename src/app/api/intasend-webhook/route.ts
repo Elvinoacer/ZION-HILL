@@ -17,7 +17,7 @@ const sendDonationReceipt = async (donationDetails: {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           to: donationDetails.donorEmail,
-          subject: "Thank You for Your Donation!",
+          subject: "Thank You for Your Contribution!",
           html: `
           <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
             <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 30px; text-align: center; color: white;">
@@ -31,7 +31,7 @@ const sendDonationReceipt = async (donationDetails: {
               </p>
               
               <div style="background: #f8fafc; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
-                <p style="font-size: 16px; margin: 0 0 10px; font-weight: 500;">Donation Summary</p>
+                <p style="font-size: 16px; margin: 0 0 10px; font-weight: 500;">Contribution Summary</p>
                 <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
                   <span style="color: #64748b;">Amount</span>
                   <span style="font-weight: 600;">KES ${donationDetails.amount.toFixed(
@@ -52,7 +52,7 @@ const sendDonationReceipt = async (donationDetails: {
               
               <div style="text-align: center; margin: 30px 0;">
                 <span style="display: inline-block; background: #e9f7ef; color: #2e7d32; padding: 12px 24px; border-radius: 24px; font-weight: 600; font-size: 14px;">
-                  Your donation is changing lives!
+                  Your contribution is changing lives!
                 </span>
               </div>
               
@@ -97,7 +97,7 @@ export async function POST(request: Request) {
 
     const transaction = await prisma.transaction.findUnique({
       where: { id: transactionId },
-      include: { donationPlan: true }, // Include donationPlan to get its name
+      include: { donationPlan: true, giving: true }, // Include both
     });
 
     if (!transaction) {
@@ -128,15 +128,16 @@ export async function POST(request: Request) {
     const updatedTransaction = await prisma.transaction.update({
       where: { id: transactionId },
       data: { reconciliationStatus: newReconciliationStatus },
-      include: { donationPlan: true }, // Include donationPlan to get its name
+      include: { donationPlan: true, giving: true }, // Include both
     });
 
     // Send email only if the status is COMPLETE and donor email is available
     if (intasendState === "COMPLETE" && updatedTransaction.donorEmail) {
+      const planName = updatedTransaction.donationPlan?.name || updatedTransaction.giving?.name || "General Contribution";
       await sendDonationReceipt({
         amount: updatedTransaction.amount,
-        planName: updatedTransaction.donationPlan?.name || "Unknown Plan",
-        donorName: updatedTransaction.donorName || "Donor",
+        planName: planName,
+        donorName: updatedTransaction.donorName || "Contributor",
         donorEmail: updatedTransaction.donorEmail,
       });
       console.log(`Email sent for transaction ${transactionId}`);

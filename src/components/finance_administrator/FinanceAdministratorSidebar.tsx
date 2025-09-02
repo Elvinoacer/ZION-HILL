@@ -61,6 +61,12 @@ const sections = [
     icon: PiggyBank,
     color: "text-teal-500",
   },
+  {
+    id: "giving-opportunities",
+    label: "Giving",
+    icon: HandHeart,
+    color: "text-pink-500",
+  },
 ];
 
 const FinanceAdministratorSidebar = () => {

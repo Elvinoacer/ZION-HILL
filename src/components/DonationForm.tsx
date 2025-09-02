@@ -10,6 +10,7 @@ import {
   FiShield,
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSession } from "next-auth/react";
 
 interface DonationFormProps {
   plan: {
@@ -18,13 +19,16 @@ interface DonationFormProps {
     description?: string;
     imageUrl?: string;
   };
+  donationType: 'plan' | 'giving';
+  onSuccess?: () => void;
 }
 
-const DonationForm: React.FC<DonationFormProps> = ({ plan }) => {
+const DonationForm: React.FC<DonationFormProps> = ({ plan, donationType, onSuccess }) => {
+  const { data: session } = useSession();
   const [amount, setAmount] = useState<number | null>(null);
   const [phone, setPhone] = useState<string>("");
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  const [name, setName] = useState<string>(session?.user?.name || "");
+  const [email, setEmail] = useState<string>(session?.user?.email || "");
   const [message, setMessage] = useState<{
     text: string;
     type: "success" | "error";
@@ -69,10 +73,11 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan }) => {
         body: JSON.stringify({
           amount,
           phone,
-          email,
-          name,
-          donationPlanId: plan.id,
-          description: "Online Donation",
+          email: email,
+          name: name,
+          donationId: plan.id,
+          donationType: donationType,
+          description: `Giving to ${plan.name}`,
         }),
       });
 
@@ -81,11 +86,37 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan }) => {
         throw new Error(errorData.error || "Failed to process donation");
       }
 
+      const paymentData = await paymentRes.json();
+      const transactionId = paymentData.transactionId;
+
       setMessage({
         text: "M-Pesa STK Push initiated. Please complete the transaction on your phone.",
         type: "success",
       });
-      setShowThankYou(true);
+
+      // Poll for transaction status
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusRes = await fetch("/api/transaction-status", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ transactionId }),
+          });
+
+          if (statusRes.ok) {
+            const statusData = await statusRes.json();
+            if (statusData.status === "APPROVED") {
+              clearInterval(pollInterval);
+              setShowThankYou(true);
+              if (onSuccess) {
+                onSuccess();
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error polling transaction status:", error);
+        }
+      }, 3000); // Poll every 3 seconds
     } catch (err) {
       const error = err as Error;
       setMessage({ text: error.message || "An error occurred", type: "error" });
@@ -141,8 +172,6 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan }) => {
                 setShowThankYou(false);
                 setAmount(null);
                 setPhone("");
-                setName("");
-                setEmail("");
               }}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
             >
@@ -227,30 +256,32 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan }) => {
               </div>
             </div>
 
-            {/* Donor Information */}
-            <div className="space-y-4 mb-6">
+            {/* Name and Email Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name (Optional)
+                  Your Name
                 </label>
                 <input
                   type="text"
-                  className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
+                  placeholder="John Doe"
+                  required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email (Optional)
+                  Your Email
                 </label>
                 <input
                   type="email"
-                  className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email"
+                  placeholder="you@example.com"
+                  required
                 />
               </div>
             </div>
@@ -261,7 +292,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan }) => {
                 M-Pesa Phone Number
               </label>
               <div className="relative rounded-lg shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-.none">
                   <FiPhone className="h-5 w-5 text-gray-400" />
                 </div>
                 <input

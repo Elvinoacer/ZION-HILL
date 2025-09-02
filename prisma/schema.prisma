@@ -497,6 +497,16 @@ model Sermon {
   speaker    User     @relation(fields: [speakerId], references: [id])
 }
 
+model Giving {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  goalAmount   Float?
+  startDate    DateTime?
+  endDate      DateTime?
+  transactions Transaction[]
+}
+
 model Transaction {
   id                   String               @id @default(cuid())
   type                 TransactionType
@@ -506,6 +516,7 @@ model Transaction {
   userId               String?
   email                String?
   donationPlanId       String?
+  givingId             String?
   donorName            String?
   donorEmail           String?
   recurring            Boolean              @default(false)
@@ -513,6 +524,7 @@ model Transaction {
   anomaly              Boolean              @default(false)
   reconciliationStatus ReconciliationStatus @default(PENDING)
   donationPlan         DonationPlan?        @relation(fields: [donationPlanId], references: [id])
+  giving               Giving?              @relation(fields: [givingId], references: [id])
   user                 User?                @relation(fields: [userId], references: [id])
 }
 

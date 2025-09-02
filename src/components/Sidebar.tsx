@@ -129,6 +129,12 @@ const SidebarContent = ({ setSidebarOpen }) => {
       requiredRoles: ["MEMBER"],
     },
     {
+      name: "Giving",
+      icon: <FaHandHoldingUsd />,
+      path: "/member/giving",
+      requiredRoles: ["MEMBER"],
+    },
+    {
       name: "Prayer Wall",
       icon: <FaPrayingHands />,
       path: "/member/prayer-wall",

@@ -1,31 +1,47 @@
 import { NextResponse } from "next/server";
 import IntaSend from "intasend-node";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(request: Request) {
-  const { amount, phone, donationPlanId, description, name, email, recurring } = await request.json();
+  const session = await getServerSession(authOptions);
+  const { amount, phone, donationId, donationType, description, name, email, recurring } = await request.json();
 
-  if (!amount || !phone || !donationPlanId) {
+  if (!amount || !phone || !donationId) {
     return NextResponse.json(
-      { error: "Amount, phone number, and donation plan are required" },
+      { error: "Amount, phone number, and donation ID are required" },
       { status: 400 }
     );
   }
 
   try {
+    let transactionData: any = {
+      type: "DONATION",
+      amount: amount,
+      method: "MPESA",
+      description: description || `Donation`,
+      donorName: name || "Anonymous Donor",
+      donorEmail: email || null,
+      recurring: recurring || false,
+      reconciliationStatus: "PENDING",
+    };
+
+    if (session?.user?.id) {
+      transactionData.userId = session.user.id;
+    }
+
+    if (donationType === 'plan') {
+      if (donationId !== 'general') {
+        transactionData.donationPlanId = donationId;
+      }
+    } else if (donationType === 'giving') {
+      transactionData.givingId = donationId;
+    }
+
     // 1. Create a pending transaction in your database
     const newTransaction = await prisma.transaction.create({
-      data: {
-        type: "DONATION",
-        amount: amount,
-        method: "MPESA", // Assuming M-Pesa for STK push
-        description: description || `Donation to plan ${donationPlanId}`,
-        donationPlanId: donationPlanId,
-        donorName: name || "Anonymous Donor",
-        donorEmail: email || null,
-        recurring: recurring || false,
-        reconciliationStatus: "PENDING",
-      },
+      data: transactionData,
     });
 
     const intasend = new IntaSend(
