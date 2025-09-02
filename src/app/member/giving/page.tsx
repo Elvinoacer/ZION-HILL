@@ -130,41 +130,6 @@ const MemberGivingPageContent = () => {
       <main className="max-w-7xl mx-auto mt-8">
         <GivingDashboard givingHistory={givingHistory} />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="col-span-1 bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg rounded-2xl p-3 text-center">
-            <h3 className="text-sm sm:text-base font-semibold text-blue-100">
-              Total Given
-            </h3>
-            <p className="text-xl sm:text-2xl font-bold text-white">
-              KES {totalGiven.toLocaleString()}
-            </p>
-          </Card>
-          <Card className="col-span-1 bg-gradient-to-br from-purple-500 to-purple-700 text-white shadow-lg rounded-2xl p-3 text-center">
-            <h3 className="text-sm sm:text-base font-semibold text-purple-100">
-              Tithes
-            </h3>
-            <p className="text-xl sm:text-2xl font-bold text-white">
-              KES {tithesGiven.toLocaleString()}
-            </p>
-          </Card>
-          <Card className="col-span-1 bg-gradient-to-br from-green-500 to-green-700 text-white shadow-lg rounded-2xl p-3 text-center">
-            <h3 className="text-sm sm:text-base font-semibold text-green-100">
-              Special Offerings
-            </h3>
-            <p className="text-xl sm:text-2xl font-bold text-white">
-              KES {specialOfferingsGiven.toLocaleString()}
-            </p>
-          </Card>
-          <Card className="col-span-1 bg-gradient-to-br from-yellow-500 to-yellow-700 text-white shadow-lg rounded-2xl p-3 text-center">
-            <h3 className="text-sm sm:text-base font-semibold text-yellow-100">
-              Project/Support
-            </h3>
-            <p className="text-xl sm:text-2xl font-bold text-white">
-              KES {projectSupportGiven.toLocaleString()}
-            </p>
-          </Card>
-        </div>
-
         <GivingOpportunitiesList
           opportunities={givingOpportunities || []}
           onCardClick={handleCardClick}
@@ -174,12 +139,14 @@ const MemberGivingPageContent = () => {
           <Button
             onClick={() => router.push("/donations")}
             variant="outline"
-            className="w-full md:w-auto justify-between group hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600"
+            className="w-full md:w-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center"
           >
             View All Donation Opportunities{" "}
-            <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-all duration-200 group-hover:translate-x-1" />
+            <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
+
+        <GivingDashboard givingHistory={givingHistory} />
 
         {session?.user && (
           <div className="mt-12">
@@ -343,8 +310,7 @@ const ErrorState = ({ message }: { message: string }) => {
         </p>
         <Button
           onClick={() => window.location.reload()}
-          variant="destructive"
-          className="text-sm sm:text-base py-2.5 sm:py-3"
+          className="bg-gradient-to-r from-red-600 to-red-800 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:from-red-700 hover:to-red-900 transition-all duration-300 w-full sm:w-auto flex items-center justify-center"
         >
           Try Again
         </Button>

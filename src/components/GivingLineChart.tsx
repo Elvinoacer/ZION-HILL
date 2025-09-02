@@ -21,10 +21,46 @@ const GivingLineChart = ({ data }: { data: any }) => {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Giving Over Time</CardTitle>
         <div className="flex space-x-2">
-          <Button variant={timeFrame === 'daily' ? 'default' : 'outline'} onClick={() => handleTimeFrameChange('daily')}>Daily</Button>
-          <Button variant={timeFrame === 'weekly' ? 'default' : 'outline'} onClick={() => handleTimeFrameChange('weekly')}>Weekly</Button>
-          <Button variant={timeFrame === 'monthly' ? 'default' : 'outline'} onClick={() => handleTimeFrameChange('monthly')}>Monthly</Button>
-          <Button variant={timeFrame === 'annually' ? 'default' : 'outline'} onClick={() => handleTimeFrameChange('annually')}>Annually</Button>
+          <Button
+            onClick={() => handleTimeFrameChange('daily')}
+            className={`font-bold text-center px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
+              timeFrame === 'daily'
+                ? 'bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800'
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+            }`}
+          >
+            Daily
+          </Button>
+          <Button
+            onClick={() => handleTimeFrameChange('weekly')}
+            className={`font-bold text-center px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
+              timeFrame === 'weekly'
+                ? 'bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800'
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+            }`}
+          >
+            Weekly
+          </Button>
+          <Button
+            onClick={() => handleTimeFrameChange('monthly')}
+            className={`font-bold text-center px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
+              timeFrame === 'monthly'
+                ? 'bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800'
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+            }`}
+          >
+            Monthly
+          </Button>
+          <Button
+            onClick={() => handleTimeFrameChange('annually')}
+            className={`font-bold text-center px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
+              timeFrame === 'annually'
+                ? 'bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800'
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+            }`}
+          >
+            Annually
+          </Button>
         </div>
       </CardHeader>
       <CardContent>

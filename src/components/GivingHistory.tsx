@@ -7,6 +7,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { exportToCsv, exportToPdf, exportToXlsx, exportToDocx } from "@/lib/export";
+import { toast } from "sonner";
+import { useState } from "react";
 
 type Donation = {
   id: number;
@@ -22,8 +24,11 @@ type GivingHistoryProps = {
 };
 
 export default function GivingHistory({ donations }: GivingHistoryProps) {
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
   const handleExport = (format: "csv" | "pdf" | "xlsx" | "docx") => {
     const fileName = `giving-history-${new Date().toISOString()}`;
+    toast.info(`Preparing your ${format.toUpperCase()} file...`);
     switch (format) {
       case "csv":
         exportToCsv(donations, fileName);
@@ -40,24 +45,25 @@ export default function GivingHistory({ donations }: GivingHistoryProps) {
       default:
         break;
     }
+    setIsPopoverOpen(false);
   };
 
   return (
     <div className="bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-lg overflow-hidden">
       <div className="p-4 flex justify-end">
-        <Popover>
+        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline">
+            <Button className="bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:from-blue-600 hover:to-blue-800 transition-all duration-300 flex items-center justify-center">
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-40">
-            <div className="grid gap-4">
-              <Button variant="ghost" onClick={() => handleExport("csv")}>Export as CSV</Button>
-              <Button variant="ghost" onClick={() => handleExport("pdf")}>Export as PDF</Button>
-              <Button variant="ghost" onClick={() => handleExport("xlsx")}>Export as XLSX</Button>
-              <Button variant="ghost" onClick={() => handleExport("docx")}>Export as DOCX</Button>
+          <PopoverContent className="w-40 p-0">
+            <div className="grid gap-1">
+              <Button variant="ghost" onClick={() => handleExport("csv")} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center">Export as CSV</Button>
+              <Button variant="ghost" onClick={() => handleExport("pdf")} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center">Export as PDF</Button>
+              <Button variant="ghost" onClick={() => handleExport("xlsx")} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center">Export as XLSX</Button>
+              <Button variant="ghost" onClick={() => handleExport("docx")} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center">Export as DOCX</Button>
             </div>
           </PopoverContent>
         </Popover>
