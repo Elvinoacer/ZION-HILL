@@ -1,53 +1,144 @@
-"use client";
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader, AlertCircle } from 'lucide-react';
 import GivingPieChart from './GivingPieChart';
-import GivingLineChart from './GivingLineChart';
+import GivingLineChart from '././GivingLineChart';
+import { format, startOfDay, startOfWeek, startOfMonth, startOfYear, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, eachYearOfInterval } from 'date-fns';
 
-const GivingDashboard = () => {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface Transaction {
+  id: string;
+  amount: number;
+  date: string;
+  type: string;
+  method: string;
+  status: string;
+}
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch('/api/member/giving-summary');
-        if (!res.ok) {
-          throw new Error('Failed to fetch giving summary');
-        }
-        const summaryData = await res.json();
-        setData(summaryData);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+interface GivingDashboardProps {
+  givingHistory: Transaction[];
+}
+
+const GivingDashboard = ({ givingHistory }: GivingDashboardProps) => {
+
+  // Process data for Pie Chart
+  const pieChartData = givingHistory.reduce((acc, t) => {
+    const existing = acc.find(item => item.name === t.type);
+    if (existing) {
+      existing.value += t.amount;
+    } else {
+      acc.push({ name: t.type, value: t.amount });
+    }
+    return acc;
+  }, [] as { name: string; value: number }[]);
+
+  // Process data for Line Chart
+  const processLineChartData = (history: Transaction[], timeFrame: 'daily' | 'weekly' | 'monthly' | 'annually') => {
+    if (history.length === 0) return [];
+
+    const sortedHistory = [...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const firstDate = new Date(sortedHistory[0].date);
+    const lastDate = new Date(sortedHistory[sortedHistory.length - 1].date);
+
+    let interval: Date[] = [];
+    let dateFormat = '';
+
+    switch (timeFrame) {
+      case 'daily':
+        interval = eachDayOfInterval({ start: startOfDay(firstDate), end: startOfDay(lastDate) });
+        dateFormat = 'MMM d';
+        break;
+      case 'weekly':
+        interval = eachWeekOfInterval({ start: startOfWeek(firstDate), end: startOfWeek(lastDate) });
+        dateFormat = 'MMM d, yyyy';
+        break;
+      case 'monthly':
+        interval = eachMonthOfInterval({ start: startOfMonth(firstDate), end: startOfMonth(lastDate) });
+        dateFormat = 'MMM yyyy';
+        break;
+      case 'annually':
+        interval = eachYearOfInterval({ start: startOfYear(firstDate), end: startOfYear(lastDate) });
+        dateFormat = 'yyyy';
+        break;
+    }
+
+    const aggregatedData = interval.map(date => {
+      const formattedDate = format(date, dateFormat);
+      return {
+        date: formattedDate,
+        Tithes: 0,
+        'Special Offerings': 0,
+        'Project/Support': 0,
+      };
+    });
+
+    history.forEach(t => {
+      let keyDate: Date;
+      switch (timeFrame) {
+        case 'daily':
+          keyDate = startOfDay(new Date(t.date));
+          break;
+        case 'weekly':
+          keyDate = startOfWeek(new Date(t.date));
+          break;
+        case 'monthly':
+          keyDate = startOfMonth(new Date(t.date));
+          break;
+        case 'annually':
+          keyDate = startOfYear(new Date(t.date));
+          break;
       }
-    };
+      const formattedKeyDate = format(keyDate, dateFormat);
+      const dataPoint = aggregatedData.find(d => d.date === formattedKeyDate);
+      if (dataPoint) {
+        dataPoint[t.type as 'Tithes' | 'Special Offerings' | 'Project/Support'] += t.amount;
+      }
+    });
 
-    fetchData();
-  }, []);
+    return aggregatedData;
+  };
 
-  if (loading) {
-    return <LoadingState />;
-  }
+  const lineChartData = {
+    daily: processLineChartData(givingHistory, 'daily'),
+    weekly: processLineChartData(givingHistory, 'weekly'),
+    monthly: processLineChartData(givingHistory, 'monthly'),
+    annually: processLineChartData(givingHistory, 'annually'),
+  };
 
-  if (error) {
-    return <ErrorState message={error} />;
-  }
+  // Calculate Total and Average Donations
+  const totalDonations = givingHistory.reduce((sum, t) => sum + t.amount, 0);
+  const averageDonation = givingHistory.length > 0 ? totalDonations / givingHistory.length : 0;
+
+  const tithesGiven = givingHistory.filter(t => t.type === 'Tithes').reduce((acc, curr) => acc + curr.amount, 0);
+  const specialOfferingsGiven = givingHistory.filter(t => t.type === 'Special Offerings').reduce((acc, curr) => acc + curr.amount, 0);
+  const projectSupportGiven = givingHistory.filter(t => t.type === 'Project/Support').reduce((acc, curr) => acc + curr.amount, 0);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="md:col-span-1">
-          <GivingPieChart data={data.pieChartData} />
+          <GivingPieChart data={pieChartData} />
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="md:col-span-2">
-          <GivingLineChart data={data.lineChartData} />
+          <GivingLineChart data={lineChartData} />
         </motion.div>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Card className="col-span-1 bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg rounded-2xl p-3 text-center">
+            <h3 className="text-sm sm:text-base font-semibold text-blue-100">Total Given</h3>
+            <p className="text-xl sm:text-2xl font-bold text-white">KES {totalDonations.toLocaleString()}</p>
+          </Card>
+          <Card className="col-span-1 bg-gradient-to-br from-purple-500 to-purple-700 text-white shadow-lg rounded-2xl p-3 text-center">
+            <h3 className="text-sm sm:text-base font-semibold text-purple-100">Tithes</h3>
+            <p className="text-xl sm:text-2xl font-bold text-white">KES {tithesGiven.toLocaleString()}</p>
+          </Card>
+          <Card className="col-span-1 bg-gradient-to-br from-green-500 to-green-700 text-white shadow-lg rounded-2xl p-3 text-center">
+            <h3 className="text-sm sm:text-base font-semibold text-green-100">Special Offerings</h3>
+            <p className="text-xl sm:text-2xl font-bold text-white">KES {specialOfferingsGiven.toLocaleString()}</p>
+          </Card>
+          <Card className="col-span-1 bg-gradient-to-br from-yellow-500 to-yellow-700 text-white shadow-lg rounded-2xl p-3 text-center">
+            <h3 className="text-sm sm:text-base font-semibold text-yellow-100">Project/Support</h3>
+            <p className="text-xl sm:text-2xl font-bold text-white">KES {projectSupportGiven.toLocaleString()}</p>
+          </Card>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <Card className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl">
@@ -55,7 +146,7 @@ const GivingDashboard = () => {
                 <CardTitle>Total Donations</CardTitle>
             </CardHeader>
             <CardContent>
-                <p className="text-3xl font-bold">KES {data.totalDonations.toLocaleString()}</p>
+                <p className="text-3xl font-bold">KES {totalDonations.toLocaleString()}</p>
             </CardContent>
           </Card>
           <Card className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl">
@@ -63,37 +154,12 @@ const GivingDashboard = () => {
                 <CardTitle>Average Donation</CardTitle>
             </CardHeader>
             <CardContent>
-                <p className="text-3xl font-bold">KES {data.averageDonation.toLocaleString()}</p>
+                <p className="text-3xl font-bold">KES {averageDonation.toLocaleString()}</p>
             </CardContent>
           </Card>
       </div>
     </motion.div>
   );
 };
-
-const LoadingState = () => (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
-      <div className="text-center space-y-3 sm:space-y-4">
-        <Loader className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-blue-500 dark:text-blue-400 animate-spin" />
-        <p className="text-base sm:text-lg">Loading Giving Dashboard...</p>
-      </div>
-    </div>
-  );
-  
-  const ErrorState = ({ message }: { message: string }) => (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
-      <Card className="bg-white dark:bg-gray-800 border border-red-500/50 shadow-lg p-6 sm:p-8 text-center max-w-sm sm:max-w-md">
-        <AlertCircle className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-red-500 mb-3 sm:mb-4" />
-        <h2 className="text-lg sm:text-xl font-bold">Error Loading Dashboard</h2>
-        <p className="text-gray-600 dark:text-gray-300 my-3 sm:my-4 text-sm sm:text-base">{message}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Try Again
-        </button>
-      </Card>
-    </div>
-  );
 
 export default GivingDashboard;

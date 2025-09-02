@@ -22,9 +22,9 @@ const GivingLineChart = ({ data }: { data: any }) => {
         <CardTitle>Giving Over Time</CardTitle>
         <div className="flex space-x-2">
           <Button variant={timeFrame === 'daily' ? 'default' : 'outline'} onClick={() => handleTimeFrameChange('daily')}>Daily</Button>
-          <Button variant={timeFrame === 'weekly' ? 'default' : 'outline'} onClick={() => handleTimeFrameChange('weekly')} disabled>Weekly</Button>
-          <Button variant={timeFrame === 'monthly' ? 'default' : 'outline'} onClick={() => handleTimeFrameChange('monthly')} disabled>Monthly</Button>
-          <Button variant={timeFrame === 'annually' ? 'default' : 'outline'} onClick={() => handleTimeFrameChange('annually')} disabled>Annually</Button>
+          <Button variant={timeFrame === 'weekly' ? 'default' : 'outline'} onClick={() => handleTimeFrameChange('weekly')}>Weekly</Button>
+          <Button variant={timeFrame === 'monthly' ? 'default' : 'outline'} onClick={() => handleTimeFrameChange('monthly')}>Monthly</Button>
+          <Button variant={timeFrame === 'annually' ? 'default' : 'outline'} onClick={() => handleTimeFrameChange('annually')}>Annually</Button>
         </div>
       </CardHeader>
       <CardContent>
