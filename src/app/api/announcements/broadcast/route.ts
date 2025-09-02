@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { pusherServer } from '@/lib/pusher';
 import { prisma } from '@/lib/prisma';
-import { sendMail } from '@/lib/email';
+import { sendEmail } from '@/lib/email';
 
 export async function POST(req: Request) {
   try {

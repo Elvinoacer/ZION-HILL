@@ -11,7 +11,6 @@ import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-const router = useRouter();
 
 interface UserProfile {
   id: string;

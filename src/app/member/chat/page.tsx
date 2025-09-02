@@ -1,7 +1,6 @@
 "use client";
 
-import { getFirebaseMessaging } from "@/lib/firebase";
-import { getToken } from "firebase/messaging";
+import { getMessagingObject, getFCMToken } from "@/lib/firebase";
 import ChatMessage from "@/components/ChatMessage";
 import {
   AlertDialog,
@@ -49,24 +48,15 @@ const ChatPage = () => {
 
   const requestPermission = async () => {
     try {
-      const messaging = await getFirebaseMessaging();
-      if (messaging) {
-        const permission = await Notification.requestPermission();
-        if (permission === "granted") {
-          const swRegistration = await navigator.serviceWorker.register(
-            "/firebase-messaging-sw.js"
-          );
-          const token = await getToken(messaging, {
-            vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
-            serviceWorkerRegistration: swRegistration,
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        const token = await getFCMToken();
+        if (token && session?.user?.id) {
+          await axios.post("/api/fcm/subscribe", {
+            token,
+            userId: session.user.id,
           });
-          if (token && session?.user?.id) {
-            await axios.post("/api/fcm/subscribe", {
-              token,
-              userId: session.user.id,
-            });
-            alert("Notifications enabled!");
-          }
+          alert("Notifications enabled!");
         }
       }
     } catch (error) {

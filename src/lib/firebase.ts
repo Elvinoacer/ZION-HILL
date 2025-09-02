@@ -14,6 +14,13 @@ const firebaseConfig = {
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
+let messaging: any;
+if (typeof window !== 'undefined') {
+  messaging = getMessaging(app);
+}
+
+export const getMessagingObject = () => messaging;
+
 export const getFCMToken = async () => {
   if (!(await isSupported())) {
     console.log("FCM not supported in this browser");
