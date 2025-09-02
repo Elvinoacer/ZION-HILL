@@ -190,7 +190,6 @@ const MemberGivingPageContent = () => {
     </div>
   );
 };
-};
 
 const Header = () => (
   <motion.header
