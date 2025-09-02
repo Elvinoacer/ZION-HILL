@@ -99,22 +99,22 @@ const MemberGivingPageContent = () => {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white p-4 sm:p-6 lg:p-8">
       <Header />
       <main className="max-w-7xl mx-auto mt-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          <Card className="md:col-span-1 bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 text-center">
-            <h3 className="text-lg font-semibold text-gray-500 dark:text-gray-400">Total Given</h3>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">KES {totalGiven.toLocaleString()}</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Card className="col-span-1 bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg rounded-2xl p-3 text-center">
+            <h3 className="text-sm sm:text-base font-semibold text-blue-100">Total Given</h3>
+            <p className="text-xl sm:text-2xl font-bold text-white">KES {totalGiven.toLocaleString()}</p>
           </Card>
-          <Card className="md:col-span-1 bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 text-center">
-            <h3 className="text-lg font-semibold text-gray-500 dark:text-gray-400">Tithes</h3>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">KES {tithesGiven.toLocaleString()}</p>
+          <Card className="col-span-1 bg-gradient-to-br from-purple-500 to-purple-700 text-white shadow-lg rounded-2xl p-3 text-center">
+            <h3 className="text-sm sm:text-base font-semibold text-purple-100">Tithes</h3>
+            <p className="text-xl sm:text-2xl font-bold text-white">KES {tithesGiven.toLocaleString()}</p>
           </Card>
-          <Card className="md:col-span-1 bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 text-center">
-            <h3 className="text-lg font-semibold text-gray-500 dark:text-gray-400">Special Offerings</h3>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">KES {specialOfferingsGiven.toLocaleString()}</p>
+          <Card className="col-span-1 bg-gradient-to-br from-green-500 to-green-700 text-white shadow-lg rounded-2xl p-3 text-center">
+            <h3 className="text-sm sm:text-base font-semibold text-green-100">Special Offerings</h3>
+            <p className="text-xl sm:text-2xl font-bold text-white">KES {specialOfferingsGiven.toLocaleString()}</p>
           </Card>
-          <Card className="md:col-span-1 bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 text-center">
-            <h3 className="text-lg font-semibold text-gray-500 dark:text-gray-400">Project/Support</h3>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">KES {projectSupportGiven.toLocaleString()}</p>
+          <Card className="col-span-1 bg-gradient-to-br from-yellow-500 to-yellow-700 text-white shadow-lg rounded-2xl p-3 text-center">
+            <h3 className="text-sm sm:text-base font-semibold text-yellow-100">Project/Support</h3>
+            <p className="text-xl sm:text-2xl font-bold text-white">KES {projectSupportGiven.toLocaleString()}</p>
           </Card>
         </div>
 

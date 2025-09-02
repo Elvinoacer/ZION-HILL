@@ -344,7 +344,7 @@ const MemberProfilePage = () => {
                             </div>
                           </div>
                           <p className="font-bold text-lg text-green-700">
-                            ${transaction.amount.toFixed(2)}
+                            KES {transaction.amount.toFixed(2)}
                           </p>
                         </li>
                       ))}

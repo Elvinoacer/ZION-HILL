@@ -23,6 +23,7 @@ export async function GET(req: NextRequest) {
         baptismApplicationStatus: true,
         baptismDate: true,
         transactions: {
+          where: { reconciliationStatus: "APPROVED" },
           select: {
             id: true,
             date: true,
