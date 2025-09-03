@@ -1,3 +1,4 @@
+"use client";
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Giving } from "@/types/giving";
