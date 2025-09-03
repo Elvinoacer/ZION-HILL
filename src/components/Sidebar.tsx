@@ -134,6 +134,7 @@ const SidebarContent = ({ setSidebarOpen }) => {
       path: "/member/giving",
       requiredRoles: ["MEMBER"],
     },
+    
     {
       name: "Prayer Wall",
       icon: <FaPrayingHands />,

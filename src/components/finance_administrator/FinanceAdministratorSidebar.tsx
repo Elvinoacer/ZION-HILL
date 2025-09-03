@@ -37,12 +37,7 @@ const sections = [
     icon: FileText,
     color: "text-purple-500",
   },
-  {
-    id: "giving",
-    label: "Online Giving",
-    icon: CreditCard,
-    color: "text-yellow-500",
-  },
+  
   {
     id: "support",
     label: "Support Requests",
@@ -63,10 +58,12 @@ const sections = [
   },
   {
     id: "giving-opportunities",
-    label: "Giving",
+    label: "Giving Opportunities",
     icon: HandHeart,
     color: "text-pink-500",
   },
+  
+  
 ];
 
 const FinanceAdministratorSidebar = () => {

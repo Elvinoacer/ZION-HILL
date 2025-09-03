@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { immer } from "zustand/middleware/immer";
 import { AuditLog, Ticket, User, Ministry, Group } from "@/generated/prisma";
 
 interface AdminState {
@@ -28,7 +29,7 @@ interface AdminState {
   updateTaskStatus: (taskId: string, status: string) => Promise<void>;
 }
 
-export const useAdminStore = create<AdminState>((set) => ({
+export const useAdminStore = create(immer<AdminState>((set) => ({
   stats: null,
   ministries: [],
   tasks: [],
@@ -43,9 +44,10 @@ export const useAdminStore = create<AdminState>((set) => ({
   fetchAdminStats: async () => {
     set((state) => {
       if (state.fetchedAdminStats) {
-        return {}; // Already fetched, do nothing
+        return;
       }
-      return { loading: true, error: null };
+      state.loading = true;
+      state.error = null;
     });
     try {
       const response = await fetch("/api/admin-dashboard?type=stats");
@@ -53,18 +55,26 @@ export const useAdminStore = create<AdminState>((set) => ({
         throw new Error(`Error fetching admin stats: ${response.statusText}`);
       }
       const stats = await response.json();
-      set({ stats, loading: false, fetchedAdminStats: true });
+      set((state) => {
+        state.stats = stats;
+        state.loading = false;
+        state.fetchedAdminStats = true;
+      });
     } catch (error: unknown) {
-      set({ error: error.message, loading: false });
+      set((state) => {
+        state.error = error.message;
+        state.loading = false;
+      });
     }
   },
 
   fetchMinistries: async () => {
     set((state) => {
       if (state.fetchedMinistries) {
-        return {}; // Already fetched, do nothing
+        return;
       }
-      return { loading: true, error: null };
+      state.loading = true;
+      state.error = null;
     });
     try {
       const response = await fetch("/api/admin-dashboard?type=ministries");
@@ -72,18 +82,26 @@ export const useAdminStore = create<AdminState>((set) => ({
         throw new Error(`Error fetching ministries: ${response.statusText}`);
       }
       const ministries = await response.json();
-      set({ ministries, loading: false, fetchedMinistries: true });
+      set((state) => {
+        state.ministries = ministries;
+        state.loading = false;
+        state.fetchedMinistries = true;
+      });
     } catch (error: unknown) {
-      set({ error: error.message, loading: false });
+      set((state) => {
+        state.error = error.message;
+        state.loading = false;
+      });
     }
   },
 
   fetchTasks: async () => {
     set((state) => {
       if (state.fetchedTasks) {
-        return {}; // Already fetched, do nothing
+        return;
       }
-      return { loading: true, error: null };
+      state.loading = true;
+      state.error = null;
     });
     try {
       const response = await fetch("/api/admin-dashboard?type=tasks");
@@ -91,18 +109,26 @@ export const useAdminStore = create<AdminState>((set) => ({
         throw new Error(`Error fetching tasks: ${response.statusText}`);
       }
       const tasks = await response.json();
-      set({ tasks, loading: false, fetchedTasks: true });
+      set((state) => {
+        state.tasks = tasks;
+        state.loading = false;
+        state.fetchedTasks = true;
+      });
     } catch (error: unknown) {
-      set({ error: error.message, loading: false });
+      set((state) => {
+        state.error = error.message;
+        state.loading = false;
+      });
     }
   },
 
   fetchActivityLogs: async () => {
     set((state) => {
       if (state.fetchedActivityLogs) {
-        return {}; // Already fetched, do nothing
+        return;
       }
-      return { loading: true, error: null };
+      state.loading = true;
+      state.error = null;
     });
     try {
       const response = await fetch("/api/admin-dashboard?type=activity");
@@ -110,14 +136,24 @@ export const useAdminStore = create<AdminState>((set) => ({
         throw new Error(`Error fetching activity logs: ${response.statusText}`);
       }
       const activityLogs = await response.json();
-      set({ activityLogs, loading: false, fetchedActivityLogs: true });
+      set((state) => {
+        state.activityLogs = activityLogs;
+        state.loading = false;
+        state.fetchedActivityLogs = true;
+      });
     } catch (error: unknown) {
-      set({ error: error.message, loading: false });
+      set((state) => {
+        state.error = error.message;
+        state.loading = false;
+      });
     }
   },
 
   updateTaskStatus: async (taskId, status) => {
-    set({ loading: true, error: null });
+    set((state) => {
+      state.loading = true;
+      state.error = null;
+    });
     try {
       const response = await fetch("/api/admin-dashboard", {
         method: "PUT",
@@ -130,14 +166,18 @@ export const useAdminStore = create<AdminState>((set) => ({
         throw new Error(`Error updating task status: ${response.statusText}`);
       }
       const updatedTask = await response.json();
-      set((state) => ({
-        tasks: state.tasks.map((task) =>
-          task.id === taskId ? { ...task, status: updatedTask.status } : task
-        ),
-        loading: false,
-      }));
+      set((state) => {
+        const task = state.tasks.find((task) => task.id === taskId);
+        if (task) {
+          task.status = updatedTask.status;
+        }
+        state.loading = false;
+      });
     } catch (error: unknown) {
-      set({ error: error.message, loading: false });
+      set((state) => {
+        state.error = error.message;
+        state.loading = false;
+      });
     }
-  },
-}));
+  }, // Added comma here
+})));

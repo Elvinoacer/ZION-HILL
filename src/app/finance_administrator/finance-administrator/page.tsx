@@ -11,8 +11,8 @@ import OnlineGivingOptimization from "@/components/finance_administrator/section
 import FinancialSupportRequests from "@/components/finance_administrator/sections/FinancialSupportRequests";
 import DonationPlans from "@/components/finance_administrator/sections/DonationPlans";
 import Budgets from "@/components/finance_administrator/sections/Budgets";
-import GivingPage from "@/app/finance_administrator/giving/page";
-import { useDonationStore, useAdminStore } from "@/store";
+
+import { useDonationStore, useAdminStore, useGivingStore } from "@/store";
 import { useFinanceDashboardStore } from "@/store/financeDashboardStore";
 import {
   BarChart3,
@@ -41,7 +41,7 @@ const sectionIcons = {
   support: <HandHeart className="h-5 w-5" />,
   plans: <ListPlus className="h-5 w-5" />,
   budgets: <PiggyBank className="h-5 w-5" />,
-  "giving-opportunities": <HandHeart className="h-5 w-5" />,
+  
 };
 
 // Section titles mapping
@@ -53,7 +53,7 @@ const sectionTitles = {
   support: "Support Requests",
   plans: "Donation Plans",
   budgets: "Budgets",
-  "giving-opportunities": "Giving",
+  
 };
 
 export default function FinanceAdministratorDashboard() {
@@ -74,6 +74,12 @@ export default function FinanceAdministratorDashboard() {
     error: adminError,
     fetchActivityLogs,
   } = useAdminStore();
+  const {
+    giving,
+    loading: givingLoading,
+    error: givingError,
+    fetchGiving,
+  } = useGivingStore();
 
   // Check if mobile on mount and resize
   useEffect(() => {
@@ -97,11 +103,13 @@ export default function FinanceAdministratorDashboard() {
   useEffect(() => {
     fetchDonations();
     fetchActivityLogs();
-  }, [fetchDonations, fetchActivityLogs]);
+    fetchGiving();
+  }, []);
 
   const handleRetry = () => {
     fetchDonations();
     fetchActivityLogs();
+    fetchGiving();
   };
 
   const sectionKeys = Object.keys(sectionTitles) as Array<
@@ -127,7 +135,7 @@ export default function FinanceAdministratorDashboard() {
       <h2 className="text-xl font-bold text-gray-800 mb-2">
         Error Loading Data
       </h2>
-      <p className="text-gray-600 mb-4">{donationError || adminError}</p>
+      <p className="text-gray-600 mb-4">{donationError || adminError || givingError}</p>
       <button
         onClick={handleRetry}
         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center"
@@ -142,7 +150,7 @@ export default function FinanceAdministratorDashboard() {
   const renderSectionComponent = () => {
     switch (activeSection) {
       case "contributions":
-        return <ContributionManagement donations={donations} />;
+        return <ContributionManagement />;
       case "financials":
         return <FinancialOversight transactions={donations} />;
       case "reporting":
@@ -155,18 +163,17 @@ export default function FinanceAdministratorDashboard() {
         return <DonationPlans searchQuery={planSearchQuery} />;
       case "budgets":
         return <Budgets />;
-      case "giving-opportunities":
-        return <GivingPage />;
+      
       default:
         return <ContributionManagement donations={donations} />;
     }
   };
 
-  if (donationLoading || adminLoading) {
+  if (donationLoading || adminLoading || givingLoading) {
     return <LoadingState />;
   }
 
-  if (donationError || adminError) {
+  if (donationError || adminError || givingError) {
     return <ErrorState />;
   }
 

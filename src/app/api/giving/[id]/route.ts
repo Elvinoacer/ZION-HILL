@@ -1,68 +1,45 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { RoleName } from '@/generated/prisma';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
-    const givingOpportunity = await prisma.giving.findUnique({
-      where: { id: params.id },
-    });
-    if (!givingOpportunity) {
-      return NextResponse.json({ error: 'Giving opportunity not found' }, { status: 404 });
-    }
-    return NextResponse.json(givingOpportunity);
-  } catch (error) {
-    console.error('Error fetching giving opportunity:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
-}
-
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user.roles.includes(RoleName.FINANCE_ADMINISTRATOR)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-
-  try {
+    const { id } = params;
     const body = await request.json();
-    const { name, description, goalAmount, startDate, endDate } = body;
+    const { name, description, goalAmount } = body;
 
-    const updatedGivingOpportunity = await prisma.giving.update({
-      where: { id: params.id },
+    const updatedGiving = await prisma.giving.update({
+      where: { id },
       data: {
         name,
         description,
         goalAmount,
-        startDate,
-        endDate,
       },
     });
 
-    return NextResponse.json(updatedGivingOpportunity);
+    return NextResponse.json(updatedGiving);
   } catch (error) {
-    console.error('Error updating giving opportunity:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    console.error("Error updating giving:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user.roles.includes(RoleName.FINANCE_ADMINISTRATOR)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
+    const { id } = params;
+
     await prisma.giving.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('Error deleting giving opportunity:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    console.error("Error deleting giving:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

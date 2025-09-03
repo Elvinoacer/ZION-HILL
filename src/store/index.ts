@@ -15,3 +15,4 @@ export * from './worshipLeaderStore';
 export * from './themeOfTheWeekStore';
 export * from './roleStore';
 export * from './dashboardStore';
+export * from './givingStore';

@@ -46,7 +46,7 @@ export default function OnlineGivingOptimization() {
   useEffect(() => {
     fetchGateways();
     fetchRecurringGifts();
-  }, [fetchGateways, fetchRecurringGifts]);
+  }, []);
 
   // Filter and process data
   const { filteredGateways, filteredRecurringGifts, stats } = useMemo(() => {

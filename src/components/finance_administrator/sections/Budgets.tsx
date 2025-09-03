@@ -134,6 +134,10 @@ export default function BudgetsContent(): JSX.Element {
     }
   };
 
+  const handleViewDetails = (budget: any) => {
+    setSelectedBudget(budget);
+  };
+
   const handleCloseModal = () => {
     setSelectedBudget(null);
   };
@@ -157,7 +161,7 @@ export default function BudgetsContent(): JSX.Element {
   useEffect(() => {
     fetchBudgets();
     fetchExpenses();
-  }, [fetchBudgets, fetchExpenses]);
+  }, []);
 
   // Merge store budgets into displayBudgets without wiping edits
   useEffect(() => {

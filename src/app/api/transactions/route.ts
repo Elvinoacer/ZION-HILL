@@ -7,6 +7,7 @@ export async function GET(request: Request) {
       include: {
         donationPlan: true,
         user: true,
+        giving: true,
       },
       orderBy: {
         date: 'desc',

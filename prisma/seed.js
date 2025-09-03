@@ -352,7 +352,7 @@ async function main() {
   }
 
   // Create Transactions
-  const transactionTypes = ["DONATION", "EXPENSE", "REVENUE"];
+  const transactionTypes = ["DONATION", "EXPENSE", "REVENUE", "GIVING"];
   const transactionMethods = [
     "MPESA",
     "STRIPE",
