@@ -5,26 +5,23 @@ import Image from 'next/image';
 interface BirthdayCardProps {
   name: string;
   imageUrl: string;
-  message: string;
-  onSendGift: () => void;
+  onSendWishes: () => void;
 }
 
-const BirthdayCard: React.FC<BirthdayCardProps> = ({ name, imageUrl, message, onSendGift }) => {
+const BirthdayCard: React.FC<BirthdayCardProps> = ({ name, imageUrl, onSendWishes }) => {
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-      <div className="relative h-48">
-        <Image src={imageUrl} alt={name} layout="fill" objectFit="cover" />
+    <div className="bg-gradient-to-br from-yellow-100 to-orange-200 rounded-2xl shadow-lg overflow-hidden text-center p-8 transform hover:scale-105 transition-transform duration-300">
+      <div className="relative w-32 h-32 mx-auto mb-4">
+        <Image src={imageUrl} alt={name} layout="fill" objectFit="cover" className="rounded-full border-4 border-white shadow-md" />
       </div>
-      <div className="p-6">
-        <h2 className="text-2xl font-bold mb-2">{name}</h2>
-        <p className="text-gray-700">{message}</p>
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 hover:bg-blue-600 transition-colors duration-300"
-          onClick={onSendGift}
-        >
-          Send a Gift
-        </button>
-      </div>
+      <h2 className="text-3xl font-bold text-gray-800 font-serif mb-2">{name}</h2>
+      <p className="text-gray-600 mb-6">wishes you a happy birthday!</p>
+      <button
+        className="bg-pink-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-pink-600 transition-colors duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
+        onClick={onSendWishes}
+      >
+        Send Birthday Wishes
+      </button>
     </div>
   );
 };
