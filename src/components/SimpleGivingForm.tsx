@@ -12,7 +12,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 
-interface DonationFormProps {
+interface SimpleGivingFormProps {
   plan: {
     id: string;
     name: string;
@@ -23,7 +23,7 @@ interface DonationFormProps {
   onSuccess?: () => void;
 }
 
-const DonationForm: React.FC<DonationFormProps> = ({ plan, donationType, onSuccess }) => {
+const SimpleGivingForm: React.FC<SimpleGivingFormProps> = ({ plan, donationType, onSuccess }) => {
   const { data: session } = useSession();
   const [amount, setAmount] = useState<number | null>(null);
   const [phone, setPhone] = useState<string>("");
@@ -51,7 +51,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan, donationType, onSucce
     // Validate inputs
     if (!amount || amount <= 0) {
       setMessage({
-        text: "Please enter a valid donation amount",
+        text: "Please enter a valid giving amount",
         type: "error",
       });
       setIsSubmitting(false);
@@ -83,7 +83,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan, donationType, onSucce
 
       if (!paymentRes.ok) {
         const errorData = await paymentRes.json();
-        throw new Error(errorData.error || "Failed to process donation");
+        throw new Error(errorData.error || "Failed to process giving");
       }
 
       const paymentData = await paymentRes.json();
@@ -158,7 +158,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan, donationType, onSucce
               Thank You!
             </h3>
             <p className="text-gray-600 mb-6">
-              Your donation of{" "}
+              Your giving of{" "}
               <span className="font-semibold">
                 KES {amount?.toLocaleString()}
               </span>{" "}
@@ -175,7 +175,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan, donationType, onSucce
               }}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
             >
-              Make Another Donation
+              Make Another Giving
             </button>
           </div>
         </motion.div>
@@ -197,7 +197,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan, donationType, onSucce
           </div>
 
           <div className="p-6">
-            {/* Donation Type Toggle */}
+            {/* Giving Type Toggle */}
             <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
               {["once", "monthly"].map((tab) => (
                 <button
@@ -218,7 +218,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan, donationType, onSucce
             {/* Amount Input */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Donation Amount (KES)
+                Giving Amount (KES)
               </label>
               <div className="relative rounded-lg shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -379,7 +379,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan, donationType, onSucce
                   <FiGift className="mr-2 h-5 w-5" />
                   {activeTab === "once"
                     ? "Donate Now"
-                    : "Start Monthly Donation"}
+                    : "Start Monthly Giving"}
                 </>
               )}
             </button>
@@ -400,5 +400,3 @@ const DonationForm: React.FC<DonationFormProps> = ({ plan, donationType, onSucce
     </AnimatePresence>
   );
 };
-
-export default DonationForm;

@@ -2,7 +2,7 @@
 
 import GivingDashboard from "@/components/GivingDashboard";
 import GivingHistory from "@/components/GivingHistory";
-import SimpleDonationForm from "@/components/SimpleDonationForm";
+import SimpleGivingForm from "@/components/SimpleGivingForm";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -140,10 +140,10 @@ const MemberGivingPageContent = () => {
 
         <div className="text-center mt-8">
           <Button
-            onClick={() => router.push("/donations")}
+            onClick={() => router.push("/giving")}
             className="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 flex items-center justify-center gap-2"
           >
-            View All Donation Opportunities
+            View All Giving Opportunities
             <ArrowRight className="h-5 w-5" />
           </Button>
         </div>
@@ -162,14 +162,14 @@ const MemberGivingPageContent = () => {
             </motion.h2>
             <Card className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl border-0 overflow-hidden">
               <CardContent className="p-0">
-                <GivingHistory donations={givingHistory || []} />
+                <GivingHistory giving={givingHistory || []} />
               </CardContent>
             </Card>
           </div>
         )}
       </main>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl p-0 border-0 overflow-hidden max-w-md md:max-w-2xl">
+        <DialogContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl p-0 border-0 overflow-hidden max-w-md md:max-w-2xl [&>button]:text-white">
           {selectedOpportunity && (
             <>
               <DialogHeader className="relative">
@@ -190,7 +190,7 @@ const MemberGivingPageContent = () => {
               </DialogHeader>
               <ScrollArea className="h-[70vh] md:h-[60vh]">
                 <div className="p-6">
-                  <SimpleDonationForm
+                  <SimpleGivingForm
                     plan={selectedOpportunity}
                     donationType="giving"
                     onSuccess={() => {
