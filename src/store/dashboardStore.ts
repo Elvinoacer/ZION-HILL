@@ -102,7 +102,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
         safeFetch(`/api/member-profile?userId=${userId}`, "Failed to fetch profile"),
         safeFetch("/api/events?type=EVENT", "Failed to fetch events"),
         safeFetch("/api/sermons", "Failed to fetch sermons"),
-        safeFetch("/api/donations", "Failed to fetch donations"),
+        safeFetch(`/api/donations?userId=${userId}`, "Failed to fetch donations"),
         safeFetch("/api/bible-study", "Failed to fetch bible study progress"),
         safeFetch("/api/prayer-requests", "Failed to fetch prayer requests"),
         safeFetch(`/api/user-counseling-sessions?userId=${userId}`, "Failed to fetch counseling sessions"), // Added

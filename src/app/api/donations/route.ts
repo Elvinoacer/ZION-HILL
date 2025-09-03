@@ -7,11 +7,16 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get('page') || '1', 10);
     const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
     const skip = (page - 1) * pageSize;
+    const userId = searchParams.get('userId');
 
     const whereClause: any = {
       type: { in: ['DONATION', 'GIVING'] },
       reconciliationStatus: 'APPROVED',
     };
+
+    if (userId) {
+      whereClause.userId = userId;
+    }
 
     // Add filtering based on query parameters if needed
     const searchQuery = searchParams.get('searchQuery');
