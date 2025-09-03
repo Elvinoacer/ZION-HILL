@@ -116,12 +116,12 @@ const PrayerRequestCard = ({
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
             {request.user?.image ? (
-              <Image
+                            <Image
                 src={request.user.image}
                 alt={request.user.name || "User"}
                 width={48}
                 height={48}
-                className="rounded-full object-cover border-2 border-white shadow-sm"
+                className="h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm"
               />
             ) : (
               <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
@@ -316,12 +316,12 @@ const PrayerWallPage = () => {
             <CardContent className="p-5 sm:p-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <Image
+                                    <Image
                     src={session?.user?.photo || "/images/prayer-dove.png"}
                     alt="Your avatar"
                     width={40}
                     height={40}
-                    className="rounded-full mt-1"
+                    className="rounded-full mt-1 object-cover"
                   />
                   <Textarea
                     id="prayerRequest"
