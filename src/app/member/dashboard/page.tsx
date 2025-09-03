@@ -188,36 +188,30 @@ const DashboardPage = () => {
             </CardHeader>
             <CardContent className="p-4 sm:p-6">
               {announcements.length > 0 ? (
-                <ul className="space-y-4">
-                  {announcements.slice(0, 3).map((announcement) => (
-                    <li
-                      key={announcement.id}
-                      className="flex items-start space-x-3"
-                    >
-                      <div className="bg-rose-50 p-2 rounded-lg mt-1">
-                        <Icons.megaphone className="h-5 w-5 text-rose-500" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-gray-800 text-sm sm:text-base">
+                <div className="space-y-4">
+                  <ul className="divide-y divide-gray-200">
+                    {announcements.slice(0, 3).map((announcement) => (
+                      <li key={announcement.id} className="py-3">
+                        <h3 className="font-medium text-gray-800 text-sm">
                           {announcement.title}
                         </h3>
-                        <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">
+                        <p className="text-xs text-gray-500 line-clamp-2">
                           {announcement.content}
                         </p>
-                      </div>
-                    </li>
-                  ))}
+                      </li>
+                    ))}
+                  </ul>
                   {announcements.length > 3 && (
                     <Link href="/member/announcements">
                       <Button
-                        variant="ghost"
-                        className="w-full text-rose-600 hover:bg-rose-50"
+                        variant="outline"
+                        className="w-full text-rose-600 border-rose-200 hover:bg-rose-50"
                       >
-                        View All ({announcements.length})
+                        View All Announcements
                       </Button>
                     </Link>
                   )}
-                </ul>
+                </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 space-y-3">
                   <Icons.megaphone className="h-8 w-8 text-gray-300" />
@@ -241,32 +235,40 @@ const DashboardPage = () => {
             </CardHeader>
             <CardContent className="p-4 sm:p-6">
               {upcomingEvents.length > 0 ? (
-                <ul className="space-y-4">
-                  {upcomingEvents.map((event) => (
-                    <li key={event.id} className="flex items-start space-x-3">
-                      <div className="bg-purple-50 p-2 rounded-lg">
-                        <div className="text-center w-12">
-                          <div className="text-xs sm:text-sm font-medium text-purple-800">
-                            {new Date(event.date).toLocaleDateString("en-US", {
-                              month: "short",
-                            })}
-                          </div>
-                          <div className="text-lg font-bold text-purple-600">
+                <div className="space-y-4">
+                  <ul className="divide-y divide-gray-200">
+                    {upcomingEvents.slice(0, 3).map((event) => (
+                      <li key={event.id} className="py-3 flex items-center space-x-4">
+                        <div className="flex-shrink-0 text-center w-14 bg-purple-50 p-2 rounded-lg">
+                          <p className="text-xs font-medium text-purple-800">
+                            {new Date(event.date).toLocaleDateString("en-US", { month: "short" })}
+                          </p>
+                          <p className="text-xl font-bold text-purple-600">
                             {new Date(event.date).getDate()}
-                          </div>
+                          </p>
                         </div>
-                      </div>
-                      <div className="pt-1">
-                        <h3 className="font-medium text-gray-800 text-sm sm:text-base">
-                          {event.title}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-gray-500">
-                          {event.location || "Church Venue"}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                        <div>
+                          <h3 className="font-medium text-gray-800 text-sm">
+                            {event.title}
+                          </h3>
+                          <p className="text-xs text-gray-500">
+                            {event.location || "Church Venue"}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  {upcomingEvents.length > 3 && (
+                    <Link href="/member/events">
+                      <Button
+                        variant="outline"
+                        className="w-full text-purple-600 border-purple-200 hover:bg-purple-50"
+                      >
+                        View All Events
+                      </Button>
+                    </Link>
+                  )}
+                </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 space-y-3">
                   <Icons.calendarOff className="h-8 w-8 text-gray-300" />
@@ -290,33 +292,47 @@ const DashboardPage = () => {
             </CardHeader>
             <CardContent className="p-4 sm:p-6">
               {recentSermons.length > 0 ? (
-                <ul className="space-y-3">
-                  {recentSermons.map((sermon) => (
-                    <li key={sermon.id} className="group">
-                      <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-amber-50 transition-colors">
-                        <div className="bg-amber-50 p-2 rounded-lg">
-                          <Icons.playCircle className="h-5 w-5 text-amber-500" />
+                <div className="space-y-4">
+                  <ul className="divide-y divide-gray-200">
+                    {recentSermons.slice(0, 3).map((sermon) => (
+                      <li key={sermon.id} className="py-3 flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="bg-amber-100 p-2 rounded-full">
+                            <Icons.playCircle className="h-5 w-5 text-amber-600" />
+                          </div>
+                          <div>
+                            <h3 className="font-medium text-gray-800 text-sm">
+                              {sermon.title}
+                            </h3>
+                            <p className="text-xs text-gray-500">
+                              {sermon.speaker?.name || "Pastor"} •{" "}
+                              {new Date(sermon.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-gray-800 truncate text-sm sm:text-base">
-                            {sermon.title}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-gray-500">
-                            {sermon.speaker?.name || "Pastor"} •{" "}
-                            {new Date(sermon.date).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-amber-600 px-2 hover:bg-amber-100"
-                        >
-                          Listen
-                        </Button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                        <Link href={`/sermons/${sermon.id}`}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-amber-600 hover:bg-amber-100"
+                          >
+                            Listen
+                          </Button>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                  {recentSermons.length > 3 && (
+                    <Link href="/sermons">
+                      <Button
+                        variant="outline"
+                        className="w-full text-amber-600 border-amber-200 hover:bg-amber-50"
+                      >
+                        View All Sermons
+                      </Button>
+                    </Link>
+                  )}
+                </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 space-y-3">
                   <Icons.audioLinesOff className="h-8 w-8 text-gray-300" />
@@ -338,39 +354,47 @@ const DashboardPage = () => {
                 </CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6">
+            <CardContent className="p-4 sm:p-6 flex flex-col">
               {bibleStudyProgress ? (
-                <div className="space-y-4">
-                  <h3 className="font-medium text-gray-800 text-sm sm:text-base">
+                <div className="space-y-3 flex-grow">
+                  <h3 className="font-medium text-gray-800 text-sm">
                     {bibleStudyProgress.title}
                   </h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-gray-600">
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs text-gray-500">
                       <span>Progress</span>
                       <span>{bibleStudyProgress.progress || 0}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-gradient-to-r from-indigo-500 to-blue-500 h-2.5 rounded-full transition-all duration-500"
+                        className="bg-gradient-to-r from-indigo-500 to-blue-500 h-2 rounded-full transition-all duration-500"
                         style={{
                           width: `${bibleStudyProgress.progress || 0}%`,
                         }}
                       ></div>
                     </div>
                   </div>
-                  <Link href="/member/bible-study">
-                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
-                      Continue Study
-                    </Button>
-                  </Link>
+                  <div className="pt-2">
+                    <Link href="/member/bible-study">
+                      <Button
+                        variant="outline"
+                        className="w-full text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                      >
+                        Continue Study
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                <div className="flex flex-col items-center justify-center py-8 space-y-4 flex-grow">
                   <Icons.bookOpenCheck className="h-8 w-8 text-gray-300" />
                   <p className="text-gray-400 text-sm">No active study</p>
                   <Link href="/member/bible-study">
-                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
-                      Start a Study
+                    <Button
+                      variant="outline"
+                      className="w-full text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                    >
+                      Start a New Study
                     </Button>
                   </Link>
                 </div>
@@ -393,32 +417,37 @@ const DashboardPage = () => {
             <CardContent className="p-4 sm:p-6">
               {givingHistory.length > 0 ? (
                 <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                    <h3 className="font-medium text-gray-800 mb-2 sm:mb-0 text-sm sm:text-base">
-                      Recent Contributions
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-emerald-50 rounded-lg">
+                    <h3 className="font-semibold text-gray-800 text-base">
+                      Total Contributions
                     </h3>
-                    <span className="text-sm font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
-                      Total: KES
+                    <span className="text-lg font-bold text-emerald-600">
+                      KES{" "}
                       {givingHistory
                         .reduce((sum, item) => sum + item.amount, 0)
                         .toFixed(2)}
                     </span>
                   </div>
-                  <ul className="space-y-3">
+                  <ul className="divide-y divide-gray-200">
                     {givingHistory.slice(0, 3).map((transaction) => (
                       <li
                         key={transaction.id}
-                        className="flex justify-between items-center text-sm sm:text-base"
+                        className="py-3 flex items-center justify-between"
                       >
-                        <div>
-                          <p className="font-medium text-gray-800">
-                            {transaction.description || "General Donation"}
-                          </p>
-                          <p className="text-xs sm:text-sm text-gray-500">
-                            {new Date(transaction.date).toLocaleDateString()}
-                          </p>
+                        <div className="flex items-center space-x-3">
+                          <div className="bg-gray-100 p-2 rounded-full">
+                            <Icons.arrowRight className="h-4 w-4 text-gray-500" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-800 text-sm">
+                              {transaction.description || "General Donation"}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {new Date(transaction.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                            </p>
+                          </div>
                         </div>
-                        <span className="font-semibold text-emerald-600">
+                        <span className="font-semibold text-gray-700 text-sm">
                           KES {transaction.amount.toFixed(2)}
                         </span>
                       </li>
@@ -427,10 +456,10 @@ const DashboardPage = () => {
                   {givingHistory.length > 3 && (
                     <Link href="/member/giving">
                       <Button
-                        variant="ghost"
-                        className="w-full text-emerald-600 hover:bg-emerald-50"
+                        variant="outline"
+                        className="w-full text-emerald-600 border-emerald-200 hover:bg-emerald-50"
                       >
-                        Show More
+                        View All Contributions
                       </Button>
                     </Link>
                   )}
@@ -456,56 +485,59 @@ const DashboardPage = () => {
                 </CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6">
+            <CardContent className="p-4 sm:p-6 flex flex-col">
               {prayerRequests.length > 0 ? (
-                <div className="space-y-4">
-                  <ul className="space-y-3">
+                <div className="space-y-4 flex-grow">
+                  <ul className="divide-y divide-gray-200">
                     {prayerRequests.slice(0, 2).map((request) => (
-                      <li
-                        key={request.id}
-                        className="p-3 rounded-lg bg-gray-50 hover:bg-pink-50 transition-colors"
-                      >
+                      <li key={request.id} className="py-3">
                         <div className="flex items-start space-x-3">
-                          {request.isUrgent ? (
-                            <Icons.alertTriangle className="h-5 w-5 text-pink-500 flex-shrink-0 mt-1" />
-                          ) : (
-                            <Icons.pray className="h-5 w-5 text-blue-500 flex-shrink-0 mt-1" />
-                          )}
-                          <p className="text-gray-700 text-sm sm:text-base">
+                          <div className="flex-shrink-0">
+                            {request.isUrgent ? (
+                              <Icons.alertTriangle className="h-5 w-5 text-pink-500" />
+                            ) : (
+                              <Icons.pray className="h-5 w-5 text-blue-500" />
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-700 line-clamp-2">
                             {request.request}
                           </p>
                         </div>
                         {request.isUrgent && (
-                          <div className="mt-2 text-xs font-medium text-pink-600">
-                            Urgent Prayer
-                          </div>
+                          <p className="mt-1 text-xs font-medium text-pink-600 text-right">
+                            Urgent
+                          </p>
                         )}
                       </li>
                     ))}
                   </ul>
-                  {prayerRequests.length > 2 && (
-                    <Button
-                      variant="ghost"
-                      className="w-full text-pink-600 hover:bg-pink-50"
-                    >
-                      View All ({prayerRequests.length})
-                    </Button>
-                  )}
-                  <Link href="/member/prayer-wall">
-                    <Button className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
-                      <Icons.plus className="h-4 w-4 mr-2" />
-                      New Prayer Request
-                    </Button>
-                  </Link>
+                  <div className="pt-2 space-y-2">
+                    {prayerRequests.length > 2 && (
+                      <Link href="/member/prayer-wall">
+                        <Button
+                          variant="outline"
+                          className="w-full text-pink-600 border-pink-200 hover:bg-pink-50"
+                        >
+                          View All Requests
+                        </Button>
+                      </Link>
+                    )}
+                    <Link href="/member/prayer-wall">
+                      <Button className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white">
+                        <Icons.plus className="h-4 w-4 mr-2" />
+                        New Request
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                <div className="flex flex-col items-center justify-center py-8 space-y-4 flex-grow">
                   <Icons.pray className="h-8 w-8 text-gray-300" />
                   <p className="text-gray-400 text-sm">No prayer requests</p>
                   <Link href="/member/prayer-wall">
-                    <Button className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
+                    <Button className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white">
                       <Icons.plus className="h-4 w-4 mr-2" />
-                      Submit Request
+                      Submit a Request
                     </Button>
                   </Link>
                 </div>
@@ -525,45 +557,59 @@ const DashboardPage = () => {
                 </CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6">
+            <CardContent className="p-4 sm:p-6 flex flex-col">
               {counselingSessions.length > 0 ? (
-                <ul className="space-y-4">
-                  {counselingSessions.slice(0, 1).map((session) => (
-                    <li key={session.id} className="flex items-start space-x-3">
-                      <div className="bg-teal-50 p-2 rounded-lg mt-1">
-                        <Icons.messageSquare className="h-5 w-5 text-teal-500" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-gray-800 text-sm sm:text-base">
-                          Topic: {session.topic?.name || "N/A"}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-gray-500">
-                          Status: {session.status}
-                        </p>
+                <div className="space-y-4 flex-grow">
+                  <ul className="divide-y divide-gray-200">
+                    {counselingSessions.slice(0, 2).map((session) => (
+                      <li key={session.id} className="py-3">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-medium text-gray-800 text-sm">
+                            Topic: {session.topic?.name || "N/A"}
+                          </h3>
+                          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                            session.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                            session.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {session.status}
+                          </span>
+                        </div>
                         {session.counselor && (
-                          <p className="text-xs sm:text-sm text-gray-500">
+                          <p className="text-xs text-gray-500 mt-1">
                             With: {session.counselor.name || "Unassigned"}
                           </p>
                         )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="pt-2">
+                    <Link href="/member/counseling">
+                      <Button
+                        variant="outline"
+                        className="w-full text-teal-600 border-teal-200 hover:bg-teal-50"
+                      >
+                        View All Sessions
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 space-y-3">
+                <div className="flex flex-col items-center justify-center py-8 space-y-4 flex-grow">
                   <Icons.messageSquareOff className="h-8 w-8 text-gray-300" />
                   <p className="text-gray-400 text-sm text-center">
                     No active counseling sessions.
                   </p>
+                  <Link href="/member/counseling-request">
+                    <Button
+                      variant="outline"
+                      className="w-full text-teal-600 border-teal-200 hover:bg-teal-50"
+                    >
+                      Request a Session
+                    </Button>
+                  </Link>
                 </div>
               )}
-              <div className="mt-4">
-                <Link href="/member/counseling-request">
-                  <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
-                    Request a Session
-                  </Button>
-                </Link>
-              </div>
             </CardContent>
           </Card>
 
@@ -579,47 +625,53 @@ const DashboardPage = () => {
                 </CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6">
+            <CardContent className="p-4 sm:p-6 flex flex-col">
               {profile?.baptismApplicationStatus ? (
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <Icons.checkCircle className="h-5 w-5 text-sky-500" />
-                    <span className="text-gray-700 font-medium text-sm sm:text-base">
-                      Status: {profile.baptismApplicationStatus}
+                <div className="space-y-3 flex-grow">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-gray-800 text-sm">Application Status</h3>
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                      profile.baptismApplicationStatus === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                      profile.baptismApplicationStatus === 'APPROVED' || profile.baptismApplicationStatus === 'SCHEDULED' ? 'bg-blue-100 text-blue-800' :
+                      profile.baptismApplicationStatus === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {profile.baptismApplicationStatus}
                     </span>
                   </div>
                   {profile.baptismDate && (
-                    <div className="flex items-center space-x-3">
-                      <Icons.calendar className="h-5 w-5 text-gray-400" />
-                      <span className="text-gray-700 text-sm sm:text-base">
-                        Date:{" "}
-                        {new Date(profile.baptismDate).toLocaleDateString()}
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <Icons.calendar className="h-4 w-4" />
+                      <span>
+                        Scheduled for {new Date(profile.baptismDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                       </span>
                     </div>
                   )}
-                  <p className="text-xs sm:text-sm text-gray-500 pt-2">
+                  <p className="text-xs text-gray-500 pt-1">
                     {profile.baptismApplicationStatus === "PENDING" &&
                       "Your application is under review. We will contact you soon."}
                     {profile.baptismApplicationStatus === "APPROVED" &&
-                      "Congratulations! Your application has been approved."}
+                      "Congratulations! Your application has been approved. Check your email for the next steps."}
                     {profile.baptismApplicationStatus === "SCHEDULED" &&
-                      "Your baptism is scheduled. Please check your email for details."}
+                      "Your baptism is scheduled! We look forward to celebrating with you."}
                     {profile.baptismApplicationStatus === "COMPLETED" &&
-                      "Praise God! Your baptism has been completed."}
+                      "Praise God! You have been baptized."}
                     {profile.baptismApplicationStatus === "REJECTED" && (
-                      <span className="text-red-500">
-                        Your application was not approved at this time. Please
-                        contact us for more information.
+                      <span className="text-red-600">
+                        Your application was not approved at this time. Please contact the church office for more information.
                       </span>
                     )}
                   </p>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                <div className="flex flex-col items-center justify-center py-8 space-y-4 flex-grow">
                   <Icons.dropletOff className="h-8 w-8 text-gray-300" />
                   <p className="text-gray-400 text-sm">No application found.</p>
                   <Link href="/member/baptism-application">
-                    <Button className="w-full bg-sky-600 hover:bg-sky-700 text-white rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
+                    <Button
+                      variant="outline"
+                      className="w-full text-sky-600 border-sky-200 hover:bg-sky-50"
+                    >
                       Apply for Baptism
                     </Button>
                   </Link>

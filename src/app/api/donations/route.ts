@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     const skip = (page - 1) * pageSize;
 
     const whereClause: any = {
-      type: 'DONATION',
+      type: { in: ['DONATION', 'GIVING'] },
       reconciliationStatus: 'APPROVED',
     };
 
@@ -38,10 +38,12 @@ export async function GET(request: Request) {
     const [donations, totalCount] = await prisma.$transaction([
       prisma.transaction.findMany({
         where: whereClause,
-        include: {
-          giving: true,
-          user: true,
-          donationPlan: true,
+        select: {
+          id: true,
+          description: true,
+          date: true,
+          amount: true,
+          reconciliationStatus: true,
         },
         orderBy: {
           date: 'desc',

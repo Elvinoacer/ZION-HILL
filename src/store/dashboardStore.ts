@@ -127,9 +127,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       }
 
       if (donationsResult.status === "fulfilled" && donationsResult.value && Array.isArray(donationsResult.value.donations)) {
-        update.givingHistory = donationsResult.value.donations.filter(
-          (transaction: Transaction) => transaction.reconciliationStatus === "FULFILLED"
-        );
+        update.givingHistory = donationsResult.value.donations;
       }
 
       if (bibleStudyResult.status === "fulfilled") {
