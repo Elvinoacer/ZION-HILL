@@ -268,7 +268,7 @@ const GivingDashboard = ({ givingHistory }: GivingDashboardProps) => {
                 <p>No giving history available yet.</p>
                 <p className="text-sm">
                   Your giving analytics will appear here once you make
-                  donations.
+                  givings.
                 </p>
               </div>
             )}

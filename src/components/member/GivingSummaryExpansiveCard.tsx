@@ -177,7 +177,7 @@ const GivingSummaryExpansiveCard = ({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">
-                    First Donation
+                    First Giving
                   </p>
                   <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">
                     {format(firstTransactionDate, "MMM dd, yyyy")}
@@ -210,7 +210,7 @@ const GivingSummaryExpansiveCard = ({
               </div>
               <div className="text-right">
                 <p className="text-xs text-blue-200">
-                  {givingHistory.length} donations
+                  {givingHistory.length} givings
                 </p>
                 <p className="text-xs text-blue-200">
                   {firstTransactionDate && lastTransactionDate

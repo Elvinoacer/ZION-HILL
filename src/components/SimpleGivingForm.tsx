@@ -209,7 +209,7 @@ const SimpleGivingForm: React.FC<SimpleGivingFormProps> = ({ plan, donationType,
                       : "text-gray-600 hover:text-gray-800"
                   }`}
                 >
-                  {tab === "once" ? "One-time" : "Monthly"} Donation
+                  {tab === "once" ? "One-time" : "Monthly"} Giving
                 </button>
               ))}
             </div>
@@ -374,7 +374,7 @@ const SimpleGivingForm: React.FC<SimpleGivingFormProps> = ({ plan, donationType,
                 <>
                   <FiGift className="mr-2 h-5 w-5" />
                   {activeTab === "once"
-                    ? "Donate Now"
+                    ? "Give Now"
                     : "Start Monthly Giving"}
                 </>
               )}
@@ -396,3 +396,5 @@ const SimpleGivingForm: React.FC<SimpleGivingFormProps> = ({ plan, donationType,
     </AnimatePresence>
   );
 };
+
+export default SimpleGivingForm;

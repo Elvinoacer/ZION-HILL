@@ -32,7 +32,7 @@ import { toast } from "sonner";
 import { useState, useEffect } from "react";
 
 type Donation = {
-  id: number;
+  id: string;
   date: string;
   amount: number;
   type: string;
@@ -385,11 +385,11 @@ export default function GivingHistory({ donations }: GivingHistoryProps) {
                 <Calendar className="h-8 w-8 text-gray-400" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
-                No donations found
+                No givings found
               </h3>
               <p className="text-gray-500 dark:text-gray-400">
                 {donations.length === 0
-                  ? "You haven't made any donations yet."
+                  ? "You haven't made any givings yet."
                   : "Try adjusting your filters to see more results."}
               </p>
             </motion.div>
@@ -521,11 +521,11 @@ export default function GivingHistory({ donations }: GivingHistoryProps) {
                         <Calendar className="h-8 w-8 text-gray-400" />
                       </div>
                       <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
-                        No donations found
+                        No givings found
                       </h3>
                       <p className="text-gray-500 dark:text-gray-400">
                         {donations.length === 0
-                          ? "You haven't made any donations yet."
+                          ? "You haven't made any givings yet."
                           : "Try adjusting your filters to see more results."}
                       </p>
                     </td>

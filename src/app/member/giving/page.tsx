@@ -154,7 +154,7 @@ const MemberGivingPageContent = () => {
 
         <div className="text-center mt-8">
           <Button
-            onClick={() => router.push("/giving")}
+            onClick={() => router.push("/donations")}
             className="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 flex items-center justify-center gap-2"
           >
             View All Giving Opportunities
@@ -176,7 +176,7 @@ const MemberGivingPageContent = () => {
             </motion.h2>
             <Card className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl border-0 overflow-hidden">
               <CardContent className="p-0">
-                <GivingHistory giving={givingHistory || []} />
+                <GivingHistory donations={givingHistory || []} />
               </CardContent>
             </Card>
           </div>
@@ -185,8 +185,7 @@ const MemberGivingPageContent = () => {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl p-0 border-0 overflow-hidden max-w-md md:max-w-2xl [&>button]:text-white">
           {selectedOpportunity && (
-            <>
-              <DialogHeader className="relative">
+            <>              <DialogHeader className="relative">
                 <div className="h-32 w-full relative">
                   <Image
                     src={

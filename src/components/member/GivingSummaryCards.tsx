@@ -203,7 +203,7 @@ const GivingSummaryCards = ({ givingHistory }: GivingSummaryCardsProps) => {
                 <p className="text-2xl font-bold text-white">
                   {givingHistory.length}
                 </p>
-                <p className="text-xs text-gray-300">Total Donations</p>
+                <p className="text-xs text-gray-300">Total Givings</p>
               </div>
 
               <div className="text-center">
