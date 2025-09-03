@@ -118,16 +118,16 @@ export const useDashboardStore = create<DashboardState>((set) => ({
         aggregatedErrors.push(profileResult.reason.message);
       }
 
-      if (eventsResult.status === "fulfilled") {
-        update.upcomingEvents = eventsResult.value;
+      if (eventsResult.status === "fulfilled" && eventsResult.value && Array.isArray(eventsResult.value.events)) {
+        update.upcomingEvents = eventsResult.value.events;
       }
 
-      if (sermonsResult.status === "fulfilled") {
-        update.recentSermons = sermonsResult.value;
+      if (sermonsResult.status === "fulfilled" && sermonsResult.value && Array.isArray(sermonsResult.value.sermons)) {
+        update.recentSermons = sermonsResult.value.sermons;
       }
 
-      if (donationsResult.status === "fulfilled") {
-        update.givingHistory = donationsResult.value.filter(
+      if (donationsResult.status === "fulfilled" && donationsResult.value && Array.isArray(donationsResult.value.donations)) {
+        update.givingHistory = donationsResult.value.donations.filter(
           (transaction: Transaction) => transaction.reconciliationStatus === "FULFILLED"
         );
       }
@@ -136,14 +136,14 @@ export const useDashboardStore = create<DashboardState>((set) => ({
         update.bibleStudyProgress = bibleStudyResult.value;
       }
 
-      if (prayerRequestsResult.status === "fulfilled") {
+      if (prayerRequestsResult.status === "fulfilled" && Array.isArray(prayerRequestsResult.value)) {
         update.prayerRequests = prayerRequestsResult.value;
       }
 
       // Added counseling sessions result handling
-      if (counselingSessionsResult.status === "fulfilled") {
+      if (counselingSessionsResult.status === "fulfilled" && Array.isArray(counselingSessionsResult.value)) {
         update.counselingSessions = counselingSessionsResult.value;
-      } else {
+      } else if (counselingSessionsResult.status === 'rejected') {
         aggregatedErrors.push(counselingSessionsResult.reason.message);
       }
 
