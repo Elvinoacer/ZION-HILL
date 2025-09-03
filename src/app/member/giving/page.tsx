@@ -65,7 +65,12 @@ const MemberGivingPageContent = () => {
         throw new Error("Failed to fetch giving opportunities");
       }
       const data = await res.json();
-      setGivingOpportunities(data);
+      if (Array.isArray(data)) {
+        setGivingOpportunities(data);
+      } else {
+        console.error("API did not return an array for giving opportunities:", data);
+        throw new Error("Received invalid data for giving opportunities.");
+      }
     } catch (error) {
       setGivingOpportunitiesError(error as Error);
     } finally {
@@ -81,7 +86,12 @@ const MemberGivingPageContent = () => {
         throw new Error("Failed to fetch giving history");
       }
       const data = await res.json();
-      setGivingHistory(data);
+      if (Array.isArray(data)) {
+        setGivingHistory(data);
+      } else {
+        console.error("API did not return an array for giving history:", data);
+        throw new Error("Received invalid data for giving history.");
+      }
     } catch (error) {
       setGivingHistoryError(error as Error);
     } finally {
@@ -91,7 +101,12 @@ const MemberGivingPageContent = () => {
 
   useEffect(() => {
     fetchGivingOpportunities();
-    fetchGivingHistory();
+  }, []);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchGivingHistory();
+    }
   }, [session?.user?.id]);
 
   const [selectedOpportunity, setSelectedOpportunity] =
@@ -108,8 +123,7 @@ const MemberGivingPageContent = () => {
     return <ErrorState message={givingOpportunitiesError.message} />;
   if (givingHistoryError)
     return <ErrorState message={givingHistoryError.message} />;
-  if (!givingOpportunities)
-    return <ErrorState message="Could not load giving opportunities" />;
+  
 
   const totalGiven =
     givingHistory?.reduce((acc, curr) => acc + curr.amount, 0) || 0;
