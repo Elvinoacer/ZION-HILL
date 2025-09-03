@@ -204,7 +204,7 @@ const GivingDashboard = ({ givingHistory }: GivingDashboardProps) => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-blue-500" />
-                Total Given: ${totalGiven.toLocaleString()}
+                Total Given: KES {totalGiven.toLocaleString()}
               </CardTitle>
 
               <Tabs
@@ -231,7 +231,7 @@ const GivingDashboard = ({ givingHistory }: GivingDashboardProps) => {
           </CardHeader>
 
           <CardContent className="pt-0">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+            <div className="grid grid-cols-1 gap-6 mt-4">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}

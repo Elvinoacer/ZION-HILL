@@ -71,7 +71,7 @@ const GivingSummaryCards = ({ givingHistory }: GivingSummaryCardsProps) => {
     {
       title: "Total Given",
       value: totalGiven,
-      icon: DollarSign,
+      icon: Gift,
       gradient: "from-blue-500 to-indigo-600",
       iconBg: "bg-blue-100 dark:bg-blue-900/30",
       iconColor: "text-blue-600 dark:text-blue-400",

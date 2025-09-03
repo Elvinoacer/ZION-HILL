@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import {
-  FiDollarSign,
   FiPhone,
   FiGift,
   FiCheckCircle,
@@ -221,12 +220,9 @@ const SimpleGivingForm: React.FC<SimpleGivingFormProps> = ({ plan, donationType,
                 Giving Amount (KES)
               </label>
               <div className="relative rounded-lg shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiDollarSign className="h-5 w-5 text-gray-400" />
-                </div>
                 <input
                   type="number"
-                  className="block w-full pl-10 pr-12 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg"
+                  className="block w-full pl-4 pr-12 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg"
                   placeholder="0.00"
                   value={amount || ""}
                   onChange={(e) => setAmount(parseFloat(e.target.value))}

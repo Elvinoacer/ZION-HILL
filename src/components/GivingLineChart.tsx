@@ -64,18 +64,20 @@ const GivingLineChart = ({ data }: { data: any }) => {
         </div>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip formatter={(value: number) => `KES ${value.toLocaleString()}`} />
-            <Legend />
-            <Line type="monotone" dataKey="Tithes" stroke="#0088FE" />
-            <Line type="monotone" dataKey="Special Offerings" stroke="#00C49F" />
-            <Line type="monotone" dataKey="Project/Support" stroke="#FFBB28" />
-          </LineChart>
-        </ResponsiveContainer>
+        <div className="h-64 md:h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip formatter={(value: number) => `KES ${value.toLocaleString()}`} />
+              <Legend />
+              <Line type="monotone" dataKey="Tithes" stroke="#0088FE" />
+              <Line type="monotone" dataKey="Special Offerings" stroke="#00C49F" />
+              <Line type="monotone" dataKey="Project/Support" stroke="#FFBB28" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );

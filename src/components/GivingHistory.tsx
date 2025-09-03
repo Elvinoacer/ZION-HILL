@@ -425,10 +425,6 @@ export default function GivingHistory({ donations }: GivingHistoryProps) {
                   onClick={() => handleSort("amount")}
                 >
                   <div className="flex items-center">
-                    <DollarSign
-                      className="inline mr-1 h-4 w-4"
-                      aria-hidden="true"
-                    />
                     Amount
                     {sortField === "amount" && (
                       <span className="ml-1">

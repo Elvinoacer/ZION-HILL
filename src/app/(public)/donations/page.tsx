@@ -69,7 +69,7 @@ const DonationsPageContent = () => {
 
   if (planId) {
     const plan = planId === "general" ? generalDonationPlan : selectedDonationPlan;
-    if (plan) return <DonationForm plan={plan} donationType="plan" />;
+    if (plan) return <SimpleGivingForm plan={plan} donationType="plan" />;
   }
 
   return (
@@ -117,26 +117,26 @@ const StatsSection = ({ opportunities, totalRaised, totalDonors }) => (
 const StatItem = ({ icon: Icon, value, label, href }) => {
   const content = (
     <>
-      <Icon className="h-8 w-8 sm:h-10 sm:w-10 mx-auto text-blue-300 mb-2 sm:mb-3" />
-      <div className="text-xl sm:text-3xl font-bold text-white">{value}</div>
-      <div className="text-xs sm:text-sm text-gray-300 mt-0.5 sm:mt-1">{label}</div>
+      <Icon className="h-8 w-8 sm:h-10 sm:w-10 mx-auto text-blue-300 mb-2 sm:mb-3 group-hover:text-white transition-colors duration-300" />
+      <div className="text-xl sm:text-3xl font-bold text-white group-hover:text-white transition-colors duration-300">{value}</div>
+      <div className="text-xs sm:text-sm text-gray-300 mt-0.5 sm:mt-1 group-hover:text-white transition-colors duration-300">{label}</div>
     </>
   );
+
+  const itemClasses = "p-3 sm:p-4 rounded-lg transition-all duration-300 group";
 
   if (href) {
     return (
       <Link href={href} passHref>
-        <div className="p-3 sm:p-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-gradient-to-br from-blue-500 to-purple-500 hover:shadow-md hover:scale-[1.02] group">
-          <Icon className="h-8 w-8 sm:h-10 sm:w-10 mx-auto text-blue-300 mb-2 sm:mb-3 group-hover:text-white" />
-          <div className="text-xl sm:text-3xl font-bold text-white group-hover:text-white">{value}</div>
-          <div className="text-xs sm:text-sm text-gray-300 mt-0.5 sm:mt-1 group-hover:text-white">{label}</div>
+        <div className={`${itemClasses} cursor-pointer hover:bg-gradient-to-br from-blue-500 to-purple-500 hover:shadow-md hover:scale-[1.02] border border-blue-400`}>
+          {content}
         </div>
       </Link>
     );
   }
 
   return (
-    <div className="p-3 sm:p-4">
+    <div className={itemClasses}>
       {content}
     </div>
   );
