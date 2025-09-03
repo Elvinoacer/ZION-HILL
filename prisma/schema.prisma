@@ -512,7 +512,8 @@ model Transaction {
   id                   String               @id @default(cuid())
   type                 TransactionType
   amount               Float
-  method               TransactionMethod
+  method               TransactionMethod?
+  otherPaymentMethod   String?
   description          String?
   userId               String?
   email                String?

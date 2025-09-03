@@ -34,7 +34,10 @@ const SimpleGivingForm: React.FC<SimpleGivingFormProps> = ({ plan, donationType,
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"once" | "monthly">("once");
+  const [paymentMethod, setPaymentMethod] = useState<"mpesa" | "other">("mpesa");
   const [showThankYou, setShowThankYou] = useState(false);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [checkoutUrl, setCheckoutUrl] = useState("");
 
   // Suggested amounts based on donation type
   const suggestedAmounts = {
@@ -56,7 +59,7 @@ const SimpleGivingForm: React.FC<SimpleGivingFormProps> = ({ plan, donationType,
       setIsSubmitting(false);
       return;
     }
-    if (!phone.match(/^2547\d{8}$/)) {
+    if (paymentMethod === 'mpesa' && !phone.match(/^2547\d{8}$/)) {
       setMessage({
         text: "Please enter a valid M-Pesa number (2547XXXXXXXX)",
         type: "error",
@@ -66,56 +69,81 @@ const SimpleGivingForm: React.FC<SimpleGivingFormProps> = ({ plan, donationType,
     }
 
     try {
-      const paymentRes = await fetch("/api/intasend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount,
-          phone,
-          email: email,
-          name: name,
-          donationId: plan.id,
-          donationType: donationType,
-          description: `Giving to ${plan.name}`,
-        }),
-      });
+      if (paymentMethod === 'other') {
+        const checkoutRes = await fetch("/api/intasend-checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount,
+            email: email,
+            name: name,
+            donationId: plan.id,
+            donationType: donationType,
+            description: `Giving to ${plan.name}`,
+          }),
+        });
 
-      if (!paymentRes.ok) {
-        const errorData = await paymentRes.json();
-        throw new Error(errorData.error || "Failed to process giving");
-      }
+        if (!checkoutRes.ok) {
+          const errorData = await checkoutRes.json();
+          throw new Error(errorData.error || "Failed to create checkout session");
+        }
 
-      const paymentData = await paymentRes.json();
-      const transactionId = paymentData.transactionId;
+        const { checkoutUrl } = await checkoutRes.json();
+        setCheckoutUrl(checkoutUrl);
+        setShowCheckoutModal(true);
 
-      setMessage({
-        text: "M-Pesa STK Push initiated. Please complete the transaction on your phone.",
-        type: "success",
-      });
+      } else { // M-Pesa payment
+        const paymentRes = await fetch("/api/intasend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount,
+            phone,
+            email: email,
+            name: name,
+            donationId: plan.id,
+            donationType: donationType,
+            description: `Giving to ${plan.name}`,
+          }),
+        });
 
-      // Poll for transaction status
-      const pollInterval = setInterval(async () => {
-        try {
-          const statusRes = await fetch("/api/transaction-status", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ transactionId }),
-          });
+        if (!paymentRes.ok) {
+          const errorData = await paymentRes.json();
+          throw new Error(errorData.error || "Failed to process giving");
+        }
 
-          if (statusRes.ok) {
-            const statusData = await statusRes.json();
-            if (statusData.status === "APPROVED") {
-              clearInterval(pollInterval);
-              setShowThankYou(true);
-              if (onSuccess) {
-                onSuccess();
+        const paymentData = await paymentRes.json();
+        const transactionId = paymentData.transactionId;
+
+        setMessage({
+          text: "M-Pesa STK Push initiated. Please complete the transaction on your phone.",
+          type: "success",
+        });
+
+        // Poll for transaction status
+        const pollInterval = setInterval(async () => {
+          try {
+            const statusRes = await fetch("/api/transaction-status", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ transactionId }),
+            });
+
+            if (statusRes.ok) {
+              const statusData = await statusRes.json();
+              if (statusData.status === "APPROVED") {
+                clearInterval(pollInterval);
+                setShowThankYou(true);
+                if (onSuccess) {
+                  onSuccess();
+                }
               }
             }
+          } catch (error) {
+            console.error("Error polling transaction status:", error);
           }
-        } catch (error) {
-          console.error("Error polling transaction status:", error);
-        }
-      }, 3000); // Poll every 3 seconds
+        }, 3000); // Poll every 3 seconds
+      }
     } catch (err) {
       const error = err as Error;
       setMessage({ text: error.message || "An error occurred", type: "error" });
@@ -196,7 +224,6 @@ const SimpleGivingForm: React.FC<SimpleGivingFormProps> = ({ plan, donationType,
           </div>
 
           <div className="p-6">
-            {/* Giving Type Toggle */}
             <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
               {["once", "monthly"].map((tab) => (
                 <button
@@ -212,6 +239,32 @@ const SimpleGivingForm: React.FC<SimpleGivingFormProps> = ({ plan, donationType,
                   {tab === "once" ? "One-time" : "Monthly"} Giving
                 </button>
               ))}
+            </div>
+
+            {/* Payment Method Toggle */}
+            <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('mpesa')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  paymentMethod === 'mpesa'
+                    ? "bg-white shadow-sm text-green-700"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
+              >
+                M-Pesa
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('other')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  paymentMethod === 'other'
+                    ? "bg-white shadow-sm text-indigo-700"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
+              >
+                Other Options
+              </button>
             </div>
 
             {/* Amount Input */}
@@ -283,29 +336,31 @@ const SimpleGivingForm: React.FC<SimpleGivingFormProps> = ({ plan, donationType,
             </div>
 
             {/* Phone Input */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                M-Pesa Phone Number
-              </label>
-              <div className="relative rounded-lg shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-.none">
-                  <FiPhone className="h-5 w-5 text-gray-400" />
+            {paymentMethod === 'mpesa' && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  M-Pesa Phone Number
+                </label>
+                <div className="relative rounded-lg shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiPhone className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="tel"
+                    className="block w-full pl-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    value={phone}
+                    onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
+                    placeholder="2547XXXXXXXX"
+                    required
+                    pattern="^2547\d{8}$"
+                    title="Please enter a valid M-Pesa number starting with 254"
+                  />
                 </div>
-                <input
-                  type="tel"
-                  className="block w-full pl-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  value={phone}
-                  onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
-                  placeholder="2547XXXXXXXX"
-                  required
-                  pattern="^2547\d{8}$"
-                  title="Please enter a valid M-Pesa number starting with 254"
-                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Format: 2547XXXXXXXX (e.g., 254712345678)
+                </p>
               </div>
-              <p className="mt-1 text-xs text-gray-500">
-                Format: 2547XXXXXXXX (e.g., 254712345678)
-              </p>
-            </div>
+            )}
 
             {/* Messages */}
             <AnimatePresence>
@@ -392,6 +447,41 @@ const SimpleGivingForm: React.FC<SimpleGivingFormProps> = ({ plan, donationType,
             </div>
           </div>
         </motion.form>
+      )}
+      {showCheckoutModal && (
+        <motion.div
+          key="checkout-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        >
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 20, opacity: 0 }}
+            className="bg-white rounded-xl shadow-xl p-8 max-w-sm text-center"
+          >
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Proceed to Checkout
+            </h3>
+            <p className="text-gray-600 mb-6">
+              You will be redirected to a secure page to complete your giving.
+            </p>
+            <a
+              href={checkoutUrl}
+              className="w-full block text-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+            >
+              Proceed
+            </a>
+            <button
+              onClick={() => setShowCheckoutModal(false)}
+              className="w-full mt-2 text-gray-600 hover:text-gray-800 font-medium py-2 px-6 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+          </motion.div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

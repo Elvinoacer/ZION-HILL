@@ -85,6 +85,7 @@ export async function POST(request: Request) {
 
     const transactionId = payload.api_ref; // This should be the transaction ID we sent
     const intasendState = payload.state; // e.g., "COMPLETE", "FAILED", "PENDING"
+    const paymentMethod = payload.method; // e.g., "M-PESA", "CARD-PAYMENT"
 
     if (!transactionId) {
       console.error("Webhook payload missing api_ref (transactionId)");
@@ -123,10 +124,22 @@ export async function POST(request: Request) {
         break;
     }
 
+    let dataToUpdate: any = {
+      reconciliationStatus: newReconciliationStatus,
+    };
+
+    if (paymentMethod) {
+      if (paymentMethod === "M-PESA") {
+        dataToUpdate.method = "MPESA";
+      } else {
+        dataToUpdate.otherPaymentMethod = paymentMethod;
+      }
+    }
+
     // Update the transaction status
     const updatedTransaction = await prisma.transaction.update({
       where: { id: transactionId },
-      data: { reconciliationStatus: newReconciliationStatus },
+      data: dataToUpdate,
       include: { donationPlan: true, giving: true }, // Include both
     });
 

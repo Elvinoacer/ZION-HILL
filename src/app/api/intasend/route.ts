@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     const intasend = new IntaSend(
       process.env.INTASEND_PUBLISHABLE_KEY as string,
       process.env.INTASEND_SECRET_KEY as string,
-      false // Set to true for test environment, false for production
+      process.env.NODE_ENV !== 'production' // Set to true for test environment, false for production
     );
 
     const collection = intasend.collection();

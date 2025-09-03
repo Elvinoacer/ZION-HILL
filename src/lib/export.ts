@@ -1,6 +1,6 @@
 import { unparse } from 'papaparse';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType } from 'docx';
 import { saveAs } from 'file-saver';
@@ -42,7 +42,7 @@ export const exportToPdf = (data: any[], fileName: string) => {
     tableRows.push(ticketData);
   });
 
-  (doc as any).autoTable(tableColumn, tableRows, { startY: 20 });
+  autoTable(doc, { head: [tableColumn], body: tableRows, startY: 20 });
   doc.text("Giving History", 14, 15);
   doc.save(`${fileName}.pdf`);
 };
