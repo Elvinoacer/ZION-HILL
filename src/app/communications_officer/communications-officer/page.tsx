@@ -18,7 +18,10 @@ import {
   FiTrash2,
   FiRefreshCw,
   FiArrowUpRight,
+  FiMail,
+  FiX,
 } from "react-icons/fi";
+import { Toaster, toast } from "react-hot-toast";
 
 interface Announcement {
   id: string;
@@ -46,6 +49,7 @@ const CommunicationsOfficerDashboard = () => {
   const [newAnnouncementTitle, setNewAnnouncementTitle] = useState("");
   const [newAnnouncementContent, setNewAnnouncementContent] = useState("");
   const [newAnnouncementTags, setNewAnnouncementTags] = useState("");
+  const [sendToAll, setSendToAll] = useState(false);
 
   // Stats data
   const [stats, setStats] = useState({
@@ -96,6 +100,7 @@ const CommunicationsOfficerDashboard = () => {
 
   const handleCreateAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
+    const toastId = toast.loading("Creating announcement...");
     try {
       const res = await fetch("/api/announcements", {
         method: "POST",
@@ -118,8 +123,35 @@ const CommunicationsOfficerDashboard = () => {
         ...prev,
         totalAnnouncements: prev.totalAnnouncements + 1,
       }));
+      toast.success("Announcement created successfully", { id: toastId });
+
+      if (sendToAll) {
+        const sendToastId = toast.loading(
+          "Sending announcement to all members..."
+        );
+        try {
+          const sendRes = await fetch("/api/announcements/send", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: newAnnouncementTitle,
+              content: newAnnouncementContent,
+            }),
+          });
+          if (!sendRes.ok) throw new Error("Failed to send announcement");
+          toast.success("Announcement sent to all members successfully", {
+            id: sendToastId,
+          });
+        } catch (err: any) {
+          setError(err.message);
+          toast.error("Failed to send announcement", { id: sendToastId });
+        }
+      }
     } catch (err: any) {
       setError(err.message);
+      toast.error("Failed to create announcement", { id: toastId });
     }
   };
 
@@ -187,6 +219,7 @@ const CommunicationsOfficerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-950 py-8 px-4 sm:px-6 lg:px-8">
+      <Toaster position="bottom-center" />
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <motion.div
@@ -604,6 +637,21 @@ const CommunicationsOfficerDashboard = () => {
                         onChange={(e) => setNewAnnouncementTags(e.target.value)}
                         placeholder="e.g. event, worship, prayer"
                       />
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        id="sendToAll"
+                        type="checkbox"
+                        checked={sendToAll}
+                        onChange={(e) => setSendToAll(e.target.checked)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label
+                        htmlFor="sendToAll"
+                        className="ml-2 block text-sm text-gray-900 dark:text-gray-300"
+                      >
+                        Send to all members
+                      </label>
                     </div>
                     <button
                       type="submit"

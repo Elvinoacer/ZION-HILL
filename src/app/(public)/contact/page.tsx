@@ -44,7 +44,6 @@ const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
   ssr: false,
 });
 
-// Default church location (example: New York City)
 const DEFAULT_LATITUDE = 0.4649392;
 const DEFAULT_LONGITUDE = 35.2481637;
 const DEFAULT_ZOOM = 13;
