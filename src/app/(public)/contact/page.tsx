@@ -1,6 +1,6 @@
 "use client";
 import { churchConfig } from "@/lib/church-config";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,8 +45,8 @@ const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
 });
 
 // Default church location (example: New York City)
-const DEFAULT_LATITUDE = 40.7128;
-const DEFAULT_LONGITUDE = -74.006;
+const DEFAULT_LATITUDE = 0.4649392;
+const DEFAULT_LONGITUDE = 35.2481637;
 const DEFAULT_ZOOM = 13;
 
 const ContactPage = () => {
@@ -56,6 +56,25 @@ const ContactPage = () => {
     subject: "",
     message: "",
   });
+
+  const [customIcon, setCustomIcon] = useState<L.Icon | null>(null);
+
+  useEffect(() => {
+    import("leaflet").then((L) => {
+      const icon = new L.Icon({
+        iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+        iconRetinaUrl:
+          "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
+        shadowUrl:
+          "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41],
+      });
+      setCustomIcon(icon);
+    });
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -189,7 +208,9 @@ const ContactPage = () => {
                     <h3 className="text-lg sm:text-xl font-semibold text-slate-800">
                       Email Us
                     </h3>
-                    <p className="text-sm sm:text-base text-slate-600">{churchConfig.contact.email}</p>
+                    <p className="text-sm sm:text-base text-slate-600">
+                      {churchConfig.contact.email}
+                    </p>
                   </div>
                 </motion.div>
 
@@ -206,7 +227,9 @@ const ContactPage = () => {
                     <h3 className="text-lg sm:text-xl font-semibold text-slate-800">
                       Call Us
                     </h3>
-                    <p className="text-sm sm:text-base text-slate-600">{churchConfig.contact.phone}</p>
+                    <p className="text-sm sm:text-base text-slate-600">
+                      {churchConfig.contact.phone}
+                    </p>
                   </div>
                 </motion.div>
 
@@ -240,13 +263,13 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <h3 className="text-lg sm:text-xl font-semibold text-slate-800">
-                      Office Hours
+                      Service Times
                     </h3>
                     <p className="text-sm sm:text-base text-slate-600">
-                      Monday - Friday: 9:00 AM - 5:00 PM
+                      Sunday Worship: 10:00 AM - 12:00 PM
                     </p>
                     <p className="text-sm sm:text-base text-slate-600">
-                      Saturday - Sunday: Closed (except for services)
+                      Midweek Service: Wednesdays 7:00 PM - 8:30 PM
                     </p>
                   </div>
                 </motion.div>
@@ -322,7 +345,10 @@ const ContactPage = () => {
                 transition={{ delay: 0.5 }}
                 className="space-y-1.5 sm:space-y-2"
               >
-                <Label htmlFor="name" className="text-slate-700 font-medium text-sm sm:text-base">
+                <Label
+                  htmlFor="name"
+                  className="text-slate-700 font-medium text-sm sm:text-base"
+                >
                   Your Name
                 </Label>
                 <Input
@@ -343,7 +369,10 @@ const ContactPage = () => {
                 transition={{ delay: 0.6 }}
                 className="space-y-1.5 sm:space-y-2"
               >
-                <Label htmlFor="email" className="text-slate-700 font-medium text-sm sm:text-base">
+                <Label
+                  htmlFor="email"
+                  className="text-slate-700 font-medium text-sm sm:text-base"
+                >
                   Your Email
                 </Label>
                 <Input
@@ -364,7 +393,10 @@ const ContactPage = () => {
                 transition={{ delay: 0.7 }}
                 className="space-y-1.5 sm:space-y-2"
               >
-                <Label htmlFor="subject" className="text-slate-700 font-medium text-sm sm:text-base">
+                <Label
+                  htmlFor="subject"
+                  className="text-slate-700 font-medium text-sm sm:text-base"
+                >
                   Subject
                 </Label>
                 <Input
@@ -385,7 +417,10 @@ const ContactPage = () => {
                 transition={{ delay: 0.8 }}
                 className="space-y-1.5 sm:space-y-2"
               >
-                <Label htmlFor="message" className="text-slate-700 font-medium text-sm sm:text-base">
+                <Label
+                  htmlFor="message"
+                  className="text-slate-700 font-medium text-sm sm:text-base"
+                >
                   Your Message
                 </Label>
                 <Textarea
@@ -515,13 +550,20 @@ const ContactPage = () => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              <Marker position={[DEFAULT_LATITUDE, DEFAULT_LONGITUDE]}>
+              <Marker
+                position={[DEFAULT_LATITUDE, DEFAULT_LONGITUDE]}
+                icon={customIcon}
+              >
                 <Popup>
                   <div className="text-center p-1 sm:p-2">
                     <Church className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 mx-auto mb-1 sm:mb-2" />
-                    <strong className="text-sm sm:text-base">{churchConfig.name}</strong>
+                    <strong className="text-sm sm:text-base">
+                      {churchConfig.name}
+                    </strong>
                     <br />
-                    <span className="text-xs sm:text-sm">{churchConfig.contact.address}</span>
+                    <span className="text-xs sm:text-sm">
+                      {churchConfig.contact.address}
+                    </span>
                   </div>
                 </Popup>
               </Marker>
