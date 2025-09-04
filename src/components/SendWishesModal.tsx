@@ -1,21 +1,51 @@
 "use client";
 import React, { useState } from 'react';
+import { useSession } from 'next-auth/react';
 
 interface SendWishesModalProps {
   isOpen: boolean;
   onClose: () => void;
   birthdayPersonName: string;
+  recipientId: string;
   onSendWishes: () => void;
 }
 
-const SendWishesModal: React.FC<SendWishesModalProps> = ({ isOpen, onClose, birthdayPersonName, onSendWishes }) => {
+const SendWishesModal: React.FC<SendWishesModalProps> = ({ isOpen, onClose, birthdayPersonName, recipientId, onSendWishes }) => {
+  const { data: session } = useSession();
   const [message, setMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSend = () => {
-    // Here you would typically send the message to a server
-    // For now, we'll just close the modal and trigger the confetti
-    onSendWishes();
-    onClose();
+  const handleSend = async () => {
+    if (!session) {
+      setError("You must be logged in to send wishes.");
+      return;
+    }
+
+    setIsSending(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/birthday-wishes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message, recipientId }),
+      });
+
+      if (res.ok) {
+        onSendWishes();
+        onClose();
+      } else {
+        const errorData = await res.json();
+        setError(errorData.error || "Failed to send wishes.");
+      }
+    } catch (error) {
+      setError("An unexpected error occurred.");
+    } finally {
+      setIsSending(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -30,6 +60,7 @@ const SendWishesModal: React.FC<SendWishesModalProps> = ({ isOpen, onClose, birt
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         <div className="flex justify-end mt-6 space-x-4">
           <button
             className="text-gray-600 hover:text-gray-800 font-medium py-2 px-6 rounded-lg transition-colors"
@@ -40,8 +71,9 @@ const SendWishesModal: React.FC<SendWishesModalProps> = ({ isOpen, onClose, birt
           <button
             className="bg-pink-500 hover:bg-pink-600 text-white font-medium py-2 px-6 rounded-lg transition-colors shadow-md"
             onClick={handleSend}
+            disabled={isSending}
           >
-            Send
+            {isSending ? "Sending..." : "Send"}
           </button>
         </div>
       </div>

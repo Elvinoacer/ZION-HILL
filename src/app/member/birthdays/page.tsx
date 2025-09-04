@@ -11,10 +11,12 @@ interface BirthdayMember {
 }
 
 const BirthdaysPage = () => {
+  const { data: session } = useSession();
   const [birthdayMembers, setBirthdayMembers] = useState<BirthdayMember[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<BirthdayMember | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [isMyBirthday, setIsMyBirthday] = useState(false);
 
   useEffect(() => {
     const fetchBirthdayMembers = async () => {
@@ -26,6 +28,9 @@ const BirthdaysPage = () => {
           if (data.length > 0) {
             setShowConfetti(true);
           }
+          if (session?.user?.id && data.some((member: any) => member.id === session.user.id)) {
+            setIsMyBirthday(true);
+          }
         } else {
           console.error('Failed to fetch birthday members:', res.statusText);
         }
@@ -35,7 +40,7 @@ const BirthdaysPage = () => {
     };
 
     fetchBirthdayMembers();
-  }, []);
+  }, [session]);
 
   const handleSendWishes = (member: BirthdayMember) => {
     setSelectedMember(member);
@@ -49,6 +54,13 @@ const BirthdaysPage = () => {
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-gray-800 font-serif mb-4">Happy Birthday!</h1>
           <p className="text-gray-600 text-lg">Let's celebrate our church family!</p>
+          {isMyBirthday && (
+            <Link href="/member/my-birthday">
+              <button className="mt-4 bg-pink-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-pink-600 transition-colors duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
+                View Your Birthday Wishes
+              </button>
+            </Link>
+          )}
         </div>
         {birthdayMembers.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -69,6 +81,7 @@ const BirthdaysPage = () => {
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             birthdayPersonName={selectedMember.name}
+            recipientId={selectedMember.id}
             onSendWishes={() => setShowConfetti(true)}
           />
         )}

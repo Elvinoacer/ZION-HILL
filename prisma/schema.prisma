@@ -114,6 +114,19 @@ model User {
   createdWorshipSets        WorshipSet[]
   sentWorshipMessages       WorshipMessage[]          @relation("WorshipMessageSender")
   receivedWorshipMessages   WorshipMessage[]          @relation("WorshipMessageRecipient")
+  sentWishes                BirthdayWish[]            @relation("SentWishes")
+  receivedWishes            BirthdayWish[]            @relation("ReceivedWishes")
+}
+
+model BirthdayWish {
+  id          String   @id @default(cuid())
+  message     String
+  senderId    String
+  recipientId String
+  createdAt   DateTime @default(now())
+
+  sender    User @relation("SentWishes", fields: [senderId], references: [id])
+  recipient User @relation("ReceivedWishes", fields: [recipientId], references: [id])
 }
 
 model Certificate {

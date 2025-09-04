@@ -14,5 +14,11 @@
         { "key": "Content-Type", "value": "application/javascript" }
       ]
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/send-birthday-notifications",
+      "schedule": "0 0 * * *"
+    }
   ]
 }
