@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import BirthdayCard from '@/components/BirthdayCard';
 import SendWishesModal from '@/components/SendWishesModal';
 import Confetti from 'react-confetti';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 interface BirthdayMember {
   id: string;
