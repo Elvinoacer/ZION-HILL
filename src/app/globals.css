@@ -199,3 +199,47 @@
 .animate-pulse-fast {
   animation: pulse-fast 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+@keyframes glowing-wave {
+  0% {
+    text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #8a2be2, 0 0 8px #8a2be2, 0 0 10px #8a2be2, 0 0 12px #8a2be2, 0 0 14px #8a2be2;
+  }
+  25% {
+    text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #ff00ff, 0 0 8px #ff00ff, 0 0 10px #ff00ff, 0 0 12px #ff00ff, 0 0 14px #ff00ff;
+  }
+  50% {
+    text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #00bfff, 0 0 8px #00bfff, 0 0 10px #00bfff, 0 0 12px #00bfff, 0 0 14px #00bfff;
+  }
+  75% {
+    text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #32cd32, 0 0 8px #32cd32, 0 0 10px #32cd32, 0 0 12px #32cd32, 0 0 14px #32cd32;
+  }
+  100% {
+    text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #8a2be2, 0 0 8px #8a2be2, 0 0 10px #8a2be2, 0 0 12px #8a2be2, 0 0 14px #8a2be2;
+  }
+}
+
+.text-glow {
+  animation: glowing-wave 8s ease-in-out infinite;
+}
+
+@keyframes glowing-wave-p {
+  0% {
+    text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #8a2be2, 0 0 8px #8a2be2, 0 0 10px #8a2be2, 0 0 12px #8a2be2, 0 0 14px #8a2be2;
+  }
+  25% {
+    text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #ff00ff, 0 0 8px #ff00ff, 0 0 10px #ff00ff, 0 0 12px #ff00ff, 0 0 14px #ff00ff;
+  }
+  50% {
+    text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #00bfff, 0 0 8px #00bfff, 0 0 10px #00bfff, 0 0 12px #00bfff, 0 0 14px #00bfff;
+  }
+  75% {
+    text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #32cd32, 0 0 8px #32cd32, 0 0 10px #32cd32, 0 0 12px #32cd32, 0 0 14px #32cd32;
+  }
+  100% {
+    text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #8a2be2, 0 0 8px #8a2be2, 0 0 10px #8a2be2, 0 0 12px #8a2be2, 0 0 14px #8a2be2;
+  }
+}
+
+.text-glow-p {
+  animation: glowing-wave-p 8s ease-in-out infinite;
+}

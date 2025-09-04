@@ -76,15 +76,15 @@ export const churchConfig: ChurchConfig = {
     },
   ],
   contact: {
-    email: "info@kagcentral.org",
-    phone: "+254 700 000 000",
-    address: "PO BOX 3596, Eldoret, Kenya",
-    mapUrl: "https://goo.gl/maps/your-map-link",
+    email: "thewckagkasaranield@gmail.com",
+    phone: "0722 447848",
+    address: "P. O. Box 9644 - 30100 Eldoret City",
+    mapUrl: "https://maps.app.goo.gl/dZYSeg8TxNheYLnk7",
   },
   socials: {
-    facebook: "https://www.facebook.com/kagcentral",
+    facebook: "https://www.facebook.com/WorshipCenterKAGKasaraniEld?mibextid=ZbWKwL",
     twitter: "https://twitter.com/kagcentral",
-    youtube: "https://www.youtube.com/kagcentral",
+    youtube: "https://youtube.com/@theworshipcenterkagkasaran7523?si=ueuOyefyKVhK62PY",
     instagram: "https://www.instagram.com/kagcentral",
   },
 };
