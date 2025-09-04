@@ -100,37 +100,33 @@ const CommunicationsOfficerDashboard = () => {
 
   const handleCreateAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
-    const toastId = toast.loading("Creating announcement...");
-    try {
-      const res = await fetch("/api/announcements", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: newAnnouncementTitle,
-          content: newAnnouncementContent,
-          tags: newAnnouncementTags.split(",").map((tag) => tag.trim()),
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to create announcement");
-      const newAnn = await res.json();
-      setAnnouncements((prev) => [newAnn, ...prev]);
-      setNewAnnouncementTitle("");
-      setNewAnnouncementContent("");
-      setNewAnnouncementTags("");
-      setStats((prev) => ({
-        ...prev,
-        totalAnnouncements: prev.totalAnnouncements + 1,
-      }));
-      toast.success("Announcement created successfully", { id: toastId });
 
-      if (sendToAll) {
-        const sendToastId = toast.loading(
-          "Sending announcement to all members..."
-        );
-        try {
-          const sendRes = await fetch("/api/announcements/send", {
+    const promise = () => new Promise(async (resolve, reject) => {
+      try {
+        const res = await fetch("/api/announcements", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: newAnnouncementTitle,
+            content: newAnnouncementContent,
+            tags: newAnnouncementTags.split(",").map((tag) => tag.trim()),
+          }),
+        });
+        if (!res.ok) throw new Error("Failed to create announcement");
+        const newAnn = await res.json();
+        setAnnouncements((prev) => [newAnn, ...prev]);
+        setNewAnnouncementTitle("");
+        setNewAnnouncementContent("");
+        setNewAnnouncementTags("");
+        setStats((prev) => ({
+          ...prev,
+          totalAnnouncements: prev.totalAnnouncements + 1,
+        }));
+
+        if (sendToAll) {
+          await fetch("/api/announcements/send", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -140,19 +136,18 @@ const CommunicationsOfficerDashboard = () => {
               content: newAnnouncementContent,
             }),
           });
-          if (!sendRes.ok) throw new Error("Failed to send announcement");
-          toast.success("Announcement sent to all members successfully", {
-            id: sendToastId,
-          });
-        } catch (err: any) {
-          setError(err.message);
-          toast.error("Failed to send announcement", { id: sendToastId });
         }
+        resolve(newAnn);
+      } catch (err) {
+        reject(err);
       }
-    } catch (err: any) {
-      setError(err.message);
-      toast.error("Failed to create announcement", { id: toastId });
-    }
+    });
+
+    toast.promise(promise, {
+      loading: 'Creating announcement...',
+      success: 'Announcement created successfully!',
+      error: 'Failed to create announcement.',
+    });
   };
 
   const handleDeleteAnnouncement = async (id: string) => {
