@@ -20,39 +20,32 @@ const MyBirthdayPage = () => {
 
   useEffect(() => {
     if (session?.user?.id) {
-      const fetchWishes = async () => {
+      const checkAndFetch = async () => {
         try {
-          const res = await fetch(`/api/birthday-wishes?userId=${session.user.id}`);
-          if (res.ok) {
-            const data = await res.json();
-            setWishes(data);
-          } else {
-            console.error('Failed to fetch birthday wishes:', res.statusText);
-          }
-        } catch (error) {
-          console.error('Error fetching birthday wishes:', error);
-        }
-      };
-
-      const checkBirthday = async () => {
-        try {
-          const res = await fetch('/api/birthdays');
-          if (res.ok) {
-            const data = await res.json();
-            const isUserBirthday = data.some((member: any) => member.id === session.user.id);
+          const birthdayRes = await fetch('/api/birthdays');
+          if (birthdayRes.ok) {
+            const birthdayData = await birthdayRes.json();
+            const isUserBirthday = birthdayData.some((member: any) => member.id === session.user.id);
             setIsBirthday(isUserBirthday);
+
             if (isUserBirthday) {
-              fetchWishes();
+              const wishesRes = await fetch(`/api/birthday-wishes?userId=${session.user.id}`);
+              if (wishesRes.ok) {
+                const wishesData = await wishesRes.json();
+                setWishes(wishesData);
+              } else {
+                console.error('Failed to fetch birthday wishes:', wishesRes.statusText);
+              }
             }
           } else {
-            console.error('Failed to fetch birthdays:', res.statusText);
+            console.error('Failed to fetch birthdays:', birthdayRes.statusText);
           }
         } catch (error) {
-          console.error('Error fetching birthdays:', error);
+          console.error('Error in birthday check or wish fetching:', error);
         }
       };
 
-      checkBirthday();
+      checkAndFetch();
     }
   }, [session]);
 
