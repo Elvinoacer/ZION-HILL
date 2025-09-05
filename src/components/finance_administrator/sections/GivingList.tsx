@@ -2,15 +2,18 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Giving } from "@/types/giving";
 import { useGivingStore } from "@/store";
-import { Search, ChevronDown, X, Download } from "lucide-react";
+import { Search, ChevronDown, X, Download, Edit, Trash } from "lucide-react";
+import CreateGivingOpportunityModal from "./CreateGivingOpportunityModal";
 
 interface GivingListProps {
   giving: Giving[];
 }
 
 export default function GivingList({ giving }: GivingListProps) {
+  const { deleteGiving } = useGivingStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filteredGiving = useMemo(() => {
     return giving.filter((g) => {
@@ -67,6 +70,10 @@ export default function GivingList({ giving }: GivingListProps) {
 
   return (
     <div className="space-y-6">
+      <CreateGivingOpportunityModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
@@ -77,6 +84,12 @@ export default function GivingList({ giving }: GivingListProps) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+          >
+            Create Giving Opportunity
+          </button>
           <button
             onClick={() => exportData("csv")}
             className="flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium"
@@ -129,7 +142,7 @@ export default function GivingList({ giving }: GivingListProps) {
           ) : (
             <div className="space-y-4">
               {filteredGiving.map((giving) => (
-                <GivingCard key={giving.id} giving={giving} />
+                <GivingCard key={giving.id} giving={giving} onDelete={deleteGiving} />
               ))}
             </div>
           )}
@@ -139,7 +152,7 @@ export default function GivingList({ giving }: GivingListProps) {
   );
 }
 
-const GivingCard = ({ giving }: { giving: Giving }) => {
+const GivingCard = ({ giving, onDelete }: { giving: Giving, onDelete: (id: string) => void }) => {
   if (!giving) return null;
 
   return (
@@ -157,6 +170,14 @@ const GivingCard = ({ giving }: { giving: Giving }) => {
             </span>
           </div>
           <p className="text-sm text-gray-600">{giving.description}</p>
+        </div>
+        <div className="flex space-x-2">
+          <button className="p-2 hover:bg-gray-100 rounded-full">
+            <Edit className="h-4 w-4" />
+          </button>
+          <button onClick={() => onDelete(giving.id)} className="p-2 hover:bg-gray-100 rounded-full">
+            <Trash className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </motion.div>

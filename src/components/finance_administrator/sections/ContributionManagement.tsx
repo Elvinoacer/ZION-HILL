@@ -260,7 +260,18 @@ export default function ContributionManagement() {
           }`}
         >
           <Gift className="h-5 w-5 mr-2 inline-block" />
-          Giving
+          Giving Opportunities
+        </button>
+        <button
+          onClick={() => setActiveTab("giving-transactions")}
+          className={`px-4 py-2 text-sm font-medium ${
+            activeTab === "giving-transactions"
+              ? "border-b-2 border-blue-600 text-blue-600"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          <CreditCard className="h-5 w-5 mr-2 inline-block" />
+          Giving Transactions
         </button>
         <button
           onClick={() => setActiveTab("analytics")}
@@ -520,7 +531,8 @@ export default function ContributionManagement() {
               />
             </div>
           )}
-          {activeTab === "giving" && (
+          {activeTab === "giving" && <GivingList giving={giving} />}
+          {activeTab === "giving-transactions" && (
             <div className="space-y-4">
               {filteredDonations.filter(d => d.type === 'GIVING').map((giving) => (
                 <DonationCard
