@@ -75,6 +75,7 @@ export default function ContributionManagement() {
 
   useEffect(() => {
     fetchDonations(currentPage, pageSize, searchQuery, reconciliationStatusFilter, dateRange);
+    fetchGiving();
   }, [currentPage, pageSize, searchQuery, reconciliationStatusFilter, dateRange]);
 
   useEffect(() => {
