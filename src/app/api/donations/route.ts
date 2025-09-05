@@ -10,7 +10,7 @@ export async function GET(request: Request) {
     const userId = searchParams.get('userId');
 
     const whereClause: any = {
-      type: { in: ['DONATION', 'GIVING'] },
+      type: { in: ['DONATION'] },
       reconciliationStatus: 'APPROVED',
     };
 

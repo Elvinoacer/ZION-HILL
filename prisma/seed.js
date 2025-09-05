@@ -361,21 +361,44 @@ async function main() {
     "CHECK",
     "IN_KIND",
   ];
+  const givings = await prisma.giving.findMany();
+  const donationPlans = await prisma.donationPlan.findMany();
+
   for (let i = 0; i < 15; i++) {
+    const transactionType = transactionTypes[
+      faker.number.int({ min: 0, max: transactionTypes.length - 1 })
+    ];
+
+    let description = faker.lorem.sentence();
+    let givingId = undefined;
+    let donationPlanId = undefined;
+
+    if (transactionType === 'GIVING' && givings.length > 0) {
+      const giving = givings[faker.number.int({ min: 0, max: givings.length - 1 })];
+      givingId = giving.id;
+      description = `Giving to ${giving.name}`;
+    }
+
+    if (transactionType === 'DONATION' && donationPlans.length > 0) {
+      const donationPlan = donationPlans[faker.number.int({ min: 0, max: donationPlans.length - 1 })];
+      donationPlanId = donationPlan.id;
+      description = `Donation to ${donationPlan.name}`;
+    }
+
     await prisma.transaction.create({
       data: {
-        type: transactionTypes[
-          faker.number.int({ min: 0, max: transactionTypes.length - 1 })
-        ],
+        type: transactionType,
         amount: faker.number.float({ min: 10, max: 1000, precision: 0.01 }),
         method:
           transactionMethods[
             faker.number.int({ min: 0, max: transactionMethods.length - 1 })
           ],
-        description: faker.lorem.sentence(),
+        description: description,
         userId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
         fundId: funds[faker.number.int({ min: 0, max: funds.length - 1 })].id,
         anomaly: faker.datatype.boolean(),
+        givingId: givingId,
+        donationPlanId: donationPlanId,
       },
     });
   }

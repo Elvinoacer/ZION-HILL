@@ -150,6 +150,8 @@ export default function ContributionManagement() {
     });
   }, [donations, searchQuery, reconciliationStatusFilter, dateRange]);
 
+  
+
   const handleSendReceipt = async (donation: Transaction) => {
     setSendingReceipts((prev) => ({ ...prev, [donation.id]: true }));
     try {
@@ -477,7 +479,7 @@ export default function ContributionManagement() {
                     </motion.div>
                   ) : (
                     <div className="space-y-4">
-                      {donations.map((donation) => (
+                      {filteredDonations.filter(d => d.type === 'DONATION').map((donation) => (
                         <DonationCard
                           key={donation.id}
                           donation={donation}
@@ -518,7 +520,19 @@ export default function ContributionManagement() {
               />
             </div>
           )}
-          {activeTab === "giving" && <GivingList giving={giving} />}
+          {activeTab === "giving" && (
+            <div className="space-y-4">
+              {filteredDonations.filter(d => d.type === 'GIVING').map((giving) => (
+                <DonationCard
+                  key={giving.id}
+                  donation={giving}
+                  isSending={sendingReceipts[giving.id]}
+                  onSendReceipt={handleSendReceipt}
+                  onViewDetails={handleViewDetails}
+                />
+              ))}
+            </div>
+          )}
           {activeTab === "analytics" && <GivingAnalytics />}
         </motion.div>
       </AnimatePresence>
