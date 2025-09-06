@@ -103,7 +103,7 @@ const AboutPage = () => {
             id: "pastor-1",
             name: "Senior Pastor Rev. Jackson Nganga",
             email: "pastor@example.com",
-            whatsapp: "1234567890",
+            whatsapp: "254722447848",
             image: "/gallery/pastor-potrait.jpg",
             role: "Presbyter Pioneer Section",
             description: "Leads the church with a heart for the community.",
