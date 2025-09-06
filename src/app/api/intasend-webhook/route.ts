@@ -82,7 +82,7 @@ export async function POST(request: Request) {
           updatedTransaction.giving?.name ||
           "General Contribution";
 
-        const emailHtml = render(DonationThankYouEmail({
+        const emailHtml = await render(DonationThankYouEmail({
           name: userName,
           amount: transactionAmount,
           transactionId: updatedTransaction.id,
