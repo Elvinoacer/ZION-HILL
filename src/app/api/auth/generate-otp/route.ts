@@ -20,14 +20,22 @@ export async function POST(request: Request) {
     const otp = randomInt(100000, 999999).toString();
     const expires = new Date(new Date().getTime() + 60 * 1000); // 1 minute from now
 
-    await prisma.verificationToken.create({
-      data: {
-        identifier: email,
-        token: otp,
-        expires,
-        type: 'OTP',
-      },
-    });
+    try {
+      await prisma.verificationToken.create({
+        data: {
+          identifier: email,
+          token: otp,
+          expires,
+          type: 'OTP',
+        },
+      });
+    } catch (dbError) {
+      console.error('Database error while creating verification token:', dbError);
+      return NextResponse.json(
+        { error: 'Database error' },
+        { status: 500 }
+      );
+    }
 
     const emailHtml = await render(OtpEmail({ otp }));
 

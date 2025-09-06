@@ -167,7 +167,14 @@ const LoginPage = () => {
                       {countdown > 0 ? (
                         <p>OTP expires in {countdown} seconds</p>
                       ) : (
-                        <p>OTP has expired.</p>
+                        <Button
+                          type="button"
+                          variant="link"
+                          onClick={() => handleGenerateOtp(form.getValues())}
+                          disabled={form.formState.isSubmitting}
+                        >
+                          Resend OTP
+                        </Button>
                       )}
                     </div>
                     <Button
