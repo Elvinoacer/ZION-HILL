@@ -26,7 +26,7 @@ interface Transaction {
   id: string;
   amount: number;
   date: string;
-  description?: string;
+  type?: string;
   reconciliationStatus?: string;
 }
 

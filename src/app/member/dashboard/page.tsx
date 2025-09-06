@@ -440,7 +440,7 @@ const DashboardPage = () => {
                           </div>
                           <div>
                             <p className="font-medium text-gray-800 text-sm">
-                              {transaction.description || "General Donation"}
+                              {transaction.type || "General Donation"}
                             </p>
                             <p className="text-xs text-gray-500">
                               {new Date(transaction.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
