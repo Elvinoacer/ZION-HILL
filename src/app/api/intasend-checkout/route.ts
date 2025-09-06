@@ -82,7 +82,10 @@ export async function POST(request: Request) {
     });
   } catch (error: any) {
     console.error("Full error object:", JSON.stringify(error, null, 2));
-    console.error("Error creating Intasend checkout session:", error.response?.data || error.message);
+    console.error(
+      "Error creating Intasend checkout session:",
+      error.response?.data || error.message
+    );
     return NextResponse.json(
       { error: error.response?.data?.detail || "Internal Server Error" },
       { status: 500 }

@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
 
@@ -38,17 +39,13 @@ export default function DonationSuccessPage() {
               </div>
             )}
           </div>
-          <div className="mt-8">
-            <Link
-              href="/member/giving"
-              className="text-primary hover:underline"
-            >
-              View Your Giving History
-            </Link>
-            <span className="mx-2">|</span>
-            <Link href="/" className="text-primary hover:underline">
-              Back to Home
-            </Link>
+          <div className="mt-8 flex justify-center space-x-4">
+            <Button asChild>
+              <Link href="/member/giving">View Your Giving History</Link>
+            </Button>
+            <Button asChild variant="secondary">
+              <Link href="/">Back to Home</Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
