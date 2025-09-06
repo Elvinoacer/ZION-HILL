@@ -36,6 +36,7 @@ const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showOtpForm, setShowOtpForm] = useState(false);
   const [countdown, setCountdown] = useState(60);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -104,6 +105,7 @@ const LoginPage = () => {
         setError(result.error);
         toast.error(result.error);
       } else {
+        setIsRedirecting(true);
         toast.success("Login successful! Redirecting...");
         router.push("/member/dashboard");
       }
@@ -179,10 +181,15 @@ const LoginPage = () => {
                     </div>
                     <Button
                       type="submit"
-                      disabled={otpForm.formState.isSubmitting || countdown === 0}
+                      disabled={otpForm.formState.isSubmitting || countdown === 0 || isRedirecting}
                       className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg py-2.5 transition-all duration-300"
                     >
-                      {otpForm.formState.isSubmitting ? (
+                      {isRedirecting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                          Redirecting...
+                        </>
+                      ) : otpForm.formState.isSubmitting ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
                           Verifying...
