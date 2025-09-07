@@ -90,8 +90,8 @@ const DonationThankYouEmail: React.FC<DonationThankYouEmailProps> = ({
           <p style={emailStyles.paragraph}>Dear {name},</p>
           <p style={emailStyles.paragraph}>
             We are incredibly grateful for your generous donation of{" "}
-            <span style={emailStyles.highlight}>${amount.toFixed(2)}</span> to
-            the <span style={emailStyles.highlight}>{fund}</span> fund. Your
+            <span style={emailStyles.highlight}>Kes {amount.toFixed(2)}</span>{" "}
+            to the <span style={emailStyles.highlight}>{fund}</span> fund. Your
             support is not just a gift; it's a partnership in our shared
             mission.
           </p>

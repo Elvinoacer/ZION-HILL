@@ -19,8 +19,19 @@ export async function GET(request: Request) {
     });
 
     if (!verificationToken || new Date() > verificationToken.expires) {
-      await prisma.verificationToken.deleteMany({ where: { identifier: verificationToken?.identifier } });
+      if (verificationToken) {
+        await prisma.verificationToken.deleteMany({
+          where: {
+            identifier: verificationToken.identifier,
+            expires: { lte: new Date() },
+          },
+        });
+      }
       return NextResponse.redirect(new URL('/login?error=Invalid or expired token', request.url));
+    }
+
+    if (verificationToken.type !== 'EMAIL_VERIFICATION') {
+      return NextResponse.redirect(new URL('/login?error=Invalid token type', request.url));
     }
 
     const user = await prisma.user.findUnique({

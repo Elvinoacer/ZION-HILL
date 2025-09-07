@@ -46,6 +46,7 @@ model VerificationToken {
 enum TokenType {
   OTP
   PASSWORD_RESET
+  EMAIL_VERIFICATION
 }
 
 model User {
