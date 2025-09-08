@@ -539,34 +539,36 @@ const ContactPage = () => {
           </div>
 
           <div className="w-full h-72 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-inner border border-slate-200">
-            <MapContainer
-              center={[DEFAULT_LATITUDE, DEFAULT_LONGITUDE]}
-              zoom={DEFAULT_ZOOM}
-              scrollWheelZoom={false}
-              style={{ height: "100%", width: "100%" }}
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <Marker
-                position={[DEFAULT_LATITUDE, DEFAULT_LONGITUDE]}
-                icon={customIcon}
+            {typeof window !== "undefined" && customIcon && (
+              <MapContainer
+                center={[DEFAULT_LATITUDE, DEFAULT_LONGITUDE]}
+                zoom={DEFAULT_ZOOM}
+                scrollWheelZoom={false}
+                style={{ height: "100%", width: "100%" }}
               >
-                <Popup>
-                  <div className="text-center p-1 sm:p-2">
-                    <Church className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 mx-auto mb-1 sm:mb-2" />
-                    <strong className="text-sm sm:text-base">
-                      {churchConfig.name}
-                    </strong>
-                    <br />
-                    <span className="text-xs sm:text-sm">
-                      {churchConfig.contact.address}
-                    </span>
-                  </div>
-                </Popup>
-              </Marker>
-            </MapContainer>
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker
+                  position={[DEFAULT_LATITUDE, DEFAULT_LONGITUDE]}
+                  icon={customIcon}
+                >
+                  <Popup>
+                    <div className="text-center p-1 sm:p-2">
+                      <Church className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 mx-auto mb-1 sm:mb-2" />
+                      <strong className="text-sm sm:text-base">
+                        {churchConfig.name}
+                      </strong>
+                      <br />
+                      <span className="text-xs sm:text-sm">
+                        {churchConfig.contact.address}
+                      </span>
+                    </div>
+                  </Popup>
+                </Marker>
+              </MapContainer>
+            )}
           </div>
 
           <motion.p
