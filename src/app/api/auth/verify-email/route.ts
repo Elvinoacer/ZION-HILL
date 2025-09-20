@@ -78,7 +78,9 @@ export async function GET(request: Request) {
     });
 
     // Redirect to the profile setup page, which will now have a valid session
-    const redirectUrl = new URL('/setup-profile', request.url);
+    const callbackUrl = searchParams.get('callbackUrl');
+    const redirectPath = callbackUrl || '/member/giving';
+    const redirectUrl = new URL(redirectPath, request.url);
     return NextResponse.redirect(redirectUrl);
 
   } catch (error) {

@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>3 Bedrooms country house — Concept Builders (demo)</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#">Concept Builders</a>
+        <nav class="main-nav">
+          <a href="#">Shop</a>
+          <a href="#">Custom Plan</a>
+          <a href="#">Learn</a>
+          <a href="#">Contact</a>
+        </nav>
+        <div class="header-actions">
+          <button class="btn ghost">Account</button>
+          <a class="cart" href="#">Cart <span class="cart-count">0</span></a>
+        </div>
+      </div>
+    </header>
+
+    <main class="container product-page">
+      <section class="product-top">
+        <div class="gallery">
+          <div class="main-image">
+            <img id="mainImg" src="images/placeholder-1.jpg" alt="Product main image" />
+          </div>
+          <div class="thumbs" id="thumbs">
+            <img data-src="images/placeholder-1.jpg" src="images/placeholder-1-sm.jpg" alt="" />
+            <img data-src="images/placeholder-2.jpg" src="images/placeholder-2-sm.jpg" alt="" />
+            <img data-src="images/placeholder-3.jpg" src="images/placeholder-3-sm.jpg" alt="" />
+            <img data-src="images/placeholder-4.jpg" src="images/placeholder-4-sm.jpg" alt="" />
+          </div>
+        </div>
+
+        <aside class="product-meta">
+          <h1 class="product-title">3 Bedrooms country house — ID 13407</h1>
+
+          <div class="badge-row">
+            <span class="badge">1 Floor</span>
+            <span class="badge">3 Bedrooms</span>
+            <span class="badge">4 Bathrooms</span>
+            <span class="badge">272 m²</span>
+          </div>
+
+          <p class="price">
+            <span class="sale">$381.94</span>
+            <span class="regular">Regular price</span>
+          </p>
+
+          <form id="purchaseForm" class="purchase-form">
+            <label class="option">
+              <input type="radio" name="fileType" value="cadpdf" checked />
+              CAD + PDF
+            </label>
+            <label class="option">
+              <input type="radio" name="fileType" value="pdf" />
+              PDF
+            </label>
+
+            <div class="drawing-sets">
+              <label><input type="checkbox" name="set" value="architectural" checked /> Architectural Drawings</label>
+              <label><input type="checkbox" name="set" value="boq" checked /> Bills of Quantity (BOQ)</label>
+            </div>
+
+            <div class="cta-row">
+              <button type="button" id="buyNow" class="btn primary">Buy Now</button>
+              <button type="button" id="addToCart" class="btn outline">Add to cart</button>
+            </div>
+
+            <div class="payments-info">
+              <small>Payments: Visa, Mastercard, AmEx, Google Pay, PayPal</small>
+            </div>
+          </form>
+
+          <div class="guarantees">
+            <p>Instant digital delivery • 100% Money Guarantee • Customizable plans</p>
+          </div>
+
+          <div class="share">
+            <span>Share:</span>
+            <a href="#" aria-label="Share to Facebook">FB</a>
+            <a href="#" aria-label="Share to Twitter">TW</a>
+            <a href="#" aria-label="Share to Pinterest">PT</a>
+          </div>
+        </aside>
+      </section>
+
+      <section class="product-body">
+        <article class="description">
+          <h2>Description</h2>
+          <p>
+            Modern home designed for comfortable family living. Roof eaves provide shade and protection from heavy
+            rains. The plan includes a private master wing, practical kitchen layout and generous living spaces.
+          </p>
+
+          <h3>Plan details</h3>
+          <ul class="features-list">
+            <li>Stories: 1</li>
+            <li>Bedrooms: 3</li>
+            <li>Bathrooms: 4</li>
+            <li>Kitchen, Pantry, Dining, Living room, Office/Study</li>
+            <li>Floor area: 272 m²</li>
+          </ul>
+        </article>
+
+        <aside class="extras">
+          <div class="card">
+            <h4>Construction Cost Calculator</h4>
+            <p>Select quality level to estimate build cost</p>
+            <select id="costLevel">
+              <option value="basic">Basic</option>
+              <option value="standard" selected>Standard</option>
+              <option value="luxury">Luxury</option>
+            </select>
+            <div class="estimate">
+              <strong>Estimated cost:</strong>
+              <p id="estimateAmount">$42,000</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4>FAQ & Support</h4>
+            <p>Support hours: Mon–Fri • 8:00–20:30</p>
+            <a href="#" class="btn small">Contact support</a>
+          </div>
+        </aside>
+      </section>
+
+      <section class="drawing-sets-expanded">
+        <h3>Drawing Sets</h3>
+        <div class="sets-grid">
+          <div class="set-item">
+            <h4>Architectural Drawings</h4>
+            <p>Plans: foundation, floor, roof, elevations, sections, furniture layout, electrical schematic.</p>
+          </div>
+          <div class="set-item">
+            <h4>Bills of Quantity (BOQ)</h4>
+            <p>Itemized materials list. Rates not included unless selected.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="reviews">
+        <h3>Reviews</h3>
+        <blockquote class="review">Very efficient and timely. I received the plans soon after payment.</blockquote>
+        <blockquote class="review">Website is user friendly and easy to navigate.</blockquote>
+      </section>
+
+      <section class="related">
+        <h3>You may also like</h3>
+        <div class="related-grid">
+          <div class="tile">
+            <img src="images/placeholder-2.jpg" alt="" />
+            <h5>2 Bedrooms Modern Bungalow</h5>
+            <p class="price-small">$199</p>
+          </div>
+          <div class="tile">
+            <img src="images/placeholder-3.jpg" alt="" />
+            <h5>4 Bedrooms Family Home</h5>
+            <p class="price-small">$499</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <h4>Concept Builders</h4>
+            <p>About — Policies — Contact</p>
+          </div>
+          <div>
+            <h4>Support</h4>
+            <p>Email support@example.com</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Simple gallery thumb click
+      document.querySelectorAll("#thumbs img").forEach((img) => {
+        img.addEventListener("click", () => {
+          const src = img.getAttribute("data-src");
+          document.getElementById("mainImg").src = src;
+        });
+      });
+
+      // Estimate calculator (demo)
+      const costMap = { basic: 28000, standard: 42000, luxury: 65000 };
+      const amountEl = document.getElementById("estimateAmount");
+      document.getElementById("costLevel").addEventListener("change", (e) => {
+        amountEl.textContent = "$" + costMap[e.target.value].toLocaleString();
+      });
+
+      // Buttons (wire these to your checkout/cart)
+      document.getElementById("buyNow").addEventListener("click", () => {
+        // gather selections
+        const fileType = document.querySelector('input[name="fileType"]:checked').value;
+        const sets = Array.from(document.querySelectorAll('input[name="set"]:checked')).map((i) => i.value);
+        console.log("Buy now:", { fileType, sets });
+        alert("Buy Now clicked — replace this handler with your checkout flow.");
+      });
+
+      document.getElementById("addToCart").addEventListener("click", () => {
+        alert("Add to cart clicked — implement cart API here.");
+      });
+    </script>
+  </body>
+</html>

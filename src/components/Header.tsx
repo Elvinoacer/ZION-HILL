@@ -13,13 +13,17 @@ const Header = () => {
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "/services", label: "Services" },
+    {
+      href: "/about",
+      label: "About",
+    },
+    { href: "/giving", label: "Giving" },
+    { href: "/projects", label: "Projects" },
+
     { href: "/contact", label: "Contact" },
     { href: "/media", label: "Media" },
     { href: "/ministries", label: "Ministries" },
-    { href: "/projects", label: "Projects" },
-    { href: "/giving", label: "Giving" },
+
     { href: "/partnerships", label: "Partnerships" },
     { href: "/newsletter-subscriptions", label: "Newsletter" },
   ];
@@ -100,7 +104,11 @@ const Header = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}
+                d={
+                  isMobileMenuOpen
+                    ? "M6 18L18 6M6 6l12 12"
+                    : "M4 6h16M4 12h16m-7 6h7"
+                }
               />
             </svg>
           </button>

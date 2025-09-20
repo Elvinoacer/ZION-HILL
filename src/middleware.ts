@@ -35,7 +35,7 @@ export default withAuth(
 
     if (protectedPath) {
       if (!token) {
-        return NextResponse.redirect(new URL("/public/login", req.url));
+        return NextResponse.redirect(new URL("/auth", req.url));
       }
 
       const requiredRoles = rolePermissions[protectedPath];
