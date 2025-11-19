@@ -134,7 +134,7 @@ const SidebarContent = ({ setSidebarOpen }) => {
       path: "/member/giving",
       requiredRoles: ["MEMBER"],
     },
-    
+
     {
       name: "Prayer Wall",
       icon: <FaPrayingHands />,
@@ -382,7 +382,7 @@ const SidebarContent = ({ setSidebarOpen }) => {
       <div className="flex items-center justify-between p-4 border-b border-gray-800">
         <div className="flex items-center gap-3">
           <Image
-            src="/images/kag-logo-free-bg.png"
+            src="/images/zion-hill.png"
             alt="The Worship Center Logo"
             width={80}
             height={80}

@@ -50,14 +50,14 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="lg:col-span-1 flex flex-col items-center md:items-start text-center md:text-left">
             <Image
-              src="/images/kag-logo-free-bg.png"
-              alt="Zion Hill KASARANI-ELD Logo"
+              src="/images/zion-hill.png"
+              alt="Zion Hill  Logo"
               width={144}
               height={144}
               className="mb-4 w-36 h-36 rounded-full object-cover"
             />
             <h3 className="text-2xl font-bold text-white tracking-tight">
-              Zion Hill KASARANI-ELD
+              Zion Hill
             </h3>
             <p className="text-gray-400 mt-2 leading-relaxed">
               {churchConfig.vision}
@@ -278,8 +278,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 pt-8 mt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm mb-4 md:mb-0">
-            © {new Date().getFullYear()} Zion Hill KASARANI-ELD. All rights
-            reserved.
+            © {new Date().getFullYear()} Zion Hill . All rights reserved.
           </p>
 
           <div className="flex space-x-6 text-sm">

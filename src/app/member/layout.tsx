@@ -35,7 +35,7 @@ export default function AuthenticatedLayout({
             </button>
             <div className="flex items-center">
               <Image
-                src="/images/kag-logo-free-bg.png"
+                src="/images/zion-hill.png"
                 alt="Church Logo"
                 width={64}
                 height={64}

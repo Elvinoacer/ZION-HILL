@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -9,7 +8,6 @@ import { SignupForm } from "./SignupForm";
 import Link from "next/link";
 import { churchConfig } from "@/lib/church-config";
 import * as Tabs from "@radix-ui/react-tabs";
-
 
 import Image from "next/image";
 
@@ -24,7 +22,12 @@ const AuthForm = () => {
       >
         <Card className="bg-white shadow-xl rounded-2xl border border-gray-200">
           <div className="flex justify-center pt-6">
-            <Image src="/images/kag-logo-free-bg.png" alt="Church Logo" width={120} height={120} />
+            <Image
+              src="/images/zion-hill.png"
+              alt="Church Logo"
+              width={120}
+              height={120}
+            />
           </div>
           <Tabs.Root defaultValue="login">
             <CardHeader className="pb-4">
@@ -83,6 +86,5 @@ const AuthForm = () => {
     </div>
   );
 };
-
 
 export default AuthForm;

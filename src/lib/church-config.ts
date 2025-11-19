@@ -33,7 +33,7 @@ interface ChurchConfig {
 }
 
 export const churchConfig: ChurchConfig = {
-  name: "Zion Hill, Eldoret, Kasarani",
+  name: "Zion Hill, Nakuru, Free state",
   fullName: "Zion Hill - Central Church",
   logo: "/images/church-image.png",
   mission:
@@ -78,7 +78,7 @@ export const churchConfig: ChurchConfig = {
   contact: {
     email: "thewckagkasaranield@gmail.com",
     phone: "0722 447848",
-    address: "P. O. Box 9644 - 30100 Eldoret City",
+    address: "P. O. Box 9644 - 20100 Nakuru City",
     mapUrl: "https://maps.app.goo.gl/dZYSeg8TxNheYLnk7",
   },
   socials: {

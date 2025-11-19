@@ -45,7 +45,7 @@ const Header = () => {
         >
           <div className="relative h-12 w-12 md:h-16 md:w-16 rounded-full overflow-hidden flex-shrink-0">
             <Image
-              src="/images/kag-logo-free-bg.png"
+              src="/images/zion-hill.png"
               alt="The Worship Center Logo"
               layout="fill"
               objectFit="cover"
