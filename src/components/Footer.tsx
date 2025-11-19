@@ -44,23 +44,20 @@ const Footer = () => {
   };
 
   return (
-    <footer
-      className="bg-gray-900 text-white pt-20 pb-10"
-      role="contentinfo"
-    >
+    <footer className="bg-gray-900 text-white pt-20 pb-10" role="contentinfo">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand Section */}
           <div className="lg:col-span-1 flex flex-col items-center md:items-start text-center md:text-left">
             <Image
               src="/images/kag-logo-free-bg.png"
-              alt="K.A.G KASARANI-ELD Logo"
+              alt="Zion Hill KASARANI-ELD Logo"
               width={144}
               height={144}
               className="mb-4 w-36 h-36 rounded-full object-cover"
             />
             <h3 className="text-2xl font-bold text-white tracking-tight">
-              K.A.G KASARANI-ELD
+              Zion Hill KASARANI-ELD
             </h3>
             <p className="text-gray-400 mt-2 leading-relaxed">
               {churchConfig.vision}
@@ -146,9 +143,7 @@ const Footer = () => {
 
           {/* Resources */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 text-white">
-              Resources
-            </h4>
+            <h4 className="text-lg font-semibold mb-4 text-white">Resources</h4>
             <ul className="space-y-3">
               {[
                 { href: "/blog", label: "Blog" },
@@ -273,12 +268,8 @@ const Footer = () => {
                 </button>
               </form>
               <div className="h-6 mt-2">
-                {message && (
-                  <p className="text-green-400 text-xs">{message}</p>
-                )}
-                {error && (
-                  <p className="text-red-400 text-xs">{error}</p>
-                )}
+                {message && <p className="text-green-400 text-xs">{message}</p>}
+                {error && <p className="text-red-400 text-xs">{error}</p>}
               </div>
             </div>
           </div>
@@ -287,7 +278,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 pt-8 mt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm mb-4 md:mb-0">
-            © {new Date().getFullYear()} K.A.G KASARANI-ELD. All rights
+            © {new Date().getFullYear()} Zion Hill KASARANI-ELD. All rights
             reserved.
           </p>
 

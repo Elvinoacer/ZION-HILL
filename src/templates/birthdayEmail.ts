@@ -33,12 +33,12 @@ export const birthdayEmailTemplate = (name: string) => `
         </div>
         <div class="content">
           <p>Dear ${name},</p>
-          <p>We, at Kenya Assemblies of God, are wishing you a very happy birthday! We pray that you have a wonderful day filled with joy, laughter, and God's blessings.</p>
+          <p>We, at Zion Hill, are wishing you a very happy birthday! We pray that you have a wonderful day filled with joy, laughter, and God's blessings.</p>
           <p>With love,</p>
           <p>Your Church Family</p>
         </div>
         <div class="footer">
-          <p>&copy; ${new Date().getFullYear()} Kenya Assemblies of God. All rights reserved.</p>
+          <p>&copy; ${new Date().getFullYear()} Zion Hill. All rights reserved.</p>
         </div>
       </div>
     </body>

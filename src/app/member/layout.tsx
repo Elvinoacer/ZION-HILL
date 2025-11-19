@@ -42,7 +42,7 @@ export default function AuthenticatedLayout({
                 className="rounded-full drop-shadow-lg"
               />
               <h1 className="text-base sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent ml-2 truncate">
-                K.A.G Worship Center, ELD
+                Zion Hill Worship Center, ELD
               </h1>
             </div>
           </div>

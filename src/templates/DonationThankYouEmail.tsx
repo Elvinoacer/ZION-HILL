@@ -129,8 +129,7 @@ const DonationThankYouEmail: React.FC<DonationThankYouEmailProps> = ({
         </div>
         <div style={emailStyles.footer}>
           <p>
-            &copy; {new Date().getFullYear()} Kenya Assemblies of God. All
-            rights reserved.
+            &copy; {new Date().getFullYear()} Zion Hill. All rights reserved.
           </p>
           <p>If you have any questions, please don't hesitate to contact us.</p>
         </div>

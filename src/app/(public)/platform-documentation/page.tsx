@@ -1,18 +1,18 @@
 "use client";
-import React, { useEffect, useState, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { motion } from 'framer-motion';
-import { ChevronRight, BookOpen, Menu, X } from 'lucide-react';
+import React, { useEffect, useState, useRef } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { motion } from "framer-motion";
+import { ChevronRight, BookOpen, Menu, X } from "lucide-react";
 
 const markdownContent = `
-# K.A.G Church Platform Documentation
+# Zion Hill Church Platform Documentation
 
-Welcome to the comprehensive documentation for the K.A.G Church Platform. This document provides an overview of the platform's features, functionalities, and how different user roles can interact with it to foster spiritual growth, community engagement, and efficient church administration.
+Welcome to the comprehensive documentation for the Zion Hill Church Platform. This document provides an overview of the platform's features, functionalities, and how different user roles can interact with it to foster spiritual growth, community engagement, and efficient church administration.
 
 ## 1. Introduction
 
-The K.A.G Church Platform is a holistic digital solution designed to connect, empower, and serve our church family and the wider community. It aims to streamline church operations, enhance member experience, facilitate spiritual development, and expand our outreach efforts through a user-friendly and feature-rich environment.
+The Zion Hill Church Platform is a holistic digital solution designed to connect, empower, and serve our church family and the wider community. It aims to streamline church operations, enhance member experience, facilitate spiritual development, and expand our outreach efforts through a user-friendly and feature-rich environment.
 
 ## 2. Core Features
 
@@ -227,7 +227,7 @@ The platform leverages modern technologies to ensure a seamless and secure exper
 
 ## 6. Getting Started
 
-To begin using the K.A.G Church Platform:
+To begin using the Zion Hill Church Platform:
 
 1. **Visit the Website:** Navigate to the main church website.
 2. **Sign Up/Login:** If you are a new user, create an account. Existing members can log in with their credentials.
@@ -246,23 +246,26 @@ interface Heading {
 const DocumentationPage: React.FC = () => {
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [isTocOpen, setIsTocOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>('');
-  const sectionRefs = useRef<{[key: string]: IntersectionObserverEntry}>({});
+  const [activeSection, setActiveSection] = useState<string>("");
+  const sectionRefs = useRef<{ [key: string]: IntersectionObserverEntry }>({});
 
   useEffect(() => {
     const extractedHeadings: Heading[] = [];
-    const lines = markdownContent.split('\n');
-    
-    lines.forEach(line => {
+    const lines = markdownContent.split("\n");
+
+    lines.forEach((line) => {
       const match = line.match(/^(#{1,6})\s(.+)$/);
       if (match) {
         const level = match[1].length;
         const text = match[2].trim();
-        const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        const id = text
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
         extractedHeadings.push({ id, level, text });
       }
     });
-    
+
     setHeadings(extractedHeadings);
   }, []);
 
@@ -273,19 +276,21 @@ const DocumentationPage: React.FC = () => {
         entries.forEach((entry) => {
           sectionRefs.current[entry.target.id] = entry;
         });
-        
+
         // Find the section that's most visible
         const visibleSections = Object.values(sectionRefs.current).filter(
           (entry) => entry.isIntersecting
         );
-        
+
         if (visibleSections.length > 0) {
           // Sort by intersection ratio to find the most visible section
-          visibleSections.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+          visibleSections.sort(
+            (a, b) => b.intersectionRatio - a.intersectionRatio
+          );
           setActiveSection(visibleSections[0].target.id);
         }
       },
-      { threshold: 0.5, rootMargin: '-100px 0px -50% 0px' }
+      { threshold: 0.5, rootMargin: "-100px 0px -50% 0px" }
     );
 
     // Observe all section headings
@@ -324,7 +329,8 @@ const DocumentationPage: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-base md:text-lg lg:text-xl opacity-90 max-w-3xl mx-auto"
           >
-            Your comprehensive guide to understanding and utilizing the K.A.G Church Platform.
+            Your comprehensive guide to understanding and utilizing the Zion
+            Hill Church Platform.
           </motion.p>
         </div>
       </header>
@@ -346,7 +352,7 @@ const DocumentationPage: React.FC = () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className={`lg:col-span-1 bg-white p-4 md:p-6 rounded-lg shadow-lg lg:sticky top-4 h-fit transition-all duration-300 ease-in-out ${isTocOpen ? 'fixed inset-4 z-40 overflow-y-auto' : 'hidden lg:block'}`}
+          className={`lg:col-span-1 bg-white p-4 md:p-6 rounded-lg shadow-lg lg:sticky top-4 h-fit transition-all duration-300 ease-in-out ${isTocOpen ? "fixed inset-4 z-40 overflow-y-auto" : "hidden lg:block"}`}
           aria-label="Table of Contents"
         >
           <div className="flex justify-between items-center mb-4">
@@ -354,8 +360,8 @@ const DocumentationPage: React.FC = () => {
               <BookOpen className="mr-2" size={20} />
               Contents
             </h2>
-            <button 
-              onClick={() => setIsTocOpen(false)} 
+            <button
+              onClick={() => setIsTocOpen(false)}
               className="lg:hidden text-gray-500 hover:text-gray-700"
               aria-label="Close table of contents"
             >
@@ -363,17 +369,19 @@ const DocumentationPage: React.FC = () => {
             </button>
           </div>
           <ul className="space-y-2 max-h-[70vh] overflow-y-auto">
-            {headings.map(heading => (
-              <li 
-                key={heading.id} 
-                className={`transition-colors duration-200 ${heading.level === 3 ? 'ml-4 text-sm' : ''} ${heading.level === 4 ? 'ml-6 text-xs italic' : ''} ${activeSection === heading.id ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600'}`}
+            {headings.map((heading) => (
+              <li
+                key={heading.id}
+                className={`transition-colors duration-200 ${heading.level === 3 ? "ml-4 text-sm" : ""} ${heading.level === 4 ? "ml-6 text-xs italic" : ""} ${activeSection === heading.id ? "text-blue-600 font-semibold" : "text-gray-700 hover:text-blue-600"}`}
               >
-                <a 
-                  href={`#${heading.id}`} 
+                <a
+                  href={`#${heading.id}`}
                   className="flex items-center py-1"
                   onClick={() => setIsTocOpen(false)}
                 >
-                  <ChevronRight className={`mr-2 flex-shrink-0 ${heading.level === 2 ? 'h-4 w-4' : 'h-3 w-3'}`} />
+                  <ChevronRight
+                    className={`mr-2 flex-shrink-0 ${heading.level === 2 ? "h-4 w-4" : "h-3 w-3"}`}
+                  />
                   <span className="truncate">{heading.text}</span>
                 </a>
               </li>
@@ -383,7 +391,7 @@ const DocumentationPage: React.FC = () => {
 
         {/* Overlay for mobile TOC */}
         {isTocOpen && (
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
             onClick={() => setIsTocOpen(false)}
           />
@@ -400,38 +408,133 @@ const DocumentationPage: React.FC = () => {
             remarkPlugins={[remarkGfm]}
             components={{
               h1: ({ node, ...props }) => {
-                const id = props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-                return <h1 id={id} {...props} className={`text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-800 mt-6 md:mt-8 mb-3 md:mb-4 border-b pb-2 ${activeSection === id ? 'text-blue-700' : ''}`} />;
+                const id = props.children
+                  ?.toString()
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]+/g, "-")
+                  .replace(/^-+|-+$/g, "");
+                return (
+                  <h1
+                    id={id}
+                    {...props}
+                    className={`text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-800 mt-6 md:mt-8 mb-3 md:mb-4 border-b pb-2 ${activeSection === id ? "text-blue-700" : ""}`}
+                  />
+                );
               },
               h2: ({ node, ...props }) => {
-                const id = props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-                return <h2 id={id} {...props} className={`text-xl md:text-2xl lg:text-3xl font-bold text-gray-700 mt-5 md:mt-6 mb-2 md:mb-3 border-b pb-1 ${activeSection === id ? 'text-blue-600' : ''}`} />;
+                const id = props.children
+                  ?.toString()
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]+/g, "-")
+                  .replace(/^-+|-+$/g, "");
+                return (
+                  <h2
+                    id={id}
+                    {...props}
+                    className={`text-xl md:text-2xl lg:text-3xl font-bold text-gray-700 mt-5 md:mt-6 mb-2 md:mb-3 border-b pb-1 ${activeSection === id ? "text-blue-600" : ""}`}
+                  />
+                );
               },
               h3: ({ node, ...props }) => {
-                const id = props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-                return <h3 id={id} {...props} className={`text-lg md:text-xl lg:text-2xl font-semibold text-gray-600 mt-4 md:mt-5 mb-2 ${activeSection === id ? 'text-blue-500' : ''}`} />;
+                const id = props.children
+                  ?.toString()
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]+/g, "-")
+                  .replace(/^-+|-+$/g, "");
+                return (
+                  <h3
+                    id={id}
+                    {...props}
+                    className={`text-lg md:text-xl lg:text-2xl font-semibold text-gray-600 mt-4 md:mt-5 mb-2 ${activeSection === id ? "text-blue-500" : ""}`}
+                  />
+                );
               },
               h4: ({ node, ...props }) => {
-                const id = props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-                return <h4 id={id} {...props} className={`text-base md:text-lg lg:text-xl font-semibold text-gray-500 mt-3 md:mt-4 mb-1 ${activeSection === id ? 'text-blue-400' : ''}`} />;
+                const id = props.children
+                  ?.toString()
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]+/g, "-")
+                  .replace(/^-+|-+$/g, "");
+                return (
+                  <h4
+                    id={id}
+                    {...props}
+                    className={`text-base md:text-lg lg:text-xl font-semibold text-gray-500 mt-3 md:mt-4 mb-1 ${activeSection === id ? "text-blue-400" : ""}`}
+                  />
+                );
               },
-              p: ({ node, ...props }) => <p {...props} className="mb-4 leading-relaxed text-gray-700" />,
-              ul: ({ node, ...props }) => <ul {...props} className="list-disc list-inside mb-4 space-y-1 text-gray-700" />,
-              ol: ({ node, ...props }) => <ol {...props} className="list-decimal list-inside mb-4 space-y-1 text-gray-700" />,
+              p: ({ node, ...props }) => (
+                <p {...props} className="mb-4 leading-relaxed text-gray-700" />
+              ),
+              ul: ({ node, ...props }) => (
+                <ul
+                  {...props}
+                  className="list-disc list-inside mb-4 space-y-1 text-gray-700"
+                />
+              ),
+              ol: ({ node, ...props }) => (
+                <ol
+                  {...props}
+                  className="list-decimal list-inside mb-4 space-y-1 text-gray-700"
+                />
+              ),
               li: ({ node, ...props }) => <li {...props} className="mb-1" />,
-              strong: ({ node, ...props }) => <strong {...props} className="font-bold text-blue-800" />,
-              a: ({ node, ...props }) => <a {...props} className="text-blue-600 hover:underline" />,
-              table: ({ node, ...props }) => <table {...props} className="min-w-full divide-y divide-gray-200 my-6" />,
-              thead: ({ node, ...props }) => <thead {...props} className="bg-gray-50" />,
-              th: ({ node, ...props }) => <th {...props} className="px-4 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" />,
-              tbody: ({ node, ...props }) => <tbody {...props} className="bg-white divide-y divide-gray-200" />,
-              td: ({ node, ...props }) => <td {...props} className="px-4 md:px-6 py-2 md:py-4 whitespace-nowrap text-sm text-gray-700" />,
-              blockquote: ({ node, ...props }) => <blockquote {...props} className="border-l-4 border-blue-500 pl-4 italic text-gray-600 my-4" />,
+              strong: ({ node, ...props }) => (
+                <strong {...props} className="font-bold text-blue-800" />
+              ),
+              a: ({ node, ...props }) => (
+                <a {...props} className="text-blue-600 hover:underline" />
+              ),
+              table: ({ node, ...props }) => (
+                <table
+                  {...props}
+                  className="min-w-full divide-y divide-gray-200 my-6"
+                />
+              ),
+              thead: ({ node, ...props }) => (
+                <thead {...props} className="bg-gray-50" />
+              ),
+              th: ({ node, ...props }) => (
+                <th
+                  {...props}
+                  className="px-4 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                />
+              ),
+              tbody: ({ node, ...props }) => (
+                <tbody
+                  {...props}
+                  className="bg-white divide-y divide-gray-200"
+                />
+              ),
+              td: ({ node, ...props }) => (
+                <td
+                  {...props}
+                  className="px-4 md:px-6 py-2 md:py-4 whitespace-nowrap text-sm text-gray-700"
+                />
+              ),
+              blockquote: ({ node, ...props }) => (
+                <blockquote
+                  {...props}
+                  className="border-l-4 border-blue-500 pl-4 italic text-gray-600 my-4"
+                />
+              ),
               code: ({ node, inline, ...props }) => {
                 if (inline) {
-                  return <code {...props} className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono text-red-600" />;
+                  return (
+                    <code
+                      {...props}
+                      className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono text-red-600"
+                    />
+                  );
                 }
-                return <pre><code {...props} className="block bg-gray-800 text-white p-4 rounded-md overflow-x-auto text-sm font-mono" /></pre>;
+                return (
+                  <pre>
+                    <code
+                      {...props}
+                      className="block bg-gray-800 text-white p-4 rounded-md overflow-x-auto text-sm font-mono"
+                    />
+                  </pre>
+                );
               },
             }}
           >
@@ -443,7 +546,8 @@ const DocumentationPage: React.FC = () => {
       {/* Current section indicator for mobile */}
       <div className="lg:hidden fixed bottom-4 left-0 right-0 flex justify-center">
         <div className="bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg text-sm">
-          Current section: {headings.find(h => h.id === activeSection)?.text || 'Introduction'}
+          Current section:{" "}
+          {headings.find((h) => h.id === activeSection)?.text || "Introduction"}
         </div>
       </div>
     </div>

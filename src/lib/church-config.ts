@@ -33,8 +33,8 @@ interface ChurchConfig {
 }
 
 export const churchConfig: ChurchConfig = {
-  name: "Kenya Assemblies of God, Eldoret, Kasarani",
-  fullName: "Kenya Assemblies of God - Central Church",
+  name: "Zion Hill, Eldoret, Kasarani",
+  fullName: "Zion Hill - Central Church",
   logo: "/images/church-image.png",
   mission:
     "To be a Christ-centered, Holy Spirit-filled, and mission-oriented church that transforms communities.",
@@ -82,9 +82,11 @@ export const churchConfig: ChurchConfig = {
     mapUrl: "https://maps.app.goo.gl/dZYSeg8TxNheYLnk7",
   },
   socials: {
-    facebook: "https://www.facebook.com/WorshipCenterKAGKasaraniEld?mibextid=ZbWKwL",
+    facebook:
+      "https://www.facebook.com/WorshipCenterKAGKasaraniEld?mibextid=ZbWKwL",
     twitter: "https://twitter.com/kagcentral",
-    youtube: "https://youtube.com/@theworshipcenterkagkasaran7523?si=ueuOyefyKVhK62PY",
+    youtube:
+      "https://youtube.com/@theworshipcenterkagkasaran7523?si=ueuOyefyKVhK62PY",
     instagram: "https://www.instagram.com/kagcentral",
   },
 };
