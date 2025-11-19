@@ -5,14 +5,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const images = [
-  "/gallery/banner-fb.jpg",
-  "/gallery/banner-fb2.jpg",
-  "/gallery/chuch-members4.jpg",
-  "/gallery/church-compound.jpg",
-  "/gallery/church-member-view.jpg",
-  "/gallery/church-members.jpg",
-  "/gallery/church-members3.jpg",
-  "/gallery/church-members5.jpg",
+  "/zion-hill-gallery/church-building1.jpg",
+  "/zion-hill-gallery/church-building2.jpeg",
+  "/zion-hill-gallery/church-building3.jpg",
+  "/zion-hill-gallery/church-members.jpg",
+  "/zion-hill-gallery/church-members2.jpg",
+  "/zion-hill-gallery/church-members3.jpg",
+  "/zion-hill-gallery/revive-church.jpg",
+  "/zion-hill-gallery/jesus-modified-img.png",
 ];
 
 interface BannerCarouselProps {

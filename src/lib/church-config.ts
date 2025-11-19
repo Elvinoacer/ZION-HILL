@@ -76,17 +76,15 @@ export const churchConfig: ChurchConfig = {
     },
   ],
   contact: {
-    email: "thewckagkasaranield@gmail.com",
-    phone: "0722 447848",
+    email: "omondielvin@gmail.com",
+    phone: "0790 670542",
     address: "P. O. Box 9644 - 20100 Nakuru City",
     mapUrl: "https://maps.app.goo.gl/dZYSeg8TxNheYLnk7",
   },
   socials: {
-    facebook:
-      "https://www.facebook.com/WorshipCenterKAGKasaraniEld?mibextid=ZbWKwL",
-    twitter: "https://twitter.com/kagcentral",
-    youtube:
-      "https://youtube.com/@theworshipcenterkagkasaran7523?si=ueuOyefyKVhK62PY",
-    instagram: "https://www.instagram.com/kagcentral",
+    facebook: "https://www.facebook.com",
+    twitter: "https://twitter.com",
+    youtube: "https://youtube.com/",
+    instagram: "https://www.instagram.com",
   },
 };

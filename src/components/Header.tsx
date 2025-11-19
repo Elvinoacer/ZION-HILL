@@ -46,13 +46,13 @@ const Header = () => {
           <div className="relative h-12 w-12 md:h-16 md:w-16 rounded-full overflow-hidden flex-shrink-0">
             <Image
               src="/images/zion-hill.png"
-              alt="The Worship Center Logo"
+              alt="The Zion Hill Logo"
               layout="fill"
               objectFit="cover"
             />
           </div>
           <span className="text-white font-semibold text-lg md:text-2xl">
-            The Worship Center
+            Zion Hill
           </span>
         </Link>
 

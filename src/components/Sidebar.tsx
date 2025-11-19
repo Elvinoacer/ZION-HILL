@@ -383,13 +383,13 @@ const SidebarContent = ({ setSidebarOpen }) => {
         <div className="flex items-center gap-3">
           <Image
             src="/images/zion-hill.png"
-            alt="The Worship Center Logo"
+            alt="The Zion Hill Logo"
             width={80}
             height={80}
             className="h-12 w-12 md:h-20 md:w-20 rounded-full object-cover"
           />
           <span className="text-lg md:text-xl font-semibold text-white">
-            The Worship Center
+            Zion HIll
           </span>
         </div>
         <button

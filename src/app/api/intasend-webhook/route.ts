@@ -1,9 +1,8 @@
-import { churchConfig } from "@/lib/church-config";
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import nodemailer from 'nodemailer';
-import { render } from '@react-email/render';
-import DonationThankYouEmail from '@/templates/DonationThankYouEmail';
+import DonationThankYouEmail from "@/templates/DonationThankYouEmail";
+import { render } from "@react-email/render";
+import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 
 export async function POST(request: Request) {
   try {
@@ -82,16 +81,18 @@ export async function POST(request: Request) {
           updatedTransaction.giving?.name ||
           "General Contribution";
 
-        const emailHtml = await render(DonationThankYouEmail({
-          name: userName,
-          amount: transactionAmount,
-          transactionId: updatedTransaction.id,
-          fund: transactionFund,
-        }));
+        const emailHtml = await render(
+          DonationThankYouEmail({
+            name: userName,
+            amount: transactionAmount,
+            transactionId: updatedTransaction.id,
+            fund: transactionFund,
+          })
+        );
 
         const transporter = nodemailer.createTransport({
           host: process.env.EMAIL_SERVER_HOST,
-          port: parseInt(process.env.EMAIL_SERVER_PORT || '587'),
+          port: parseInt(process.env.EMAIL_SERVER_PORT || "587"),
           secure: true, // true for 465, false for other ports
           auth: {
             user: process.env.EMAIL_SERVER_USER,

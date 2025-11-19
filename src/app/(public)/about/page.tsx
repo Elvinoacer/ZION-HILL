@@ -1,29 +1,26 @@
 "use client";
-import { churchConfig } from "@/lib/church-config";
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import BannerCarousel from "@/components/about/BannerCarousel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { churchConfig } from "@/lib/church-config";
+import { motion } from "framer-motion";
 import {
-  Users,
+  ArrowRight,
+  Award,
   Calendar,
+  Eye,
+  Handshake,
   Heart,
   Lightbulb,
-  Handshake,
-  Award,
   Mail,
-  XCircle,
   MapPin,
-  ArrowRight,
-  Church,
+  MessageSquare,
   Star,
   Target,
-  Eye,
-  MessageSquare,
+  XCircle,
 } from "lucide-react";
-import BannerCarousel from "@/components/about/BannerCarousel";
-import ProfileCarousel from "@/components/about/ProfileCarousel";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useState } from "react";
 
 interface Theme {
   id: string;
@@ -101,10 +98,10 @@ const AboutPage = () => {
         const hardcodedTeam = [
           {
             id: "pastor-1",
-            name: "Senior Pastor Rev. Jackson Nganga",
+            name: "Senior Pastor Rev. Dr. David",
             email: "pastor@example.com",
             whatsapp: "254722447848",
-            image: "/gallery/pastor-potrait.jpg",
+            image: "/zion-hill-gallery/church-pastor2.jpg",
             role: "Presbyter Pioneer Section",
             description: "Leads the church with a heart for the community.",
           },
@@ -113,7 +110,7 @@ const AboutPage = () => {
             name: "Worship Leader Jane",
             email: "jane@example.com",
             whatsapp: "1234567890",
-            image: "https://randomuser.me/api/portraits/women/2.jpg",
+            image: "/zion-hill-gallery/worship-leader1.jpg",
             role: "Worship Leader",
             description: "Leads the congregation in worship every Sunday.",
           },
@@ -122,7 +119,7 @@ const AboutPage = () => {
             name: "Events Coordinator Mike",
             email: "mike@example.com",
             whatsapp: "1234567890",
-            image: "https://randomuser.me/api/portraits/men/3.jpg",
+            image: "/zion-hill-gallery/events-cordinator1.jpg",
             role: "Events Coordinator",
             description: "Organizes all church events and activities.",
           },
@@ -131,7 +128,7 @@ const AboutPage = () => {
             name: "Finance Admin Sarah",
             email: "sarah@example.com",
             whatsapp: "1234567890",
-            image: "https://randomuser.me/api/portraits/women/4.jpg",
+            image: "/zion-hill-gallery/church-finance-admin1.jpg",
             role: "Finance Administrator",
             description: "Manages the church finances and budget.",
           },
@@ -243,44 +240,29 @@ const AboutPage = () => {
 
   const roleImageMapping: { [key: string]: string[] } = {
     "Senior Pastor": [
-      "/gallery/pastor-image2.jpg",
-      "/gallery/pastor-image3.jpg",
-      "/gallery/pastor-image4.jpg",
-      "/gallery/pastor-potrait.jpg",
-      "/gallery/pastor-preaching1.jpg",
-      "/gallery/pastor-preaching2.jpg",
-      "/gallery/pastor-preaching3.jpg",
-      "/gallery/pastor-preaching4.jpg",
-      "/gallery/pastor-preaching5.jpg",
-      "/gallery/pastor.jpg",
+      "/zion-hill-gallery/church-pastor.jpg",
+      "/zion-hill-gallery/church-pastor2.jpg",
     ],
     "Presbyter Pioneer Section": [
-      "/gallery/pastor-image2.jpg",
-      "/gallery/pastor-image3.jpg",
-      "/gallery/pastor-image4.jpg",
-      "/gallery/pastor-potrait.jpg",
-      "/gallery/pastor-preaching1.jpg",
-      "/gallery/pastor-preaching2.jpg",
-      "/gallery/pastor-preaching3.jpg",
-      "/gallery/pastor-preaching4.jpg",
-      "/gallery/pastor-preaching5.jpg",
-      "/gallery/pastor.jpg",
+      "/zion-hill-gallery/church-pastor.jpg",
+      "/zion-hill-gallery/church-pastor2.jpg",
     ],
     "Worship Leader": [
-      "/gallery/relative-pastor2.jpg",
-      "/gallery/relative-pastor4.jpg",
-      "/gallery/relative-pastor5.jpg",
-      "/gallery/relative-pastor6.jpg",
-      "/gallery/relative-pastor.jpg",
+      "/zion-hill-gallery/worship-leader1.jpg",
+      "/zion-hill-gallery/worship-leader2.jpg",
+      "/zion-hill-gallery/worship-leader3.jpg",
+      "/zion-hill-gallery/worship-leader4.jpg",
     ],
     "Events Coordinator": [
-      "/gallery/kids-member2.jpg",
-      "/gallery/kids-members.jpg",
+      "/zion-hill-gallery/events-cordinator1.jpg",
+      "/zion-hill-gallery/events-coordinator2.jpeg",
+      "/zion-hill-gallery/events-coordinator3.jpeg",
     ],
     "Finance Administrator": [
-      "/gallery/church-members.jpg",
-      "/gallery/church-members3.jpg",
-      "/gallery/church-members5.jpg",
+      "/zion-hill-gallery/church-finance-admin1.jpg",
+      "/zion-hill-gallery/church-finance-admin2.webp",
+      "/zion-hill-gallery/church-finance-admin3.jpg",
+      "/zion-hill-gallery/church-finance-admin4.jpeg",
     ],
   };
 
@@ -631,7 +613,7 @@ const AboutPage = () => {
                           <img
                             src={person.image}
                             alt={person.name || ""}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover object-top"
                           />
                         ) : (
                           person.name?.charAt(0) ||
@@ -647,12 +629,6 @@ const AboutPage = () => {
                       <p className="text-xs text-blue-400 font-medium sm:text-sm">
                         {person.role || "Church Leader"}
                       </p>
-                      {person.role && roleImageMapping[person.role] && (
-                        <ProfileCarousel
-                          images={roleImageMapping[person.role]}
-                          isMobile={isMobile}
-                        />
-                      )}
                       <p className="text-xs text-slate-400 mt-1 sm:text-sm">
                         {person.description}
                       </p>
