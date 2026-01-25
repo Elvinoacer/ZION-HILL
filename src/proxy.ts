@@ -24,10 +24,10 @@ const rolePermissions: { [key: string]: string[] } = {
 };
 
 export default withAuth(
-  function middleware(req) {
+  function proxy(req) {
     const token = req.nextauth.token;
     const pathname = req.nextUrl.pathname;
-    const userRoles = token?.roles || [];
+    const userRoles = (token?.roles || []) as string[];
 
     const protectedPath = Object.keys(rolePermissions).find((path) =>
       pathname.startsWith(path)
