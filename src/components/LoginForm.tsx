@@ -135,50 +135,52 @@ export const LoginForm = () => {
             <div className="grid gap-2">
               <Label
                 htmlFor="otp"
-                className="text-sm sm:text-base font-medium text-gray-700 flex items-center gap-2"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1"
               >
-                <Lock className="h-4 w-4" /> One-Time Password
+                <Lock className="h-4 w-4 text-blue-500" /> One-Time Password
               </Label>
               <Input
                 type="text"
                 id="otp"
-                placeholder="123456"
+                placeholder="Enter 6-digit code"
                 {...otpForm.register("otp")}
-                className="rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all"
+                className="h-12 rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-center text-lg tracking-widest"
+                maxLength={6}
               />
               {otpForm.formState.errors.otp && (
-                <p className="text-red-500 text-xs">
+                <p className="text-red-500 text-xs mt-1 font-medium bg-red-50 p-2 rounded">
                   {otpForm.formState.errors.otp.message}
                 </p>
               )}
             </div>
-            <div className="text-center text-sm text-gray-500">
+            <div className="text-center text-sm text-gray-500 my-4">
               {countdown > 0 ? (
-                <p>OTP expires in {countdown} seconds</p>
+                <p>Code expires in <span className="font-semibold text-blue-600">{countdown}s</span></p>
               ) : (
                 <Button
                   type="button"
                   variant="link"
                   onClick={() => handleGenerateOtp(form.getValues())}
                   disabled={form.formState.isSubmitting}
+                  className="text-blue-600 p-0 h-auto font-medium"
                 >
-                  Resend OTP
+                  Resend Code
                 </Button>
               )}
             </div>
             <Button
               type="submit"
               disabled={otpForm.formState.isSubmitting || countdown === 0 || isRedirecting}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg py-2.5 transition-all duration-300"
+              className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
             >
               {isRedirecting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
-                  Redirecting...
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />{" "}
+                  Logging in...
                 </>
               ) : otpForm.formState.isSubmitting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />{" "}
                   Verifying...
                 </>
               ) : (
@@ -202,19 +204,19 @@ export const LoginForm = () => {
             <div className="grid gap-2">
               <Label
                 htmlFor="email"
-                className="text-sm sm:text-base font-medium text-gray-700 flex items-center gap-2"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1"
               >
-                <Mail className="h-4 w-4" /> Email
+                <Mail className="h-4 w-4 text-gray-400" /> Email Address
               </Label>
               <Input
                 type="email"
                 id="email"
-                placeholder="m@example.com"
+                placeholder="you@example.com"
                 {...form.register("email")}
-                className="rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all"
+                className="h-11 rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               />
               {form.formState.errors.email && (
-                <p className="text-red-500 text-xs">
+                <p className="text-red-500 text-xs mt-1 font-medium">
                   {form.formState.errors.email.message}
                 </p>
               )}
@@ -222,59 +224,64 @@ export const LoginForm = () => {
             <div className="grid gap-2 relative">
               <Label
                 htmlFor="password"
-                className="text-sm sm:text-base font-medium text-gray-700 flex items-center gap-2"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1"
               >
-                <Lock className="h-4 w-4" /> Password
+                <Lock className="h-4 w-4 text-gray-400" /> Password
               </Label>
-              <Input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                {...form.register("password")}
-                className="rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all pr-10"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute right-1 top-8 h-7 w-7"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </Button>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  placeholder="••••••••"
+                  {...form.register("password")}
+                  className="h-11 rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1 h-9 w-9 text-gray-400 hover:text-gray-600"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
               {form.formState.errors.password && (
-                <p className="text-red-500 text-xs">
+                <p className="text-red-500 text-xs mt-1 font-medium">
                   {form.formState.errors.password.message}
                 </p>
               )}
             </div>
             <AnimatePresence>
               {error && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="text-red-500 text-sm text-center"
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="p-3 rounded-lg bg-red-50 border border-red-100"
                 >
-                  {error}
-                </motion.p>
+                  <p className="text-red-600 text-xs text-center font-medium">
+                    {error}
+                  </p>
+                </motion.div>
               )}
             </AnimatePresence>
             <Button
               type="submit"
               disabled={form.formState.isSubmitting}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg py-2.5 transition-all duration-300"
+              className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
             >
               {form.formState.isSubmitting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
-                  Please wait
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />{" "}
+                  Sending Code...
                 </>
               ) : (
-                "Get OTP"
+                "Continue with Email"
               )}
             </Button>
           </form>

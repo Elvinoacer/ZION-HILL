@@ -18,13 +18,13 @@ export const SocialLogin = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 mt-6">
-      <div className="relative">
+    <div className="flex flex-col gap-4">
+      <div className="relative my-2">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-gray-300" />
+          <span className="w-full border-t border-gray-200" />
         </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-2 text-gray-500">Or continue with</span>
+        <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
+          <span className="bg-white px-3 text-gray-400 font-semibold">Or continue with</span>
         </div>
       </div>
       <Button
@@ -32,13 +32,13 @@ export const SocialLogin = () => {
         type="button"
         disabled={isLoading}
         onClick={handleGoogleLogin}
-        className="w-full"
+        className="w-full h-11 border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-gray-700 rounded-xl transition-all duration-200 shadow-sm"
       >
         {isLoading ? (
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         ) : (
           <svg
-            className="mr-2 h-4 w-4"
+            className="mr-3 h-5 w-5"
             aria-hidden="true"
             focusable="false"
             data-prefix="fab"
@@ -53,7 +53,7 @@ export const SocialLogin = () => {
             ></path>
           </svg>
         )}
-        Google
+        <span className="font-medium">Sign in with Google</span>
       </Button>
     </div>
   );
