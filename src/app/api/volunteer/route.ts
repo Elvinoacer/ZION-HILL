@@ -15,7 +15,16 @@ export async function GET(request: Request) {
         const shifts = await prisma.volunteerShift.findMany();
         return NextResponse.json(shifts);
       case 'volunteers':
-        const volunteers = await prisma.user.findMany({ where: { roles: { has: 'VOLUNTEER' } } });
+        const volunteers = await prisma.user.findMany({
+          where: { roles: { has: 'VOLUNTEER' } },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            roles: true
+          }
+        });
         return NextResponse.json(volunteers);
       case 'needs':
         // This is a placeholder. You'll need to define how to calculate these needs.

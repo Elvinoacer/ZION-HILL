@@ -190,9 +190,11 @@ const ChatPage = () => {
         messageContent = `${newMessage} ${fileUrl}`.trim();
       }
 
-      await axios.post("/api/pusher", {
+      // Updated to use the standard messages endpoint
+      await axios.post("/api/messages", {
         content: messageContent,
         senderId: session.user.id,
+        // Optional: subject: "Community Message",
       });
 
       setNewMessage("");

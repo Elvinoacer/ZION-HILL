@@ -24,7 +24,18 @@ export async function GET(request: Request) {
         const documentTemplates = await prisma.asset.findMany({ where: { type: 'TEMPLATE' } });
         return NextResponse.json(documentTemplates);
       case 'users':
-        const users = await prisma.user.findMany();
+        const users = await prisma.user.findMany({
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            roles: true,
+            isActive: true,
+            profileComplete: true,
+            createdAt: true,
+          }
+        });
         return NextResponse.json(users);
       default:
         return NextResponse.json({ error: 'Invalid data type' }, { status: 400 });

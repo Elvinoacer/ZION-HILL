@@ -8,6 +8,7 @@ import { SignupForm } from "./SignupForm";
 import Link from "next/link";
 import { churchConfig } from "@/lib/church-config";
 import * as Tabs from "@radix-ui/react-tabs";
+import { SocialLogin } from "./SocialLogin";
 
 import Image from "next/image";
 
@@ -80,6 +81,9 @@ const AuthForm = () => {
                 </Link>
               </p>
             </CardContent>
+            <div className="px-6 sm:px-8 pb-6 sm:pb-8">
+              <SocialLogin />
+            </div>
           </Tabs.Root>
         </Card>
       </motion.div>

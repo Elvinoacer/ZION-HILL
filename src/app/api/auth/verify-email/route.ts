@@ -77,11 +77,16 @@ export async function GET(request: Request) {
       secure: process.env.NODE_ENV === 'production',
     });
 
-    // Redirect to the profile setup page, which will now have a valid session
+    // Redirect to the profile setup page, passing the original callbackUrl
     const callbackUrl = searchParams.get('callbackUrl');
-    const redirectPath = callbackUrl || '/member/giving';
-    const redirectUrl = new URL(redirectPath, request.url);
-    return NextResponse.redirect(redirectUrl);
+    
+    // Construct redirect to setup-profile, preserving the ultimate destination
+    const setupUrl = new URL('/setup-profile', request.url);
+    if (callbackUrl) {
+      setupUrl.searchParams.set('callbackUrl', callbackUrl);
+    }
+    
+    return NextResponse.redirect(setupUrl);
 
   } catch (error) {
     console.error('Email verification error:', error);

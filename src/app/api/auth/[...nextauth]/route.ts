@@ -2,11 +2,17 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -49,6 +55,7 @@ export const authOptions = {
         token.id = user.id;
         token.roles = user.roles;
         token.photo = user.photo;
+        token.profileComplete = user.profileComplete;
       }
       return token;
     },
@@ -57,6 +64,8 @@ export const authOptions = {
         session.user.id = token.id;
         session.user.roles = token.roles;
         session.user.photo = token.photo;
+        // @ts-expect-error - Adding custom property to session user
+        session.user.profileComplete = token.profileComplete;
       }
       return session;
     },

@@ -25,7 +25,16 @@ export async function PUT(
           connect: { id: roleId },
         },
       },
-      include: { roles: true },
+      select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          roles: true,
+          isActive: true,
+          profileComplete: true,
+          createdAt: true,
+      }
     });
 
     return NextResponse.json(updatedUser);

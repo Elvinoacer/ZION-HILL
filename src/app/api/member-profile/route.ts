@@ -74,6 +74,16 @@ export async function PUT(req: NextRequest) {
         birthdate,
         photo,
       },
+      select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          address: true,
+          membersince: true,
+          birthdate: true,
+          photo: true,
+      }
     });
 
     return NextResponse.json(updatedUser);

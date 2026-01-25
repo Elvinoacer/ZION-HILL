@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { pusherServer } from "@/lib/pusher";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -43,37 +44,59 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { senderId, recipientId, subject, content, eventId, type } = body;
 
-  console.log("Received message POST body:", body); // Added logging
+  console.log("Received message POST body:", body);
 
-  if (!senderId || !recipientId || !subject || !content) {
+  if (!senderId || !content) {
     console.error(
-      "Validation failed: Missing required fields for message creation."
-    ); // Added logging
+      "Validation failed: Missing senderId or content."
+    );
     return NextResponse.json(
-      { error: "Sender, recipient, subject, and content are required" },
+      { error: "Sender and content are required" },
       { status: 400 }
     );
   }
+
+  // Default values for community chat if not provided
+  const finalSubject = subject || "Community Message";
+  const finalRecipientId = recipientId || null;
 
   try {
     const newMessage = await prisma.message.create({
       data: {
         senderId,
-        recipientId,
-        subject,
+        recipientId: finalRecipientId,
+        subject: finalSubject,
         content,
         eventId,
-        type,
+        type: type || "GENERAL",
+      },
+      include: { 
+        sender: { select: { name: true, email: true, image: true } } 
       },
     });
-    console.log("Message created successfully:", newMessage); // Added logging
+
+    console.log("Message created successfully:", newMessage.id);
+
+    // Trigger Pusher event
+    // We use the same channel 'chat-channel' as the frontend expects
+    await pusherServer.trigger("chat-channel", "new-message", newMessage);
+
+    // Trigger FCM notification (Fire and forget, don't await blocking response)
+    // Using relative URL or internal service would be better, but keeping consistent with previous logic for now
+    if (process.env.NEXT_PUBLIC_APP_URL) {
+       fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/fcm/send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: newMessage, senderId }),
+      }).catch(err => console.error("FCM Send Error:", err));
+    }
+
     return NextResponse.json(newMessage, { status: 201 });
   } catch (error: any) {
-    // Explicitly type error as any for easier access to message
-    console.error("Error creating message:", error.message); // Log error message
-    // Check for specific Prisma errors if needed
+    console.error("Error creating message:", error.message);
     if (error.code === "P2003") {
-      // Foreign key constraint failed
       return NextResponse.json(
         { error: "Invalid sender or recipient ID" },
         { status: 400 }

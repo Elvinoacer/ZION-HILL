@@ -51,6 +51,16 @@ export async function POST(request: Request) {
           push: RoleName.COUNSELOR,
         },
       },
+      select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          roles: true,
+          isActive: true,
+          profileComplete: true,
+          createdAt: true,
+      }
     });
 
     return NextResponse.json(updatedUser);
@@ -90,6 +100,16 @@ export async function DELETE(request: Request) {
       data: {
         roles: updatedRoles,
       },
+      select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          roles: true,
+          isActive: true,
+          profileComplete: true,
+          createdAt: true,
+      }
     });
 
     return NextResponse.json(updatedUser);

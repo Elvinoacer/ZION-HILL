@@ -3,7 +3,18 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        roles: true,
+        isActive: true,
+        profileComplete: true,
+        createdAt: true,
+      }
+    });
     return NextResponse.json(users);
   } catch (error) {
     console.error('Failed to fetch users', error);
@@ -28,11 +39,33 @@ export async function PUT(request: Request) {
       updatedUser = await prisma.user.update({
         where: { id },
         data: { familyId },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          roles: true,
+          isActive: true,
+          profileComplete: true,
+          createdAt: true,
+          familyId: true
+        }
       });
     } else if (type === "remove") {
       updatedUser = await prisma.user.update({
         where: { id },
         data: { familyId: null },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          roles: true,
+          isActive: true,
+          profileComplete: true,
+          createdAt: true,
+          familyId: true
+        }
       });
     } else {
       return NextResponse.json({ error: "Invalid type" }, { status: 400 });

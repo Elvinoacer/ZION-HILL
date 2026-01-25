@@ -229,7 +229,9 @@ const SetupProfilePage = () => {
 
   // @ts-expect-error
   if (session?.user?.profileComplete) {
-    router.push("/member/dashboard");
+    const searchParams = new URLSearchParams(window.location.search);
+    const callbackUrl = searchParams.get("callbackUrl");
+    router.push(callbackUrl || "/member/dashboard");
     return null;
   }
 
@@ -255,7 +257,10 @@ const SetupProfilePage = () => {
         body: JSON.stringify(formData),
       });
       toast.success("Profile setup complete! Welcome!");
-      router.push("/member/dashboard");
+      
+      const searchParams = new URLSearchParams(window.location.search);
+      const callbackUrl = searchParams.get("callbackUrl");
+      router.push(callbackUrl || "/member/dashboard");
     } catch (error) {
       toast.error("Failed to complete profile setup.");
     } finally {

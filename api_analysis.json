@@ -1,0 +1,1702 @@
+[
+  {
+    "path": "/api/admin-command-center",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/admin-command-center/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/admin-dashboard",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/admin-dashboard/route.ts",
+    "methods": [
+      "GET",
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/admin/bible-study/course/[courseId]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/admin/bible-study/course/[courseId]/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/admin/budgets",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/admin/budgets/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/admin/counseling",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/admin/counseling/route.ts",
+    "methods": [
+      "GET",
+      "PATCH"
+    ]
+  },
+  {
+    "path": "/api/admin/expenses",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/admin/expenses/route.ts",
+    "methods": [
+      "GET",
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/admin/financial-settings",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/admin/financial-settings/route.ts",
+    "methods": [
+      "GET",
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/all-families",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/all-families/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/analytics/service-duration",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/analytics/service-duration/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/analytics/team-participation",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/analytics/team-participation/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/analytics/top-songs",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/analytics/top-songs/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/announcements",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/announcements/route.ts",
+    "methods": [
+      "POST",
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/announcements/broadcast",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/announcements/broadcast/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/announcements/send",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/announcements/send/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/ask-the-pastor",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/ask-the-pastor/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/audit-logs",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/audit-logs/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/auth/forgot-password",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/auth/forgot-password/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/auth/generate-otp",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/auth/generate-otp/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/auth/resend-verification",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/auth/resend-verification/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/auth/reset-password",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/auth/reset-password/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/auth/verify-email",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/auth/verify-email/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/auth/verify-otp",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/auth/verify-otp/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/baptism-applications",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/baptism-applications/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/baptism-candidates",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/baptism-candidates/route.ts",
+    "methods": [
+      "GET",
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/bible-reading-plans",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-reading-plans/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/bible-reading-plans/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-reading-plans/[id]/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/bible-study",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-study/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/bible-study/course",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-study/course/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/bible-study/course/[courseId]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-study/course/[courseId]/route.ts",
+    "methods": [
+      "GET",
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/bible-study/course/[courseId]/enroll",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-study/course/[courseId]/enroll/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/bible-study/course/[courseId]/lesson",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-study/course/[courseId]/lesson/route.ts",
+    "methods": [
+      "POST",
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/bible-study/lesson/[lessonId]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-study/lesson/[lessonId]/route.ts",
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/bible-study/lesson/[lessonId]/question",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-study/lesson/[lessonId]/question/route.ts",
+    "methods": [
+      "POST",
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/bible-study/lesson/[lessonId]/submit",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-study/lesson/[lessonId]/submit/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/bible-study/lesson/reorder",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-study/lesson/reorder/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/bible-study/my-certificates",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-study/my-certificates/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/bible-study/my-progress",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-study/my-progress/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/bible-study/question/[questionId]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/bible-study/question/[questionId]/route.ts",
+    "methods": [
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/birthday-wishes",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/birthday-wishes/route.ts",
+    "methods": [
+      "POST",
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/birthdays",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/birthdays/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/blog",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/blog/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/brand-engagement",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/brand-engagement/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/canvas-designs",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/canvas-designs/route.ts",
+    "methods": [
+      "POST",
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/canvas-designs/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/canvas-designs/[id]/route.ts",
+    "methods": [
+      "GET",
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/certificate/[certificateId]/download",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/certificate/[certificateId]/download/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/certificates",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/certificates/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/certificates/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/certificates/[id]/route.ts",
+    "methods": [
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/certificates/[id]/url",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/certificates/[id]/url/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/certificates/public",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/certificates/public/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/church-admin",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/church-admin/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/counseling-requests",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/counseling-requests/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/counseling-requests/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/counseling-requests/[id]/route.ts",
+    "methods": [
+      "PATCH"
+    ]
+  },
+  {
+    "path": "/api/counseling-sessions",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/counseling-sessions/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/counseling-topics",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/counseling-topics/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/counselor/clients",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/counselor/clients/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/counselor/sessions",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/counselor/sessions/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/counselors",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/counselors/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/courses/[courseId]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/courses/[courseId]/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/crisis-intervention",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/crisis-intervention/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/cron/send-birthday-notifications",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/cron/send-birthday-notifications/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/daily-rooms",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/daily-rooms/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/devotionals",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/devotionals/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/digital-hub",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/digital-hub/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/discipleship",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discipleship/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/discipleship-admin",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discipleship-admin/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/discipleship-safety",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discipleship-safety/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/discussion-forums",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discussion-forums/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/discussion-forums/posts/[postId]/feedback",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discussion-forums/posts/[postId]/feedback/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/discussion-forums/posts/[postId]/user-feedback",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discussion-forums/posts/[postId]/user-feedback/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/discussion-forums/topics",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discussion-forums/topics/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/discussion-forums/topics/[topicId]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discussion-forums/topics/[topicId]/route.ts",
+    "methods": [
+      "GET",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/discussion-forums/topics/[topicId]/feedback",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discussion-forums/topics/[topicId]/feedback/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/discussion-forums/topics/[topicId]/posts",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discussion-forums/topics/[topicId]/posts/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/discussion-forums/topics/[topicId]/posts/[postId]/feedback",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discussion-forums/topics/[topicId]/posts/[postId]/feedback/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/discussion-forums/topics/[topicId]/user-feedback",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discussion-forums/topics/[topicId]/user-feedback/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/discussion-forums/topics/related",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/discussion-forums/topics/related/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/donation-plans",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/donation-plans/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/donation-plans/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/donation-plans/[id]/route.ts",
+    "methods": [
+      "GET",
+      "DELETE",
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/donations",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/donations/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/donor-records",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/donor-records/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/email/send-pastoral-email",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/email/send-pastoral-email/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/event-rsvp",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/event-rsvp/route.ts",
+    "methods": [
+      "POST",
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/events",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/events/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/events-manger-route",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/events-manger-route/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/events/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/events/[id]/route.ts",
+    "methods": [
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/events/dates",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/events/dates/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/events/rsvp",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/events/rsvp/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/families/search",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/families/search/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/family",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/family/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/family-life",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/family-life/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/family/[familyId]/members",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/family/[familyId]/members/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/fcm/send",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/fcm/send/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/fcm/subscribe",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/fcm/subscribe/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/feedback",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/feedback/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/financial-support",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/financial-support/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/financial-support/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/financial-support/[id]/route.ts",
+    "methods": [
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/financials",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/financials/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/funds",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/funds/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/get-admin-course",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/get-admin-course/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/giving",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/giving/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/giving/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/giving/[id]/route.ts",
+    "methods": [
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/giving/[id]/progress",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/giving/[id]/progress/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/giving/analytics",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/giving/analytics/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/giving/giving",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/giving/giving/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/groups",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/groups/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/institutions",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/institutions/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/intasend",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/intasend/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/intasend-checkout",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/intasend-checkout/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/intasend-webhook",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/intasend-webhook/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/kids-teens-resources",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/kids-teens-resources/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/lessons",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/lessons/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/lessons/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/lessons/[id]/route.ts",
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/link-preview",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/link-preview/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/livestream",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/livestream/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/livestream-integration",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/livestream-integration/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/livestream/view",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/livestream/view/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/media",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/media/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/member-profile",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/member-profile/route.ts",
+    "methods": [
+      "GET",
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/member/giving-history",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/member/giving-history/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/member/giving-summary",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/member/giving-summary/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/members/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/members/[id]/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/messages",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/messages/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/messages/[messageId]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/messages/[messageId]/route.ts",
+    "methods": [
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/metrics/spiritual-growth",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/metrics/spiritual-growth/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/ministries",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/ministries/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/ministries/[id]/growth-data",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/ministries/[id]/growth-data/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/ministries/check-membership",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/ministries/check-membership/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/ministry",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/ministry/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/ministry-join-requests",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/ministry-join-requests/route.ts",
+    "methods": [
+      "POST",
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/ministry-members",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/ministry-members/route.ts",
+    "methods": [
+      "POST",
+      "DELETE",
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/ministry/add-member",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/ministry/add-member/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/mission-outreach",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/mission-outreach/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/music-proposals",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/music-proposals/route.ts",
+    "methods": [
+      "POST",
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/newsletter-send",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/newsletter-send/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/newsletter-subscriptions",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/newsletter-subscriptions/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/newsletter-templates",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/newsletter-templates/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/outreach",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/outreach/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/outreach-programs",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/outreach-programs/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/parental-controls",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/parental-controls/route.ts",
+    "methods": [
+      "GET",
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/participants",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/participants/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/partners",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/partners/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/partnerships",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/partnerships/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/pastoral-care",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/pastoral-care/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/pastoral-care-analytics/followups",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/pastoral-care-analytics/followups/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/pastoral-care-analytics/trends",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/pastoral-care-analytics/trends/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/pastoral-care/messages/inbox",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/pastoral-care/messages/inbox/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/pastoral-care/messages/send",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/pastoral-care/messages/send/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/pastoral-care/messages/unread-count",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/pastoral-care/messages/unread-count/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/pastors-desk",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/pastors-desk/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/polls",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/polls/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/prayer-chain/activate",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/prayer-chain/activate/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/prayer-requests",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/prayer-requests/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/prayer-requests/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/prayer-requests/[id]/route.ts",
+    "methods": [
+      "PATCH"
+    ]
+  },
+  {
+    "path": "/api/prayer-wall",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/prayer-wall/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/profile",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/profile/route.ts",
+    "methods": [
+      "GET",
+      "PUT",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/profile/setup",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/profile/setup/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/project-applications",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/project-applications/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/projects",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/projects/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/publish",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/publish/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/pusher",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/pusher/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/register",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/register/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/register-token",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/register-token/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/resources",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/resources/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/resources-allocation",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/resources-allocation/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/revalidate-birthdays",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/revalidate-birthdays/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/roles",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/roles/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/secure-materials",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/secure-materials/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/send-email",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/send-email/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/send-notification",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/send-notification/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/send-receipt",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/send-receipt/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/sermons",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/sermons/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/services",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/services/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/sessions",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/sessions/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/song-proposals",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/song-proposals/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/song-proposals/like",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/song-proposals/like/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/song-search",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/song-search/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/sponsors",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/sponsors/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/subscribers/count",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/subscribers/count/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/testimonies-wall",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/testimonies-wall/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/theme-of-the-week",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/theme-of-the-week/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/therapists",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/therapists/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/tickets",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/tickets/route.ts",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/transaction-status",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/transaction-status/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/transactions",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/transactions/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/trips",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/trips/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/upload",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/upload/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/upload-certificate",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/upload-certificate/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/upload-document",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/upload-document/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/upload-image",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/upload-image/route.ts",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/user-counseling-sessions",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/user-counseling-sessions/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/users",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/users/route.ts",
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/users/[userId]/bible-study-enrollments",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/users/[userId]/bible-study-enrollments/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/users/[userId]/role",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/users/[userId]/role/route.ts",
+    "methods": [
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/users/all-with-roles",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/users/all-with-roles/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/users/assign-role/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/users/assign-role/[id]/route.ts",
+    "methods": [
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/users/by-role",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/users/by-role/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/users/count",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/users/count/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/users/profile",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/users/profile/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/users/revoke-role",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/users/revoke-role/route.ts",
+    "methods": [
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/users/search",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/users/search/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/users/update-role",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/users/update-role/route.ts",
+    "methods": [
+      "PUT"
+    ]
+  },
+  {
+    "path": "/api/users/with-roles",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/users/with-roles/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/vapid-public-key",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/vapid-public-key/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/volunteer",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/volunteer/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/volunteer-shifts",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/volunteer-shifts/route.ts",
+    "methods": [
+      "POST",
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/volunteer-shifts/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/volunteer-shifts/[id]/route.ts",
+    "methods": [
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/volunteering-applications",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/volunteering-applications/route.ts",
+    "methods": [
+      "POST",
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/volunteering-applications/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/volunteering-applications/[id]/route.ts",
+    "methods": [
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/volunteering-opportunities",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/volunteering-opportunities/route.ts",
+    "methods": [
+      "POST",
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/volunteering-opportunities/[id]",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/volunteering-opportunities/[id]/route.ts",
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/volunteering-opportunities/new-count",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/volunteering-opportunities/new-count/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/volunteers",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/volunteers/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/waivers",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/waivers/route.ts",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/worship-leader",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/worship-leader/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "path": "/api/worship-messages",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/worship-messages/route.ts",
+    "methods": [
+      "POST",
+      "GET"
+    ]
+  },
+  {
+    "path": "/api/worship-resources",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/worship-resources/route.ts",
+    "methods": [
+      "POST",
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "path": "/api/worship-sets",
+    "file": "/home/elvin/Projects/businesses/church-web-v2/src/app/api/worship-sets/route.ts",
+    "methods": [
+      "POST",
+      "GET",
+      "PUT"
+    ]
+  }
+]
