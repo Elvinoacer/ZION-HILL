@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
+import { RoleName } from "@prisma/client";
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
@@ -37,7 +38,7 @@ export const authOptions = {
           throw new Error("Email not verified. Please check your inbox.");
         }
 
-        if (user && (await bcrypt.compare(credentials.password, user.password))) {
+        if (user && user.password && (await bcrypt.compare(credentials.password, user.password))) {
           return user;
         }
 
@@ -64,10 +65,21 @@ export const authOptions = {
         session.user.id = token.id;
         session.user.roles = token.roles;
         session.user.photo = token.photo;
-        // @ts-expect-error - Adding custom property to session user
         session.user.profileComplete = token.profileComplete;
       }
       return session;
+    },
+  },
+  events: {
+    async createUser({ user }) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          roles: {
+            push: RoleName.MEMBER,
+          },
+        },
+      });
     },
   },
 };
