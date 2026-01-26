@@ -20,7 +20,7 @@ export async function GET() {
                 id: true, 
                 name: true, 
                 photo: true,
-                email: isAdmin, // Explicitly use boolean to fetch email only for admins
+                ...(isAdmin ? { email: true } : {}) // Use conditional spread instead of boolean flag
             } 
         },
         createdBy: { 

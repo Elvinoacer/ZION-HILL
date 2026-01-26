@@ -92,7 +92,7 @@ export async function GET(
     const pdfBytes = await pdfDoc.save();
 
     // Return the PDF with correct headers
-    return new NextResponse(pdfBytes, {
+    return new NextResponse(pdfBytes as any, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",

@@ -31,7 +31,7 @@ export async function GET(request: Request) {
         id: true,
         name: true,
         image: true,
-        email: isAdmin, // Explicit boolean for email selection
+        ...(isAdmin ? { email: true } : {}) // Use conditional spread
       },
       take: 10,
     });

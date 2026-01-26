@@ -14,17 +14,19 @@ export async function GET() {
   const isAdmin = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.SENIOR_PASTOR);
 
   try {
-    // Correctly using boolean flags for conditional fields in Prisma select
+    // Correctly using conditional object spreading to avoid passing 'false' to Prisma select
     const users = await prisma.user.findMany({
       select: {
         id: true,
         name: true,
         image: true,
-        email: isAdmin,
-        roles: isAdmin,
-        isActive: isAdmin,
-        profileComplete: isAdmin,
-        createdAt: isAdmin,
+        ...(isAdmin ? {
+            email: true,
+            roles: true,
+            isActive: true,
+            profileComplete: true,
+            createdAt: true,
+        } : {})
       }
     });
     return NextResponse.json(users);

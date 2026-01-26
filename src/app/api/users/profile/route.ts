@@ -31,14 +31,16 @@ export async function GET(request: Request) {
         image: true,
         roles: true,
         createdAt: true,
-        // Sensitive fields explicitly controlled by boolean flag
-        email: canSeePII,
-        phone: canSeePII,
-        address: canSeePII,
-        membersince: canSeePII,
-        birthdate: canSeePII,
-        photo: canSeePII,
-        christian: canSeePII,
+        // Sensitive fields via conditional spread
+        ...(canSeePII ? {
+            email: true,
+            phone: true,
+            address: true,
+            membersince: true,
+            birthdate: true,
+            photo: true,
+            christian: true,
+        } : {})
       },
     });
 
