@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { token, userId } = await req.json();
+    const { token, userId, deviceType } = await req.json();
 
     if (!token || !userId) {
       return new NextResponse("Missing token or userId", { status: 400 });
@@ -21,27 +21,22 @@ export async function POST(req: Request) {
       return new NextResponse("Forbidden: User ID mismatch", { status: 403 });
     }
 
-    // Check if the token already exists for this user
-    const existingToken = await prisma.fcmToken.findFirst({
-      where: {
-        token: token,
-        userId: userId,
+    // Upsert the token: create if new, update lastSeenAt if existing
+    await prisma.fcmToken.upsert({
+      where: { token },
+      update: {
+        lastSeenAt: new Date(),
+        userId, // update userId just in case, though it should match if token is unique per device
+        deviceType: deviceType || null,
       },
-    });
-
-    if (existingToken) {
-      return new NextResponse("Token already exists for this user", { status: 200 });
-    }
-
-    // Create new token
-    await prisma.fcmToken.create({
-      data: {
-        userId,
+      create: {
         token,
+        userId,
+        deviceType: deviceType || null,
       },
     });
 
-    return new NextResponse("Token saved", { status: 200 });
+    return new NextResponse("Token saved and refreshed", { status: 200 });
   } catch (error) {
     console.error("Error saving FCM token:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

@@ -748,6 +748,8 @@ model Message {
 model FcmToken {
   id        String   @id @default(cuid())
   token     String   @unique
+  deviceType String?  // "ANDROID", "IOS", "WEB"
+  lastSeenAt DateTime @default(now())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())

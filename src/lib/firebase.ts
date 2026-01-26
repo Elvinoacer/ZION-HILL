@@ -30,8 +30,7 @@ export const getFCMToken = async () => {
   const messaging = getMessaging(app);
   try {
     const token = await getToken(messaging, {
-      vapidKey:
-        "BCgaCgoVeI-cmxp1KSeFz6aLhPhIGqsUPp7O30H9t4uc3XRCAYLR31PQBXg4th-aZMvilTa237SofxnFf4OPZHU",
+      vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
     });
     return token;
   } catch (error) {

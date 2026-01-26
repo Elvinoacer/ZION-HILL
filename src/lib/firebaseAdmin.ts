@@ -3,10 +3,21 @@ import admin from "firebase-admin";
 import path from "path";
 
 if (!admin.apps.length) {
-  const serviceAccountPath = path.join(process.cwd(), 'church-web-app-43176-firebase-adminsdk-fbsvc-8699dc2bbd.json');
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccountPath), // Path to your service account key
-  });
+  try {
+    const serviceAccount = JSON.parse(
+      process.env.FIREBASE_SERVICE_ACCOUNT_JSON || '{}'
+    );
+
+    if (!serviceAccount.project_id) {
+        throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON is missing or invalid.");
+    }
+
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+  } catch (error) {
+    console.error("Firebase Admin Initialization Error:", error);
+  }
 }
 
 export const messaging = admin.messaging();

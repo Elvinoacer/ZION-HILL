@@ -55,6 +55,7 @@ const ChatPage = () => {
           await axios.post("/api/fcm/subscribe", {
             token,
             userId: session.user.id,
+            deviceType: "WEB",
           });
           alert("Notifications enabled!");
         }
