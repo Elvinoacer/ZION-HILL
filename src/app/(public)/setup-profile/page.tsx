@@ -104,7 +104,7 @@ const Step2 = () => {
     setIsLoading(true);
     setHasSearched(true);
     try {
-      const results = await safeFetch(`/api/families/search?query=${searchQuery}`);
+      const results = await safeFetch<any[]>(`/api/families/search?query=${searchQuery}`);
       setSearchResults(results);
     } catch (error) {
       toast.error("Failed to search for families.");
@@ -227,11 +227,11 @@ const SetupProfilePage = () => {
     return null;
   }
 
-  // @ts-expect-error
-  if (session?.user?.profileComplete) {
+  // Ensure we don't redirect if we are already in the process of submitting
+  if (session?.user?.profileComplete && !isLoading) {
     const searchParams = new URLSearchParams(window.location.search);
     const callbackUrl = searchParams.get("callbackUrl");
-    router.push(callbackUrl || "/member/dashboard");
+    window.location.href = callbackUrl || "/member/dashboard";
     return null;
   }
 
@@ -259,11 +259,11 @@ const SetupProfilePage = () => {
       toast.success("Profile setup complete! Welcome!");
       
       // Update session to get latest roles and profileComplete status
-      await sessionUpdate();
+      await sessionUpdate({});
 
       const searchParams = new URLSearchParams(window.location.search);
       const callbackUrl = searchParams.get("callbackUrl");
-      router.push(callbackUrl || "/member/dashboard");
+      window.location.href = callbackUrl || "/member/dashboard";
     } catch (error) {
       toast.error("Failed to complete profile setup.");
     } finally {
