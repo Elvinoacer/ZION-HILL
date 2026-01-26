@@ -6,21 +6,28 @@ import { RoleName } from '@prisma/client';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  if (!session || !session.user || (!session.user.roles?.includes(RoleName.ADMIN) && !session.user.roles?.includes(RoleName.SENIOR_PASTOR))) {
+  
+  if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const isAdmin = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.SENIOR_PASTOR);
+
   try {
+    // If not admin, return only sanitized user data for search/selection
     const users = await prisma.user.findMany({
       select: {
         id: true,
         name: true,
-        email: true,
         image: true,
-        roles: true,
-        isActive: true,
-        profileComplete: true,
-        createdAt: true,
+        // Admins get extra fields
+        ...(isAdmin ? {
+            email: true,
+            roles: true,
+            isActive: true,
+            profileComplete: true,
+            createdAt: true,
+        } : {})
       }
     });
     return NextResponse.json(users);
@@ -32,7 +39,7 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   const session = await getServerSession(authOptions);
-  if (!session || !session.user || (!session.user.roles?.includes(RoleName.ADMIN) && !session.user.roles?.includes(RoleName.SENIOR_PASTOR))) {
+  if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -44,6 +51,30 @@ export async function PUT(request: Request) {
 
   if (!id) {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+  }
+
+  const isAdmin = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.SENIOR_PASTOR);
+
+  // Security: Check if user has permission to modify this specific user record for family management
+  if (!isAdmin && (type === "connect" || type === "remove")) {
+      // Users can always modify themselves
+      if (id !== session.user.id) {
+          // If modifying someone else, check if current user is the owner/creator of the family
+          if (familyId) {
+             const family = await prisma.family.findUnique({
+                 where: { id: familyId },
+                 select: { createdById: true }
+             });
+             if (!family || family.createdById !== session.user.id) {
+                 return NextResponse.json({ error: 'Forbidden: You do not have permission to manage this family' }, { status: 403 });
+             }
+          } else {
+             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+          }
+      }
+  } else if (!isAdmin) {
+      // Non-family-management updates strictly require Admin
+      return NextResponse.json({ error: 'Forbidden: Administrative access required' }, { status: 403 });
   }
 
   try {

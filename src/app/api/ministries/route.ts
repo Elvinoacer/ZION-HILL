@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { RoleName } from "@prisma/client";
 
@@ -15,28 +15,30 @@ async function isAdminOrCoordinator(session: any) {
 
 export async function GET(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    const isPrivileged = await isAdminOrCoordinator(session);
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
     if (id) {
-      // Fetch a single ministry by ID with detailed includes
       const ministry = await prisma.ministry.findUnique({
         where: { id },
         include: {
           leader: {
-            select: { id: true, name: true, email: true, photo: true },
+            select: { id: true, name: true, photo: true, email: isPrivileged },
           },
           members: {
             include: {
               user: {
-                select: { id: true, name: true, image: true, email: true, photo: true },
+                select: { id: true, name: true, image: true, photo: true, email: isPrivileged },
               },
             },
           },
           groups: true,
           events: {
             where: {
-              date: { gte: new Date() }, // Only upcoming events
+              date: { gte: new Date() },
             },
           },
         },
@@ -47,7 +49,6 @@ export async function GET(request: Request) {
       }
       return NextResponse.json(ministry);
     } else {
-      // Fetch a paginated list of ministries
       const page = parseInt(searchParams.get("page") || "1", 10);
       const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
       const skip = (page - 1) * pageSize;
@@ -135,10 +136,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Missing ministry ID" }, { status: 400 });
     }
 
-    // Use transaction for manual cascade (if not handled by DB schema)
     await prisma.$transaction(async (tx) => {
-      // Cleanup events related to this ministry specifically
-      // This is a safety measure if schema cascade isn't fully set
       await tx.event.deleteMany({ where: { ministryId: id } });
       await tx.ministryMember.deleteMany({ where: { ministryId: id } });
       await tx.ministry.delete({ where: { id } });

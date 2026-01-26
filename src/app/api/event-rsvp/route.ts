@@ -1,106 +1,124 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]/route";
+import { RoleName } from "@prisma/client";
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await request.json();
-  const { eventId, userId, status } = body; // Destructure eventId, userId, status
+  const { eventId, userId, status } = body;
 
   if (!eventId || !userId || !status) {
-    return NextResponse.json({ error: "Missing required fields: eventId, userId, status" }, { status: 400 });
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  // Security: users can only RSVP for themselves unless they are Admin/Manager
+  if (userId !== session.user.id && !session.user.roles?.includes(RoleName.ADMIN) && !session.user.roles?.includes(RoleName.EVENTS_MANAGER)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
-    // 1. Get Event Capacity
     const event = await prisma.event.findUnique({
       where: { id: eventId },
-      select: { capacity: true }, // Select only capacity
+      select: { capacity: true },
     });
 
     if (!event) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
-    // 2. Count Current RSVPs
     const currentRsvps = await prisma.participant.count({
       where: { eventId: eventId },
     });
 
-    // 3. Compare with Capacity
-    // Assuming capacity is stored as an integer and 0 means unlimited or not set
-    if (event.capacity && event.capacity > 0 && currentRsvps >= event.capacity) {
-      return NextResponse.json({ error: "Event capacity reached" }, { status: 409 }); // 409 Conflict
+    if (event.capacity && parseInt(event.capacity) > 0 && currentRsvps >= parseInt(event.capacity)) {
+      return NextResponse.json({ error: "Event capacity reached" }, { status: 409 });
     }
 
-    // Check if user has already RSVP'd to this specific event
     const existingRsvp = await prisma.participant.findFirst({
-      where: {
-        eventId: eventId,
-        userId: userId,
-      },
+      where: { eventId, userId },
     });
 
     if (existingRsvp) {
       return NextResponse.json({ error: "You have already RSVP'd to this event." }, { status: 409 });
     }
 
-    // 4. Create RSVP
     const newRsvp = await prisma.participant.create({
-      data: {
-        eventId,
-        userId,
-        status,
-      },
+      data: { eventId, userId, status },
     });
     return NextResponse.json(newRsvp, { status: 201 });
   } catch (error) {
     console.error("Error creating RSVP:", error);
-    return NextResponse.json({ error: "Error creating RSVP" }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
 export async function GET(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const eventId = searchParams.get('eventId');
   const userId = searchParams.get('userId');
 
+  const isAdmin = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.EVENTS_MANAGER);
+
+  // Security: users can only fetching for themselves or be Admin/Manager for eventId queries
+  if (userId && userId !== session.user.id && !isAdmin) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (eventId && !isAdmin) {
+      // If a non-admin queries by eventId, return only THEIR rsvp for that event
+      const rsvp = await prisma.participant.findFirst({
+          where: { eventId, userId: session.user.id },
+          include: { user: { select: { id: true, name: true } } }
+      });
+      return NextResponse.json(rsvp ? [rsvp] : []);
+  }
+
   try {
     let whereClause: any = {};
+    if (eventId) whereClause.eventId = eventId;
+    if (userId) whereClause.userId = userId;
 
-    if (eventId) {
-      whereClause.eventId = eventId;
-    }
-    if (userId) {
-      whereClause.userId = userId;
-    }
-
-    // If neither eventId nor userId is provided, return an empty array
     if (!eventId && !userId) {
-        return NextResponse.json([]);
+        // If no filter, only admins see all, others see their own
+        if (!isAdmin) whereClause.userId = session.user.id;
     }
 
     const rsvps = await prisma.participant.findMany({
       where: whereClause,
-      include: { // Include the related User model
+      include: {
         user: {
-          select: { // Select specific fields from User
+          select: {
             id: true,
             name: true,
-            email: true,
+            email: isAdmin, // Only admins get email
           },
         },
       },
     });
     return NextResponse.json(rsvps);
   } catch (error) {
-    console.error("Error fetching RSVPs:", error); // Add console.error for debugging
-    return NextResponse.json(
-      { error: "Error fetching RSVPs" },
-      { status: 500 }
-    );
+    console.error("Error fetching RSVPs:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
 export async function PUT(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
   const body = await request.json();
@@ -110,17 +128,37 @@ export async function PUT(request: Request) {
   }
 
   try {
+    const existingRsvp = await prisma.participant.findUnique({
+        where: { id },
+        select: { userId: true }
+    });
+
+    if (!existingRsvp) {
+        return NextResponse.json({ error: "RSVP not found" }, { status: 404 });
+    }
+
+    const isAdmin = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.EVENTS_MANAGER);
+
+    if (existingRsvp.userId !== session.user.id && !isAdmin) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const updatedRsvp = await prisma.participant.update({
       where: { id },
-      data: { ...body },
+      data: { status: body.status }, // Only allow status updates
     });
     return NextResponse.json(updatedRsvp);
   } catch (error) {
-    return NextResponse.json({ error: "Error updating RSVP" }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
 export async function DELETE(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
@@ -129,9 +167,20 @@ export async function DELETE(request: Request) {
   }
 
   try {
+    const existingRsvp = await prisma.participant.findUnique({
+        where: { id },
+        select: { userId: true }
+    });
+
+    const isAdmin = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.EVENTS_MANAGER);
+
+    if (existingRsvp && existingRsvp.userId !== session.user.id && !isAdmin) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     await prisma.participant.delete({ where: { id } });
     return NextResponse.json({ message: "RSVP deleted successfully" });
   } catch (error) {
-    return NextResponse.json({ error: "Error deleting RSVP" }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

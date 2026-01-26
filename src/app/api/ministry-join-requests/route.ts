@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { RoleName } from "@prisma/client";
 
@@ -55,18 +55,20 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
+  const { searchParams } = new URL(request.url);
+  let userId = searchParams.get("userId");
+  const ministryId = searchParams.get("ministryId");
+  const status = searchParams.get("status");
+
+  const isPrivileged = await isAdminOrCoordinator(session);
+
+  // Privacy logic: Generic users can only see their own requests.
+  if (!isPrivileged) {
+      // If not admin, they are forced to only see their own requests
+      userId = session.user.id;
+  }
+
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-    const ministryId = searchParams.get("ministryId");
-    const status = searchParams.get("status");
-
-    // Privacy logic: Generic users can only see their own requests. Admins/Coordinators can see all.
-    if (userId !== session.user.id && !(await isAdminOrCoordinator(session))) {
-       // Note: If they didn't provide a userId, but aren't admin, they automatically default to their own ID.
-       return NextResponse.json([], { status: 200 }); 
-    }
-
     const whereClause: any = {};
     if (userId) whereClause.userId = userId;
     if (ministryId) whereClause.ministryId = ministryId;
@@ -75,7 +77,7 @@ export async function GET(request: Request) {
     const joinRequests = await prisma.ministryJoinRequest.findMany({
       where: whereClause,
       include: {
-        user: { select: { id: true, name: true, email: true, photo: true } },
+        user: { select: { id: true, name: true, email: isPrivileged, photo: true } }, // Sanitized email
         ministry: { select: { id: true, name: true } },
       },
       orderBy: { requestedAt: "desc" },

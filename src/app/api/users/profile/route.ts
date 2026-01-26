@@ -1,12 +1,24 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../../auth/[...nextauth]/route";
+import { RoleName } from "@prisma/client";
 
 export async function GET(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
   if (!id) {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });
   }
+
+  const isAdmin = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.SENIOR_PASTOR);
+  const isSelf = session.user.id === id;
+
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -15,16 +27,19 @@ export async function GET(request: Request) {
       select: {
         id: true,
         name: true,
-        email: true,
         image: true,
-        phone: true,
-        address: true,
-        membersince: true,
-        birthdate: true,
-        photo: true,
         roles: true,
-        christian: true,
         createdAt: true,
+        // Sensitive fields only for Admins or Self
+        ...(isAdmin || isSelf ? {
+            email: true,
+            phone: true,
+            address: true,
+            membersince: true,
+            birthdate: true,
+            photo: true,
+            christian: true,
+        } : {})
       },
     });
 
@@ -34,7 +49,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error("Error fetching user profile:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
