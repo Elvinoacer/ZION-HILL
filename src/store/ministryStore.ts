@@ -39,7 +39,7 @@ export const useMinistryStore = create<MinistryState>((set) => ({
     });
     try {
       const response = await fetch(
-        `/api/ministry?page=${page}&pageSize=${pageSize}`
+        `/api/ministries?page=${page}&pageSize=${pageSize}`
       );
       if (!response.ok) {
         throw new Error(`Error fetching ministries: ${response.statusText}`);
@@ -53,7 +53,7 @@ export const useMinistryStore = create<MinistryState>((set) => ({
         loading: false,
         fetched: true,
       });
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -61,7 +61,7 @@ export const useMinistryStore = create<MinistryState>((set) => ({
   fetchMinistryMembers: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await fetch("/api/ministry?type=ministry-members");
+      const response = await fetch("/api/ministries?type=ministry-members");
       if (!response.ok) {
         throw new Error(
           `Error fetching ministry members: ${response.statusText}`
@@ -70,7 +70,7 @@ export const useMinistryStore = create<MinistryState>((set) => ({
       const data = await response.json();
       const ministryMembers = Array.isArray(data) ? data : [];
       set({ ministryMembers, loading: false });
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -78,7 +78,7 @@ export const useMinistryStore = create<MinistryState>((set) => ({
   createMinistry: async (ministry) => {
     set({ loading: true, error: null });
     try {
-      const response = await fetch("/api/ministry", {
+      const response = await fetch("/api/ministries", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,7 +93,7 @@ export const useMinistryStore = create<MinistryState>((set) => ({
         ministries: [...state.ministries, newMinistry],
         loading: false,
       }));
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -101,7 +101,7 @@ export const useMinistryStore = create<MinistryState>((set) => ({
   updateMinistry: async (ministryId, data) => {
     set({ loading: true, error: null });
     try {
-      const response = await fetch("/api/ministry", {
+      const response = await fetch("/api/ministries", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -120,7 +120,7 @@ export const useMinistryStore = create<MinistryState>((set) => ({
         ),
         loading: false,
       }));
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
@@ -128,7 +128,7 @@ export const useMinistryStore = create<MinistryState>((set) => ({
   deleteMinistry: async (ministryId) => {
     set({ loading: true, error: null });
     try {
-      const response = await fetch("/api/ministry", {
+      const response = await fetch("/api/ministries", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -144,7 +144,7 @@ export const useMinistryStore = create<MinistryState>((set) => ({
         ),
         loading: false,
       }));
-    } catch (error: unknown) {
+    } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },

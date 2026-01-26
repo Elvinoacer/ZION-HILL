@@ -51,7 +51,7 @@ const MinistryDetailPageContent = ({
       setMinistry(data);
       if (session?.user?.id) {
         const joinRequests = await safeFetch<any[]>(
-          `/api/ministry-join-requests?userId=${session.user.id}&ministryId=${id}`
+          `/api/ministries-join-requests?userId=${session.user.id}&ministryId=${id}`
         );
         setHasRequestedToJoin(joinRequests.length > 0);
       }
@@ -73,7 +73,7 @@ const MinistryDetailPageContent = ({
     }
     setIsJoining(true);
     try {
-      await safeFetch("/api/ministry-join-requests", {
+      await safeFetch("/api/ministries-join-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: session.user.id, ministryId: id }),

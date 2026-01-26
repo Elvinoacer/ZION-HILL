@@ -83,9 +83,9 @@ const AdminMinistriesPage = () => {
   const fetchData = async () => {
     try {
       const [ministriesRes, usersRes, requestsRes] = await Promise.all([
-        fetch("/api/ministry"),
+        fetch("/api/ministries"),
         fetch("/api/users"),
-        fetch("/api/ministry-join-requests?status=PENDING"),
+        fetch("/api/ministries-join-requests?status=PENDING"),
       ]);
       if (!ministriesRes.ok) throw new Error("Failed to fetch ministries");
       if (!usersRes.ok) throw new Error("Failed to fetch users");

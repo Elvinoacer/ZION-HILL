@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/route';
+import { RoleName } from '@prisma/client';
 
 export async function GET(req: NextRequest) {
-  const userId = req.nextUrl.searchParams.get('userId');
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  let userId = req.nextUrl.searchParams.get('userId');
 
   if (!userId) {
-    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+      userId = session.user.id;
+  }
+
+  // Privacy: Only the user themselves or an Admin can view the detailed profile
+  if (userId !== session.user.id && !session.user.roles?.includes(RoleName.ADMIN)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   try {
@@ -54,9 +67,19 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const userId = req.nextUrl.searchParams.get('userId');
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  let userId = req.nextUrl.searchParams.get('userId');
   if (!userId) {
-    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    userId = session.user.id;
+  }
+
+  // Security: Only the user themselves or an Admin can update the profile
+  if (userId !== session.user.id && !session.user.roles?.includes(RoleName.ADMIN)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   try {

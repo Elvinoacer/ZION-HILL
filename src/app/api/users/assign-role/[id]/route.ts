@@ -26,33 +26,31 @@ export async function PUT(
     const roleToAdd: RoleName = roleToAddString as RoleName; // Explicitly cast to RoleName enum
 
     // Check if the authenticated user has permission to assign roles
-    // Only ADMIN or COUNSELING_COORDINATOR can assign COUNSELOR role
-    // const currentUser = await prisma.user.findUnique({
-    //   where: { id: session.user.id },
-    //   select: { roles: true },
-    // });
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { roles: true },
+    });
 
-    //SECURITY NOTE: Uncomment the following lines to enforce role-based access control
-    // if (
-    //   !currentUser ||
-    //   (!currentUser.roles.includes(RoleName.ADMIN) &&
-    //     !currentUser.roles.includes(RoleName.VOLUNTEER_COORDINATOR))
-    // ) {
-    //   return new NextResponse(
-    //     "Forbidden: You do not have permission to assign roles",
-    //     { status: 403 }
-    //   );
-    // }
+    if (
+      !currentUser ||
+      (!currentUser.roles.includes(RoleName.ADMIN) &&
+        !currentUser.roles.includes(RoleName.SENIOR_PASTOR))
+    ) {
+      return new NextResponse(
+        "Forbidden: You do not have permission to assign roles",
+        { status: 403 }
+      );
+    }
 
     // Prevent non-admins from assigning ADMIN role
-    // if (
-    //   roleToAdd === RoleName.ADMIN &&
-    //   !currentUser.roles.includes(RoleName.ADMIN)
-    // ) {
-    //   return new NextResponse("Forbidden: Only ADMINs can assign ADMIN role", {
-    //     status: 403,
-    //   });
-    // }
+    if (
+      roleToAdd === RoleName.ADMIN &&
+      !currentUser.roles.includes(RoleName.ADMIN)
+    ) {
+      return new NextResponse("Forbidden: Only ADMINs can assign ADMIN role", {
+        status: 403,
+      });
+    }
 
     const userToUpdate = await prisma.user.findUnique({
       where: { id: userId },

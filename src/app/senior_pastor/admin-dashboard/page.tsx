@@ -24,7 +24,7 @@ const AdminDashboardPage = () => {
         const usersData = await usersRes.json();
 
         // Fetch total ministries
-        const ministriesRes = await fetch('/api/ministry');
+        const ministriesRes = await fetch('/api/ministries');
         if (!ministriesRes.ok) throw new Error('Failed to fetch ministries');
         const ministriesData = await ministriesRes.json();
 

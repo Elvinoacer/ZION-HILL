@@ -461,7 +461,7 @@ const WorshipLeaderDashboard = () => {
 
   const fetchMinistryMembers = async (ministryId: string) => {
     try {
-      const res = await fetch(`/api/ministry-members?ministryId=${ministryId}`);
+      const res = await fetch(`/api/ministries-members?ministryId=${ministryId}`);
       if (!res.ok) throw new Error("Failed to fetch ministry members");
       const data = await res.json();
       setCurrentMinistryMembers(data);

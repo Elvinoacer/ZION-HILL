@@ -1,13 +1,27 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/route';
+import { RoleName } from '@prisma/client';
 
 export async function GET(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1', 10);
     const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
     const skip = (page - 1) * pageSize;
-    const userId = searchParams.get('userId');
+    let userId = searchParams.get('userId');
+
+    // Security: Non-admins can only see their own donations
+    const isAdmin = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.FINANCE_ADMINISTRATOR);
+    if (!isAdmin) {
+      userId = session.user.id;
+    }
 
     const whereClause: any = {
       type: { in: ['DONATION'] },

@@ -1,16 +1,29 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]/route";
+import { RoleName } from "@prisma/client";
 
 export async function GET(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
+    let userId = searchParams.get("userId");
 
     if (!userId) {
-      return NextResponse.json(
-        { message: "User Id is require" },
-        { status: 401 }
-      );
+      userId = session.user.id;
+    }
+
+    // Security: Generic users can only see their own family association. Admins see all.
+    if (
+      userId !== session.user.id &&
+      !session.user.roles?.includes(RoleName.ADMIN)
+    ) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const families = await prisma.family.findMany({
@@ -24,26 +37,34 @@ export async function GET(request: Request) {
     });
     return NextResponse.json(families);
   } catch (error) {
+    console.error("Error fetching family data:", error);
     return NextResponse.json({ error: "Error fetching data" }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    // Security: Only create family for self as first member
     const newFamily = await prisma.family.create({
       data: {
         name: body.name,
-        createdById: body.member.id,
+        createdById: session.user.id,
         members: {
           connect: {
-            id: body.member.id,
+            id: session.user.id,
           },
         },
       },
     });
     return NextResponse.json(newFamily);
   } catch (error) {
+    console.error("Error creating family:", error);
     return NextResponse.json({ error: "Error creating data" }, { status: 500 });
   }
 }

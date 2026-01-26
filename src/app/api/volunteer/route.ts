@@ -1,10 +1,24 @@
-
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/route';
+import { RoleName } from '@prisma/client';
 
 export async function GET(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type');
+
+  // RBAC check for sensitive types
+  const isPrivileged = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.VOLUNTEER_COORDINATOR);
+  
+  if (['volunteers', 'retention-metrics'].includes(type || '') && !isPrivileged) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   try {
     switch (type) {
@@ -42,6 +56,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user || (!session.user.roles?.includes(RoleName.ADMIN) && !session.user.roles?.includes(RoleName.VOLUNTEER_COORDINATOR))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type');
   const body = await request.json();

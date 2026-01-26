@@ -3,13 +3,34 @@ import DonationThankYouEmail from "@/templates/DonationThankYouEmail";
 import { render } from "@react-email/render";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import crypto from "crypto";
 
 export async function POST(request: Request) {
   try {
-    const payload = await request.json();
+    const rawBody = await request.text();
+    const signature = request.headers.get("X-Intasend-Signature");
 
-    // TODO: Implement webhook verification (e.g., using a secret key from Intasend)
+    if (!signature) {
+      return NextResponse.json({ error: "Missing signature" }, { status: 401 });
+    }
 
+    const secret = process.env.INTASEND_SECRET_KEY;
+    if (!secret) {
+        console.error("INTASEND_SECRET_KEY is not defined");
+        return NextResponse.json({ error: "Configuration error" }, { status: 500 });
+    }
+
+    const expectedSignature = crypto
+      .createHmac("sha256", secret)
+      .update(rawBody)
+      .digest("hex");
+
+    if (signature !== expectedSignature) {
+      console.warn("Invalid webhook signature received");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    }
+
+    const payload = JSON.parse(rawBody);
     const transactionId = payload.api_ref; // This should be the transaction ID we sent
     const intasendState = payload.state; // e.g., "COMPLETE", "FAILED", "PENDING"
     const paymentMethod = payload.method; // e.g., "M-PESA", "CARD-PAYMENT"

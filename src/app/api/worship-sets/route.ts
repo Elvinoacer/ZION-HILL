@@ -158,8 +158,8 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Authorization: Only the leader who created it or an Admin can update
-    const isAdmin = session.user.roles?.includes("Admin");
+    // Authorization: Only the leader who created it or an Admin / Senior Pastor can update
+    const isAdmin = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.SENIOR_PASTOR);
     const isLeader = existingWorshipSet.leaderId === session.user.id;
 
     if (!isAdmin && !isLeader) {

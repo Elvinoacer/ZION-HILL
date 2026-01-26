@@ -582,8 +582,8 @@ model DonationFund {
   id           String         @id @default(cuid())
   name         String
   description  String?
-  goalAmount   String?
-  raisedAmount String?
+  goalAmount   Float?
+  raisedAmount Float?
   plans        DonationPlan[]
 }
 
@@ -677,10 +677,13 @@ model WaiverSignature {
 model AuditLog {
   id        String   @id @default(cuid())
   userId    String
-  action    String
-  details   String?
-  timestamp DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
+  action    String   // e.g., "DELETE_USER", "UPDATE_FINANCIALS", "ASSIGN_ROLE"
+  entity    String?  // e.g., "User", "Transaction", "WorshipSet"
+  entityId  String?
+  details   Json?    // Store payload snapshots or diffs
+  ip        String?
+  timestamp DateTime @default(now())
 }
 
 model VolunteerShift {
@@ -1090,3 +1093,4 @@ model LiveStream {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+

@@ -1,7 +1,23 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/route';
+import { RoleName } from '@prisma/client';
+
+async function isOutreachPrivileged(session: any) {
+  if (!session?.user?.roles) return false;
+  const roles = session.user.roles;
+  return roles.includes(RoleName.ADMIN) || 
+         roles.includes(RoleName.SENIOR_PASTOR) || 
+         roles.includes(RoleName.OUTREACH_PASTOR);
+}
 
 export async function GET(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const outreachPrograms = await prisma.event.findMany({ where: { type: 'EVENT' } });
     return NextResponse.json(outreachPrograms);
@@ -11,6 +27,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || !(await isOutreachPrivileged(session))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const body = await request.json();
   try {
     const newOutreachProgram = await prisma.event.create({ data: { ...body, type: 'EVENT' } });
@@ -21,6 +42,11 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || !(await isOutreachPrivileged(session))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
   const body = await request.json();
@@ -32,7 +58,7 @@ export async function PUT(request: Request) {
   try {
     const updatedOutreachProgram = await prisma.event.update({
       where: { id },
-      data: { ...body },
+      data: { ...body, type: 'EVENT' },
     });
     return NextResponse.json(updatedOutreachProgram);
   } catch (error) {
@@ -41,6 +67,11 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || !(await isOutreachPrivileged(session))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 

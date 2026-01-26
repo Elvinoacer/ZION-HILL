@@ -75,7 +75,7 @@ const MinistryDetailPage = () => {
   const fetchMinistryDetails = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/ministry?id=${id}`);
+      const res = await fetch(`/api/ministries?id=${id}`);
       if (!res.ok) throw new Error("Failed to fetch ministry details");
       const data = await res.json();
       setMinistry(data);

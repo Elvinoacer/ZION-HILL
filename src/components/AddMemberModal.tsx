@@ -74,7 +74,7 @@ const AddMemberModal = ({
     if (!selectedUser) return;
     setIsAdding(true);
     try {
-      const res = await fetch(`/api/ministry/add-member`, {
+      const res = await fetch(`/api/ministries/add-member`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -34,12 +34,12 @@ export async function POST(req: NextRequest) {
   const isWorshipLeader = session.user.roles?.includes("WORSHIP_LEADER");
   const isAdmin = session.user.roles?.includes("ADMIN");
 
-  // if (!isWorshipLeader && !isAdmin) {
-  //   return NextResponse.json(
-  //     { error: "Forbidden: You do not have permission to create resources" },
-  //     { status: 403 }
-  //   );
-  // }
+  if (!isWorshipLeader && !isAdmin) {
+    return NextResponse.json(
+      { error: "Forbidden: You do not have permission to create resources" },
+      { status: 403 }
+    );
+  }
 
   try {
     const contentType = req.headers.get("content-type");

@@ -62,6 +62,7 @@ export async function GET(request: Request) {
         email: user.email,
         roles: user.roles,
         photo: user.photo,
+        profileComplete: user.profileComplete,
         sub: user.id, // Subject, standard JWT claim
       },
     });

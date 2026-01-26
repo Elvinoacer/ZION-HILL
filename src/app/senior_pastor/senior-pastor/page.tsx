@@ -104,7 +104,7 @@ const SeniorPastorDashboard = () => {
           metricsRes,
         ] = await Promise.all([
           fetch("/api/users"),
-          fetch("/api/ministry"),
+          fetch("/api/ministries"),
           fetch("/api/events"),
           fetch("/api/prayer-requests"),
           fetch("/api/metrics/spiritual-growth"),

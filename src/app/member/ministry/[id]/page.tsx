@@ -77,7 +77,7 @@ const MinistryDetailPage = () => {
       if (!session?.user?.id || !ministry?.id) return;
       try {
         const response = await fetch(
-          `/api/ministry-members?ministryId=${ministry.id}&userId=${session.user.id}`
+          `/api/ministries-members?ministryId=${ministry.id}&userId=${session.user.id}`
         );
         if (!response.ok) {
           if (response.status === 404) {
