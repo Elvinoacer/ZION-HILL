@@ -51,7 +51,17 @@ export const authOptions = {
     maxAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === "update" && token.id) {
+         // When updating session, fetch fresh user data including roles
+         const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
+         if (dbUser) {
+            token.roles = dbUser.roles;
+            token.photo = dbUser.photo;
+            token.profileComplete = dbUser.profileComplete;
+         }
+      }
+      
       if (user) {
         token.id = user.id;
         token.roles = user.roles;

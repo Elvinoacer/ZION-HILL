@@ -194,7 +194,7 @@ const Step3 = () => {
 }
 
 const SetupProfilePage = () => {
-  const { data: session, status } = useSession();
+  const { data: session, status, update: sessionUpdate } = useSession();
   const { step, setStep, formData, setFormData } = useSetupStore();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -258,6 +258,9 @@ const SetupProfilePage = () => {
       });
       toast.success("Profile setup complete! Welcome!");
       
+      // Update session to get latest roles and profileComplete status
+      await sessionUpdate();
+
       const searchParams = new URLSearchParams(window.location.search);
       const callbackUrl = searchParams.get("callbackUrl");
       router.push(callbackUrl || "/member/dashboard");
