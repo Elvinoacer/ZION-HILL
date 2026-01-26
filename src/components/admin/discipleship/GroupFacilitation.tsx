@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Users } from "lucide-react";
-import { BibleStudy, PrayerRequest } from "@prisma/client";
+import { BibleStudy, PrayerRequest } from "@/generated/prisma";
 import { useDiscipleshipStore } from "@/store";
 
 interface GroupFacilitationProps {

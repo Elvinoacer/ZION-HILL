@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Ticket } from "@prisma/client";
+import { Ticket } from "@/generated/prisma";
 import { useAdminStore } from "@/store";
 
 interface RecentTasksProps {

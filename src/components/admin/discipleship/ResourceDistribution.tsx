@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Book } from "lucide-react";
 import { useDiscipleshipStore } from "@/store";
-import { Asset, PrayerRequest } from "@prisma/client";
+import { Asset, PrayerRequest } from "@/generated/prisma";
 
 interface ResourceDistributionProps {
   resources: Asset[];

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Share2, CheckCircle } from "lucide-react";
-import { Asset } from "@prisma/client";
+import { Asset } from "@/generated/prisma";
 import { useBrandEngagementStore } from "@/store";
 
 interface ContentCreationProps {

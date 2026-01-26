@@ -7,7 +7,7 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
-import { Event } from "@prisma/client";
+import { Event } from "@/generated/prisma";
 import { useEventStore } from "@/store";
 
 interface ServiceCalendarProps {

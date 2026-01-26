@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { FileText, Music, Download, BookOpen } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useResourceStore } from "@/store";
-import { Asset } from "@prisma/client";
+import { Asset } from "@/generated/prisma";
 
 export default function ServiceMaterials() {
   const [searchTerm, setSearchTerm] = useState("");

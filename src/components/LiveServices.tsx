@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Play, Users, Clock, Calendar } from "lucide-react";
-import { Event } from "@prisma/client";
+import { Event } from "@/generated/prisma";
 
 interface LiveServicesProps {
   services: Event[];

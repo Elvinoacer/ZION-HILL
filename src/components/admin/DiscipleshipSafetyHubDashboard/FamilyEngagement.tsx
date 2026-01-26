@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
-import { Lesson } from "@prisma/client";
+import { Lesson } from "@/generated/prisma";
 
 interface FamilyEngagementProps {
   lessons: Lesson[];

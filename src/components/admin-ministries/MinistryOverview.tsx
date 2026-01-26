@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useMinistryStore } from "@/store";
-import { Ministry } from "@prisma/client";
+import { Ministry } from "@/generated/prisma";
 
 export default function MinistryOverview() {
   const { ministries, loading, error, fetchMinistries } = useMinistryStore();

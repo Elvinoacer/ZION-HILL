@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useFamilyStore } from "@/store";
-import { User as PrismaUser } from "@prisma/client";
+import { User as PrismaUser } from "@/generated/prisma";
 
 interface AddFamilyMemberFormProps {
   familyId: string;

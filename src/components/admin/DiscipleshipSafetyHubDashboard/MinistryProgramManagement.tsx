@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Book, AlertTriangle } from "lucide-react";
 import { useDrop, useDrag } from "react-dnd";
-import { Lesson, User } from "@prisma/client";
+import { Lesson, User } from "@/generated/prisma";
 
 interface MinistryProgramManagementProps {
   lessons: Lesson[];

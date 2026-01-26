@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from "@prisma/client";
+import { User } from "@/generated/prisma";
 import { Button } from "./ui/button";
 
 interface ViewFamilyMembersModalProps {

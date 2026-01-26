@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Calendar, AlertTriangle } from "lucide-react";
-import { Event } from "@prisma/client";
+import { Event } from "@/generated/prisma";
 
 interface EventCalendarProps {
   events: Event[];

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { messaging } from "@/lib/firebaseAdmin";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { RoleName } from "@prisma/client";
+import { RoleName } from "@/generated/prisma";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);

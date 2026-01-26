@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 import { useBrandEngagementStore } from "@/store";
-import { Ticket, Asset } from "@prisma/client";
+import { Ticket, Asset } from "@/generated/prisma";
 
 interface CrisisCommunicationProps {
   alerts: Ticket[];

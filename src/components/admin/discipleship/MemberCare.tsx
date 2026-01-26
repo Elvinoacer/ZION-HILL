@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Heart, AlertTriangle } from "lucide-react";
 import { useDiscipleshipStore, useUserStore } from "@/store";
-import { User } from "@prisma/client";
+import { User } from "@/generated/prisma";
 
 export default function MemberCare() {
   const { celebrateMilestone, initiateFollowUp } = useDiscipleshipStore();

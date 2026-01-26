@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { RoleName } from "@prisma/client";
+import { RoleName } from "@/generated/prisma";
 
 // Helper to check for Administrative / Coordinator roles
 async function isAdminOrCoordinator(session: any) {

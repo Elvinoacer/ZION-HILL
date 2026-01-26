@@ -4,7 +4,7 @@ import { Package, Users } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { useEventStore, useResourceStore } from "@/store";
-import { Resource, Event, ResourceAllocation as PrismaResourceAllocation } from "@prisma/client";
+import { Resource, Event, ResourceAllocation as PrismaResourceAllocation } from "@/generated/prisma";
 
 interface ResourceAllocationProps {
   // No props needed as data is fetched from stores

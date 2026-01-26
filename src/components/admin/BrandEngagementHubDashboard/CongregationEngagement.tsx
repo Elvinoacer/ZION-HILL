@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Users } from "lucide-react";
-import { Asset } from "@prisma/client";
+import { Asset } from "@/generated/prisma";
 import { useBrandEngagementStore } from "@/store";
 
 interface CongregationEngagementProps {

@@ -1,7 +1,7 @@
 // components/BibleStudyProgress.tsx
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { BibleStudyProgress as PrismaBibleStudyProgress } from "@prisma/client";
+import { BibleStudyProgress as PrismaBibleStudyProgress } from "@/generated/prisma";
 
 interface BibleStudyProgressProps {
   overallProgress: number;

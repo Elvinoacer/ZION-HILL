@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { FeedbackType } from '@prisma/client';
+import { FeedbackType } from '@/generated/prisma';
 
 export async function POST(request: Request, { params }: { params: { topicId: string, postId: string } }) {
   try {

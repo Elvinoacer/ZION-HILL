@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Shield, AlertTriangle } from "lucide-react";
-import { User } from "@prisma/client";
+import { User } from "@/generated/prisma";
 
 interface VolunteerCoordinationProps {
   volunteers: User[];

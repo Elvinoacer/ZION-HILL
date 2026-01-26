@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AuditLog } from "@prisma/client";
+import { AuditLog } from "@/generated/prisma";
 
 interface ActivityFeedProps {
   activityLogs: AuditLog[];

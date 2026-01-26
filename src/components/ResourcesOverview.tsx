@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { Asset } from "@prisma/client";
+import { Asset } from "@/generated/prisma";
 
 interface ResourcesOverviewProps {
   resources: Asset[];

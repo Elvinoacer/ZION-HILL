@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Users, PlusCircle, X } from "lucide-react";
 import Image from "next/image";
-import { Family, User as PrismaUser } from "@prisma/client";
+import { Family, User as PrismaUser } from "@/generated/prisma";
 import { useState } from "react";
 import AddFamilyMemberForm from "./AddFamilyMemberForm";
 import { useFamilyStore } from "@/store";
