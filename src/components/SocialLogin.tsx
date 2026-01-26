@@ -9,7 +9,7 @@ import { Loader2 } from "lucide-react";
 
 export const SocialLogin = () => {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/setup-profile";
+  const callbackUrl = searchParams.get("callbackUrl") || "/member/dashboard";
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleLogin = async () => {

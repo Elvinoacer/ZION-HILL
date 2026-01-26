@@ -33,18 +33,37 @@ export default withAuth(
       pathname.startsWith(path)
     );
 
-    if (protectedPath) {
-      if (!token) {
-        return NextResponse.redirect(new URL("/auth", req.url));
+    const requiredRoles = protectedPath ? rolePermissions[protectedPath] : [];
+    
+    // 1. Unauthenticated users on protected paths
+    if (protectedPath && !token) {
+      return NextResponse.redirect(new URL("/auth", req.url));
+    }
+
+    // 2. Authenticated users
+    if (token) {
+      const isProfileComplete = !!token.profileComplete;
+      const isSetupPage = pathname === "/setup-profile";
+
+      // If profile is NOT complete and trying to access a protected dashboard
+      if (!isProfileComplete && !isSetupPage && protectedPath) {
+        return NextResponse.redirect(new URL("/setup-profile", req.url));
       }
 
-      const requiredRoles = rolePermissions[protectedPath];
-      const hasRequiredRole = requiredRoles.some((role) =>
-        userRoles.includes(role)
-      );
+      // If profile IS complete and trying to access setup page
+      if (isProfileComplete && isSetupPage) {
+        return NextResponse.redirect(new URL("/member/dashboard", req.url));
+      }
 
-      if (!hasRequiredRole) {
-        return NextResponse.redirect(new URL("/denied", req.url));
+      // 3. Role-based access control (if on protected path)
+      if (protectedPath) {
+        const hasRequiredRole = requiredRoles.some((role) =>
+          userRoles.includes(role)
+        );
+
+        if (!hasRequiredRole) {
+          return NextResponse.redirect(new URL("/denied", req.url));
+        }
       }
     }
 
@@ -85,5 +104,6 @@ export const config = {
     "/tech_media_manager/:path*",
     "/volunteer_coordinator/:path*",
     "/worship_leader/:path*",
+    "/setup-profile",
   ],
 };
