@@ -1,6 +1,6 @@
 import { PrismaClient } from "@/generated/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import EnrollButton from "./EnrollButton";
 import {
