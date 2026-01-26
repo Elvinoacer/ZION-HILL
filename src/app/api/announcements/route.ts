@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { messaging } from "@/lib/firebaseAdmin";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { RoleName } from "@/generated/prisma";
+import { sendNotification } from "@/lib/notification-service";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -30,21 +30,37 @@ export async function POST(req: NextRequest) {
 
     // Send push notification
     try {
-        const userTokens = await prisma.fcmToken.findMany();
-        const guestTokens = await prisma.token.findMany();
-        const allTokens = [...userTokens.map(t => t.token), ...guestTokens.map(t => t.token)];
+      // Fetch all active users for broadcast
+      const users = await prisma.user.findMany({
+        where: { isActive: true },
+        select: { id: true },
+      });
+      const userIds = users.map((u) => u.id);
 
-        if (allTokens.length > 0) {
-          const message = {
-            notification: { title: `New Announcement: ${title}`, body: content },
-            tokens: allTokens,
-          };
-          await messaging.sendEachForMulticast(message);
-          console.log("Announcement notification sent successfully.");
-        }
+      if (userIds.length > 0) {
+        // Use batching if necessary, but sendNotification handles basic multicast
+        // Ideally we might want to chunk this for very large user bases, 
+        // but for now we pass the list to the service which uses token query with 'in'.
+        // Note: Prisma 'in' query limit is high, but Firestore multicast limit is 500.
+        // We might need to handle chunking in the service later if not present.
+        // For simple implementations, sending all IDs is okay if under a few thousand.
+        
+        await sendNotification({
+          userIds,
+          title: `New Announcement: ${title}`,
+          body: content.substring(0, 100), // Truncate body for notification
+          data: {
+            url: "/announcements",
+            announcementId: announcement.id,
+          },
+        });
+      }
     } catch (notificationError) {
-        console.error("Error sending announcement notification:", notificationError);
-        // Continue even if notification fails
+      console.error(
+        "Error sending announcement notification:",
+        notificationError
+      );
+      // Continue even if notification fails
     }
 
     return NextResponse.json(announcement);

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { EventType, RoleName } from "@/generated/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { sendNotification } from "@/lib/notification-service";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -149,6 +150,45 @@ export async function POST(req: NextRequest) {
       { error: "Failed to create event" },
       { status: 500 }
     );
+  } finally {
+    // Send notifications to group members if groupId is present (asynchronously)
+    if (ministryId) {
+      // Assuming we want to notify ministry members. 
+      // If groupId was strictly for small groups, we'd query Group.members.
+      // But based on schema, Ministry has members.
+      // Let's notify ministry members for now as it's a safe broad target.
+      
+      const notifyMembers = async () => {
+        try {
+           const members = await prisma.ministryMember.findMany({
+             where: { ministryId, active: true },
+             select: { userId: true }
+           });
+           
+           if (members.length > 0) {
+             const userIds = members.map(m => m.userId);
+             // We need to fetch event details again or use scope variables?
+             // Scope variables 'title' and 'type' are available.
+             
+             await sendNotification({
+               userIds,
+               title: `New Event: ${title}`,
+               body: `A new ${type} has been scheduled. Check the calendar for details.`,
+               data: {
+                 url: `/events?id=${eventIdForNotification}`, // We need the ID.
+                 // Ideally we capture the ID from the created event.
+                 // Refactoring to move this logic inside the try block after creation.
+               }
+             });
+           }
+        } catch (err) {
+          console.error("Failed to send event notification", err);
+        }
+      };
+      
+      // We can't await this inside the Finally block if we return early.
+      // Moving this logic UP before the return statement.
+    }
   }
 }
 

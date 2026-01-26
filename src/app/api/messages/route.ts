@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { pusherServer } from "@/lib/pusher";
+import { sendNotification } from "@/lib/notification-service";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -83,14 +84,18 @@ export async function POST(request: Request) {
 
     // Trigger FCM notification (Fire and forget, don't await blocking response)
     // Using relative URL or internal service would be better, but keeping consistent with previous logic for now
-    if (process.env.NEXT_PUBLIC_APP_URL) {
-       fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/fcm/send`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    // Trigger FCM notification (Fire and forget, don't await blocking response)
+    if (recipientId) {
+      sendNotification({
+        userIds: [recipientId],
+        title: `New Message from ${newMessage.sender.name || "a user"}`,
+        body: content.length > 50 ? content.substring(0, 50) + "..." : content,
+        data: {
+          url: `/member/chat?senderId=${senderId}`,
+          messageId: newMessage.id,
         },
-        body: JSON.stringify({ message: newMessage, senderId }),
-      }).catch(err => console.error("FCM Send Error:", err));
+        imageUrl: newMessage.sender.image || undefined,
+      }).catch((err) => console.error("FCM Send Error:", err));
     }
 
     return NextResponse.json(newMessage, { status: 201 });
