@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { PrismaClient } from "@/generated/prisma";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 const prisma = new PrismaClient();

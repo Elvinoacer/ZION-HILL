@@ -17,7 +17,7 @@ import {
   eachYearOfInterval,
   format,
 } from "date-fns";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
