@@ -20,7 +20,7 @@ export async function GET() {
                 id: true, 
                 name: true, 
                 photo: true,
-                ...(isAdmin ? { email: true } : {}) // Only admins get family member emails
+                email: isAdmin, // Explicitly use boolean to fetch email only for admins
             } 
         },
         createdBy: { 

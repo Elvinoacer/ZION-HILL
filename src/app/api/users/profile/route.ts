@@ -18,6 +18,7 @@ export async function GET(request: Request) {
 
   const isAdmin = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.SENIOR_PASTOR);
   const isSelf = session.user.id === id;
+  const canSeePII = isAdmin || isSelf;
 
   try {
     const user = await prisma.user.findUnique({
@@ -30,16 +31,14 @@ export async function GET(request: Request) {
         image: true,
         roles: true,
         createdAt: true,
-        // Sensitive fields only for Admins or Self
-        ...(isAdmin || isSelf ? {
-            email: true,
-            phone: true,
-            address: true,
-            membersince: true,
-            birthdate: true,
-            photo: true,
-            christian: true,
-        } : {})
+        // Sensitive fields explicitly controlled by boolean flag
+        email: canSeePII,
+        phone: canSeePII,
+        address: canSeePII,
+        membersince: canSeePII,
+        birthdate: canSeePII,
+        photo: canSeePII,
+        christian: canSeePII,
       },
     });
 

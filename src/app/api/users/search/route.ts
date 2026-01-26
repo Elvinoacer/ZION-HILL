@@ -31,10 +31,9 @@ export async function GET(request: Request) {
         id: true,
         name: true,
         image: true,
-        // Only admins get email in search results
-        ...(isAdmin ? { email: true } : {})
+        email: isAdmin, // Explicit boolean for email selection
       },
-      take: 10, // Limit results for efficiency
+      take: 10,
     });
 
     return NextResponse.json(users);

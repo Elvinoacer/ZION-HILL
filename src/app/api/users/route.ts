@@ -14,20 +14,17 @@ export async function GET() {
   const isAdmin = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.SENIOR_PASTOR);
 
   try {
-    // If not admin, return only sanitized user data for search/selection
+    // Correctly using boolean flags for conditional fields in Prisma select
     const users = await prisma.user.findMany({
       select: {
         id: true,
         name: true,
         image: true,
-        // Admins get extra fields
-        ...(isAdmin ? {
-            email: true,
-            roles: true,
-            isActive: true,
-            profileComplete: true,
-            createdAt: true,
-        } : {})
+        email: isAdmin,
+        roles: isAdmin,
+        isActive: isAdmin,
+        profileComplete: isAdmin,
+        createdAt: isAdmin,
       }
     });
     return NextResponse.json(users);
@@ -55,11 +52,8 @@ export async function PUT(request: Request) {
 
   const isAdmin = session.user.roles?.includes(RoleName.ADMIN) || session.user.roles?.includes(RoleName.SENIOR_PASTOR);
 
-  // Security: Check if user has permission to modify this specific user record for family management
   if (!isAdmin && (type === "connect" || type === "remove")) {
-      // Users can always modify themselves
       if (id !== session.user.id) {
-          // If modifying someone else, check if current user is the owner/creator of the family
           if (familyId) {
              const family = await prisma.family.findUnique({
                  where: { id: familyId },
@@ -73,7 +67,6 @@ export async function PUT(request: Request) {
           }
       }
   } else if (!isAdmin) {
-      // Non-family-management updates strictly require Admin
       return NextResponse.json({ error: 'Forbidden: Administrative access required' }, { status: 403 });
   }
 
