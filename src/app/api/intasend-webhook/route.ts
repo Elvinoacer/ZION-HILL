@@ -4,6 +4,7 @@ import { render } from "@react-email/render";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
+import { sendNotification } from "@/lib/notification-service";
 
 export async function POST(request: Request) {
   try {
@@ -130,6 +131,23 @@ export async function POST(request: Request) {
         console.log("Thank you email sent successfully to:", userEmail);
       } catch (emailError) {
         console.error("Error sending thank you email:", emailError);
+      }
+
+      // Send Push Notification
+      if (updatedTransaction.userId) {
+        try {
+          await sendNotification({
+            userIds: [updatedTransaction.userId],
+            title: "Donation Received",
+            body: `Thank you for your generous gift of KES ${transactionAmount} to ${transactionFund}.`,
+            data: {
+              url: "/member/giving", // Redirect to giving history
+              transactionId: updatedTransaction.id,
+            },
+          });
+        } catch (notifyError) {
+          console.error("Error sending donation notification:", notifyError);
+        }
       }
     }
 

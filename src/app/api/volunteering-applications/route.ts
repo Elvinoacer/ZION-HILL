@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth"; // Adjust path as needed
+import { sendNotification } from "@/lib/notification-service";
 
 export async function POST(request: Request) {
   try {
@@ -43,6 +44,35 @@ export async function POST(request: Request) {
         },
       },
     });
+
+    // Notify Volunteer Coordinators
+    try {
+      // Find all users with the VOLUNTEER_COORDINATOR role
+      const coordinators = await prisma.user.findMany({
+        where: {
+          roles: {
+            has: "VOLUNTEER_COORDINATOR",
+          },
+        },
+        select: { id: true },
+      });
+
+      const coordinatorIds = coordinators.map((c) => c.id);
+
+      if (coordinatorIds.length > 0) {
+        await sendNotification({
+          userIds: coordinatorIds,
+          title: "New Volunteer Application",
+          body: `A new application has been received for opportunity #${opportunityId}.`,
+          data: {
+            url: "/volunteer_coordinator/applications", // Adjust path as per admin routes
+            applicationId: newApplication.id,
+          },
+        });
+      }
+    } catch (notifyError) {
+      console.error("Error sending volunteer notification:", notifyError);
+    }
 
     return NextResponse.json(newApplication, { status: 201 });
   } catch (error) {

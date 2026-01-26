@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendNotification } from "@/lib/notification-service";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -38,8 +39,37 @@ export async function POST(request: Request) {
   const body = await request.json();
   try {
     const newPrayerRequest = await prisma.prayerRequest.create({ data: { ...body, isPublic: true, status: body.status || 'PENDING' } });
+
+    // Notify Prayer Team
+    try {
+      const prayerTeam = await prisma.user.findMany({
+        where: {
+          roles: {
+            hasSome: ["PRAYER_MANAGER", "SENIOR_PASTOR"],
+          },
+        },
+        select: { id: true },
+      });
+
+      const teamIds = prayerTeam.map((u) => u.id);
+
+      if (teamIds.length > 0) {
+        await sendNotification({
+          userIds: teamIds,
+          title: "New Prayer Request",
+          body: `A new ${newPrayerRequest.isUrgent ? "URGENT " : ""}prayer request has been posted.`,
+          data: {
+            url: "/senior_pastor/prayer-requests", // or appropriate prayer management route
+            requestId: newPrayerRequest.id,
+          },
+        });
+      }
+    } catch (notifyError) {
+      console.error("Error sending prayer notification:", notifyError);
+    }
+
     return NextResponse.json(newPrayerRequest, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creating public prayer request:", error);
     return NextResponse.json({ error: 'Error creating public prayer request', details: error.message }, { status: 500 });
   }

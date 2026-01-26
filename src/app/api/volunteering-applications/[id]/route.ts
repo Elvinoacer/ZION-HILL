@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { sendNotification } from "@/lib/notification-service";
 
 export async function PUT(
   request: Request,
@@ -77,6 +78,23 @@ export async function PUT(
         assignedPeople: updatedAssignedPeople,
       },
     });
+
+    // Notify Applicant of status change
+    try {
+        if (status !== application.status) {
+            await sendNotification({
+                userIds: [application.applicantId],
+                title: "Application Status Update",
+                body: `Your application for ${application.opportunity.title} has been ${status.toLowerCase()}.`,
+                data: {
+                    url: "/volunteer/my-applications",
+                    applicationId: updatedApplication.id,
+                },
+            });
+        }
+    } catch (notifyError) {
+        console.error("Error sending application status notification:", notifyError);
+    }
 
     return NextResponse.json(updatedApplication);
   } catch (error) {
